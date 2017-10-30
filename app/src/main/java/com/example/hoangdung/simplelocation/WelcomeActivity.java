@@ -1,9 +1,8 @@
 package com.example.hoangdung.simplelocation;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -20,17 +19,16 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.Profile;
-import com.facebook.appevents.AppEventsLogger;
-import com.facebook.login.Login;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
-import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 public class WelcomeActivity extends AppCompatActivity {
@@ -44,6 +42,9 @@ public class WelcomeActivity extends AppCompatActivity {
     private Button mLoginBtn;
     private ImageView mBackground;
     private CallbackManager mCallbackManager;
+    //Read Permission
+    private List<String> readPermissions = Arrays.asList(
+            "emails","public_profile");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,10 +92,34 @@ public class WelcomeActivity extends AppCompatActivity {
         LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                goToMapsActivity();
-                finish();
+                GraphRequest graphRequest =  GraphRequest.newMeRequest(
+                        loginResult.getAccessToken()
+                        , new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(JSONObject object, GraphResponse response) {
+                                Intent intent = new Intent(WelcomeActivity.this,MapsActivity.class);
+                                try {
+                                    //Store User Information From Facebook into SharePreferences
+                                    SharedPreferences sharedPreferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString("email",object.getString("email"));
+                                    editor.putString("first_name",object.getString("first_name"));
+                                    editor.putString("last_name",object.getString("last_name"));
+                                    editor.putString("picture",object.getString("picture"));
+                                    editor.commit();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                goToMapsActivity();
+                                finish();
+                            }
+                        }
+                );//graphRequest
+                Bundle params = new Bundle();
+                params.putString("fields","email,first_name,last_name,picture");
+                graphRequest.setParameters(params);
+                graphRequest.executeAsync();
             }
-
             @Override
             public void onCancel() {
 
@@ -116,8 +141,9 @@ public class WelcomeActivity extends AppCompatActivity {
         WelcomeActivity.this.startActivity(intent);
     }
     private void startLogin(){
-        LoginManager.getInstance().logInWithReadPermissions(WelcomeActivity.this,Arrays.asList("email","user_photos"));
+        LoginManager.getInstance().logInWithReadPermissions(WelcomeActivity.this,readPermissions);
     }
+
     /**
      * Request Result Callback Method
      * @param requestCode
