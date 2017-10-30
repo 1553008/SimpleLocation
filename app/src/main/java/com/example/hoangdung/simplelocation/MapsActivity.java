@@ -2,8 +2,12 @@ package com.example.hoangdung.simplelocation;
 
 import android.*;
 import android.Manifest;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -13,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -33,13 +38,17 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     //For Debugging
     private String TAG = MapsActivity.class.getSimpleName();
     private int DEFAULT_ZOOM = 15;
-
+    private String mEmail;
+    private String mName;
+    private String mProfileIconURL;
     //Google Map model
     private GoogleMap mMap;
 
@@ -61,6 +70,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         mLocationProvider = LocationServices.getFusedLocationProviderClient(this);
+        initUserInfoHeader();
+        drawerLayoutSetup();
     }//onCreate
 
 
@@ -105,14 +116,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }// showLastknowLocation
     private void drawerLayoutSetup(){
-        mDrawer = new DrawerBuilder().withActivity(this).build();
+
         //Account header
         AccountHeader accountHeader = new AccountHeaderBuilder()
                 .withActivity(this)
                 .addProfiles(
-                        new ProfileDrawerItem().withEmail("").withName("").withIcon("")
+                        new ProfileDrawerItem().withEmail(mEmail).withName(mName).withIcon(mProfileIconURL)
                 )
+                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile profile, boolean current) {
+                        return false;
+                    }
+                })
                 .build();
+        //Drawer setup
+        mDrawer = new DrawerBuilder()
+                .withActivity(this)
+                .withAccountHeader(accountHeader)
+                .withTranslucentNavigationBar(true)
+                .withTranslucentStatusBar(true)
+                .build();
+
     }
     private void updateUI() {
         try{
@@ -123,5 +148,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         }
     }
-
+    private void initUserInfoHeader(){
+        SharedPreferences sharedPreferences = getSharedPreferences("UserInfo",0);
+        mEmail = sharedPreferences.getString("email","");
+        mName = sharedPreferences.getString("first_name","") + sharedPreferences.getString("last_name","");
+        mProfileIconURL = sharedPreferences.getString("picture","");
+    }
 }
