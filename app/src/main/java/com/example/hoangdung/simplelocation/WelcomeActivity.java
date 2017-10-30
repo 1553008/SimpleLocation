@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 
@@ -44,11 +45,12 @@ public class WelcomeActivity extends AppCompatActivity {
     private CallbackManager mCallbackManager;
     //Read Permission
     private List<String> readPermissions = Arrays.asList(
-            "emails","public_profile");
+            "email","public_profile");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         getLocationPermission();
         loginSetup();
 
@@ -105,7 +107,7 @@ public class WelcomeActivity extends AppCompatActivity {
                                     editor.putString("email",object.getString("email"));
                                     editor.putString("first_name",object.getString("first_name"));
                                     editor.putString("last_name",object.getString("last_name"));
-                                    editor.putString("picture",object.getString("picture"));
+                                    editor.putString("picture",object.getJSONObject("picture").getJSONObject("data").getString("url"));
                                     editor.commit();
                                 } catch (JSONException e) {
                                     e.printStackTrace();
