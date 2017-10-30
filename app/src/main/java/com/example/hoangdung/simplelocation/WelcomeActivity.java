@@ -12,14 +12,26 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.Profile;
 import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.Login;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.squareup.picasso.Picasso;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public class WelcomeActivity extends AppCompatActivity {
     //For Debugging
@@ -29,7 +41,8 @@ public class WelcomeActivity extends AppCompatActivity {
     //Delay time
     private final int delayTime = 2000;
     //Login Button
-    private LoginButton mLoginBtn;
+    private Button mLoginBtn;
+    private ImageView mBackground;
     private CallbackManager mCallbackManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,15 +67,32 @@ public class WelcomeActivity extends AppCompatActivity {
      *
      */
     private void loginSetup(){
-        mLoginBtn = findViewById(R.id.login_button);
+        mLoginBtn = findViewById(R.id.loginBtn);
+        mLoginBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startLogin();
+            }
+        });
+        mBackground = findViewById(R.id.loginBg);
+        //if already loggined
+        if(checkAlreadyLoggined()){
+            mLoginBtn.setVisibility(View.INVISIBLE);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    goToMapsActivity();
+                    finish();
+                }
+            }, delayTime);
+            return;
+        }
         mCallbackManager = CallbackManager.Factory.create();
-        mLoginBtn.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+        LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                //Go to maps activity
-                Intent intent = new Intent(WelcomeActivity.this,MapsActivity.class);
-                WelcomeActivity.this.startActivity(intent);
-                WelcomeActivity.this.finish();
+                goToMapsActivity();
+                finish();
             }
 
             @Override
@@ -75,6 +105,18 @@ public class WelcomeActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private boolean checkAlreadyLoggined(){
+        //If the user is already loggin, go straight to the MapsActivity
+        return AccessToken.getCurrentAccessToken()!= null && Profile.getCurrentProfile() != null;
+    }
+    private void goToMapsActivity(){
+        Intent intent = new Intent(WelcomeActivity.this,MapsActivity.class);
+        WelcomeActivity.this.startActivity(intent);
+    }
+    private void startLogin(){
+        LoginManager.getInstance().logInWithReadPermissions(WelcomeActivity.this,Arrays.asList("email","user_photos"));
     }
     /**
      * Request Result Callback Method
