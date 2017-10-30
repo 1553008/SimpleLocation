@@ -24,10 +24,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
@@ -36,6 +39,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //For Debugging
     private String TAG = MapsActivity.class.getSimpleName();
     private int DEFAULT_ZOOM = 15;
+
     //Google Map model
     private GoogleMap mMap;
 
@@ -45,6 +49,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Last known location
     private Location mLastknownLocation;
 
+    //Drawer Layout
+
+    private Drawer mDrawer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +80,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         showLastknownLocation();
     }//onMapReady
 
+    /**
+     * Get the Last Know Location of the user (maybe the current location)
+     */
     private void showLastknownLocation() {
        try{
            Task<Location> lastLocation = mLocationProvider.getLastLocation();
@@ -94,13 +104,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
        }
 
     }// showLastknowLocation
-
+    private void drawerLayoutSetup(){
+        mDrawer = new DrawerBuilder().withActivity(this).build();
+        //Account header
+        AccountHeader accountHeader = new AccountHeaderBuilder()
+                .withActivity(this)
+                .addProfiles(
+                        new ProfileDrawerItem().withEmail("").withName("").withIcon("")
+                )
+                .build();
+    }
     private void updateUI() {
         try{
            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(false);
         }
         catch (SecurityException e){
 
         }
     }
+
 }
