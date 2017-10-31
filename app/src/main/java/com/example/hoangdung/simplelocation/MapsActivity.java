@@ -3,12 +3,19 @@ package com.example.hoangdung.simplelocation;
 import android.*;
 import android.Manifest;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -17,8 +24,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -30,6 +41,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.vision.text.Line;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -47,6 +59,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //For Debugging
     private String TAG = MapsActivity.class.getSimpleName();
     private int DEFAULT_ZOOM = 15;
+    private int statusBarHeight = 24; //dp
     private String mEmail;
     private String mName;
     private String mProfileIconURL;
@@ -90,7 +103,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap = googleMap;
         updateUI();
         showLastknownLocation();
+
     }//onMapReady
+
+    @Override
+    protected void onResumeFragments() {
+        super.onResumeFragments();
+    }
 
     /**
      * Get the Last Know Location of the user (maybe the current location)
@@ -101,7 +120,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
            lastLocation.addOnCompleteListener(this, new OnCompleteListener<Location>() {
                @Override
                public void onComplete(@NonNull Task<Location> task) {
-                   if (task.isComplete() && task.isSuccessful()) {
+                   if (task.isComplete() && task.isSuccessful() && task.getResult()!=null) {
                        mLastknownLocation = task.getResult();
                        mMap.moveCamera(CameraUpdateFactory
                                .newLatLngZoom(
@@ -116,11 +135,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
        }
 
     }// showLastknowLocation
-    private void drawerLayoutSetup(){
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    private void drawerLayoutSetup(){
+        Window window = getWindow();
+        window.getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        );
+        //Toolbar Setup
+        Toolbar toolbar = findViewById(R.id.toolbar);
         //Account header
         AccountHeader accountHeader = new AccountHeaderBuilder()
                 .withActivity(this)
+                .withCompactStyle(false)
                 .addProfiles(
                         new ProfileDrawerItem().withEmail(mEmail).withName(mName).withIcon(mProfileIconURL)
                 )
@@ -130,25 +161,27 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         return false;
                     }
                 })
+                .withHeaderBackground(R.drawable.drawerlayoutbackground)
                 .build();
         //Drawer setup
         mDrawer = new DrawerBuilder()
                 .withActivity(this)
+                .withToolbar(toolbar)
                 .withAccountHeader(accountHeader)
-                .withTranslucentNavigationBar(true)
-                .withTranslucentStatusBar(true)
+                .withFullscreen(true)
                 .build();
 
     }
     private void updateUI() {
         try{
-           mMap.setMyLocationEnabled(true);
+            mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
         }
         catch (SecurityException e){
 
         }
     }
+
     private void initUserInfoHeader(){
         SharedPreferences sharedPreferences = getSharedPreferences("UserInfo",0);
         mEmail = sharedPreferences.getString("email","");
