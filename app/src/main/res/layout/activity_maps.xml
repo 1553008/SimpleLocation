@@ -1,44 +1,30 @@
-<android.support.design.widget.CoordinatorLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MapsActivity"
-    android:fitsSystemWindows="true">
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/appbar_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/collapsing_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_collapseMode="pin"
-                />
-        </android.support.design.widget.CollapsingToolbarLayout>
-    </android.support.design.widget.AppBarLayout>
-    <fragment
-        xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="false"
+    android:id="@+id/drawerlayout_container">
+
+    <fragment xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.example.hoangdung.simplelocation.MapsActivity"
-        />
+        tools:context="com.example.hoangdung.simplelocation.MapsActivity" />
+    <FrameLayout
+        android:id="@+id/toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|top">
+    </FrameLayout>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/floating_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        app:layout_anchor="@id/map"
-        app:layout_anchorGravity="bottom|right|end"
         />
-</android.support.design.widget.CoordinatorLayout>
+</FrameLayout>
 
