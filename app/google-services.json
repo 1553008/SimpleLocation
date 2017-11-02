@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "161715523714",
+    "firebase_url": "https://simplelocation-1508805530347.firebaseio.com",
+    "project_id": "simplelocation-1508805530347",
+    "storage_bucket": "simplelocation-1508805530347.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:161715523714:android:20e3d24719d2ffc2",
+        "android_client_info": {
+          "package_name": "com.example.hoangdung.simplelocation"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "161715523714-qqqnjm2648lnlm2ibftn3u187chgt2r2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.hoangdung.simplelocation",
+            "certificate_hash": "6fac97477f5c1ef47043b97f0b90689b41156416"
+          }
+        },
+        {
+          "client_id": "161715523714-hbh5qlsgpte5ggbkkh9r0r8s7p1l3ong.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCj4uVMWg3MkyH8PUlDy_UAsG9iQJBQ-pU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "161715523714-hbh5qlsgpte5ggbkkh9r0r8s7p1l3ong.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
