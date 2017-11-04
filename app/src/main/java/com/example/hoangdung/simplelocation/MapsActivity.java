@@ -17,6 +17,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -63,6 +64,9 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.squareup.picasso.Picasso;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, SearchFragment.SearchFragmentCallback{
 
     //For Debugging
@@ -77,6 +81,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Firebase Authentication
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
+    @BindView(R.id.floating_btn)
+    public FloatingActionButton mLocateBtn;
     //Google Map model
     private GoogleMap mMap;
 
@@ -93,6 +99,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        ButterKnife.bind(this);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -101,6 +108,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         initUserInfoHeader();
         drawerLayoutSetup();
         toolbarSetup();
+        locateButtonSetup();
     }//onCreate
 
 
@@ -236,7 +244,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         win.setAttributes(winParams);
     }
-
+    private void locateButtonSetup(){
+        //mLocateBtn = findViewById(R.id.floating_btn);
+        mLocateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showLastknownLocation();
+            }
+        });
+    }
     /**
      * SearchFragment Interface
      */

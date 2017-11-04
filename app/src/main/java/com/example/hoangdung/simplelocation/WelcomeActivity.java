@@ -47,7 +47,7 @@ public class WelcomeActivity extends AppCompatActivity {
     //Request code
     private final int FINE_LOCATION_REQUEST = 0;
     //Delay time
-    private final int delayTime = 2000;
+    private final int delayTime = 0;
     //Login Button
     public @BindView(R.id.loginBtn) Button mLoginBtn;
     private CallbackManager mCallbackManager;
@@ -122,8 +122,7 @@ public class WelcomeActivity extends AppCompatActivity {
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-                                goToMapsActivity();
-                                finish();
+
                             }
                         }
                 );//graphRequest
@@ -171,8 +170,11 @@ public class WelcomeActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
                             Log.d(TAG,"signInWithCredential:success");
+                            goToMapsActivity();
+                            finish();
                         }else{
                             Log.d(TAG,"signInWithCredential:failure");
+                            finish();
                         }
                     }
                 });
