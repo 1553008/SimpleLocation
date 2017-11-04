@@ -25,12 +25,21 @@ import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class WelcomeActivity extends AppCompatActivity {
     //For Debugging
@@ -40,9 +49,10 @@ public class WelcomeActivity extends AppCompatActivity {
     //Delay time
     private final int delayTime = 2000;
     //Login Button
-    private Button mLoginBtn;
-    private ImageView mBackground;
+    public @BindView(R.id.loginBtn) Button mLoginBtn;
     private CallbackManager mCallbackManager;
+    //Facebook and Firebase
+    private FirebaseAuth mAuth;
     //Read Permission
     private List<String> readPermissions = Arrays.asList(
             "email","public_profile");
@@ -51,6 +61,8 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        ButterKnife.bind(this);
+        initializeFirebaseAuth();
         getLocationPermission();
         loginSetup();
 
@@ -70,14 +82,12 @@ public class WelcomeActivity extends AppCompatActivity {
      *
      */
     private void loginSetup(){
-        mLoginBtn = findViewById(R.id.loginBtn);
         mLoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startLogin();
             }
         });
-        mBackground = findViewById(R.id.loginBg);
         //if already loggined
         if(checkAlreadyLoggined()){
             mLoginBtn.setVisibility(View.INVISIBLE);
@@ -121,6 +131,9 @@ public class WelcomeActivity extends AppCompatActivity {
                 params.putString("fields","email,first_name,last_name,picture");
                 graphRequest.setParameters(params);
                 graphRequest.executeAsync();
+                //FireBase Authentication
+                handleFacebookAccessToken(loginResult.getAccessToken());
+
             }
             @Override
             public void onCancel() {
@@ -145,7 +158,25 @@ public class WelcomeActivity extends AppCompatActivity {
     private void startLogin(){
         LoginManager.getInstance().logInWithReadPermissions(WelcomeActivity.this,readPermissions);
     }
-
+    //------------------------------Facebook and Firebase--------------------------------------
+    private void initializeFirebaseAuth(){
+        mAuth = FirebaseAuth.getInstance();
+    }
+    private void handleFacebookAccessToken(AccessToken token){
+        Log.d(TAG,"handleFacebookAccessToken:" + token);
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if(task.isSuccessful()){
+                            Log.d(TAG,"signInWithCredential:success");
+                        }else{
+                            Log.d(TAG,"signInWithCredential:failure");
+                        }
+                    }
+                });
+    }
     /**
      * Request Result Callback Method
      * @param requestCode

@@ -22,8 +22,8 @@ import butterknife.Unbinder;
  */
 public class SearchFragment extends Fragment {
     private AppCompatActivity mContext;
-    private @BindView(R.id.toolbar_search)Toolbar mToolbar;
-    private @BindView(R.id.search_textview) TextView mSearchTextView;
+    public @BindView(R.id.toolbar_search)Toolbar mToolbar;
+    public @BindView(R.id.search_textview) TextView mSearchTextView;
     private Unbinder mUnbinder;
     public SearchFragment() {
         // Required empty public constructor
