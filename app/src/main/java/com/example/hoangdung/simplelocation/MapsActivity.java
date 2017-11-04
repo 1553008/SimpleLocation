@@ -66,6 +66,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String mName;
     private String mProfileIconURL;
     private SearchFragment mSearchFragment;
+    private FrameLayout mToolbarContainer;
     //Google Map model
     private GoogleMap mMap;
 
@@ -83,9 +84,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        /*SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);*/
+        mapFragment.getMapAsync(this);
         mLocationProvider = LocationServices.getFusedLocationProviderClient(this);
         initUserInfoHeader();
         drawerLayoutSetup();
@@ -227,7 +228,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     /**
-     * This is called when View in SearchFragment is created
+     * SearchFragment Interface
      */
     @Override
     public void onSearchFragmentViewCreated() {

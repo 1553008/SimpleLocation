@@ -11,6 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link SearchFragment#newInstance} factory method to
@@ -18,8 +22,9 @@ import android.widget.TextView;
  */
 public class SearchFragment extends Fragment {
     private AppCompatActivity mContext;
-    private Toolbar mToolbar;
-    private TextView mSearchTextView;
+    private @BindView(R.id.toolbar_search)Toolbar mToolbar;
+    private @BindView(R.id.search_textview) TextView mSearchTextView;
+    private Unbinder mUnbinder;
     public SearchFragment() {
         // Required empty public constructor
     }
@@ -50,9 +55,15 @@ public class SearchFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mToolbar = (Toolbar) inflater.inflate(R.layout.fragment_search,container,false);
-        mSearchTextView = mToolbar.findViewById(R.id.search_textview);
-        return mToolbar;
+        View view  = inflater.inflate(R.layout.fragment_search,container,false);
+        mUnbinder = ButterKnife.bind(this,view);
+        return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mUnbinder.unbind();
     }
 
     public void setText(String text){
