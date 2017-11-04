@@ -5,4 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
     tools:context="com.example.hoangdung.simplelocation.SearchFragment">
+    <TextView
+        android:id="@+id/search_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Search"/>
 </android.support.v7.widget.Toolbar>

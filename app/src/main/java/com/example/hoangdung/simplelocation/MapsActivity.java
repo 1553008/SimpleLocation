@@ -56,7 +56,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, SearchFragment.SearchFragmentCallback{
 
     //For Debugging
     private String TAG = MapsActivity.class.getSimpleName();
@@ -65,6 +65,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String mEmail;
     private String mName;
     private String mProfileIconURL;
+    private SearchFragment mSearchFragment;
     //Google Map model
     private GoogleMap mMap;
 
@@ -113,36 +114,50 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onResumeFragments();
     }
 
-    /**
-     * Get the Last Know Location of the user (maybe the current location)
-     */
-    private void showLastknownLocation() {
-       try{
-           Task<Location> lastLocation = mLocationProvider.getLastLocation();
-           lastLocation.addOnCompleteListener(this, new OnCompleteListener<Location>() {
-               @Override
-               public void onComplete(@NonNull Task<Location> task) {
-                   if (task.isComplete() && task.isSuccessful() && task.getResult()!=null) {
-                       mLastknownLocation = task.getResult();
-                       mMap.moveCamera(CameraUpdateFactory
-                               .newLatLngZoom(
-                                       new LatLng(mLastknownLocation.getLatitude(), mLastknownLocation.getLongitude())
-                                       , DEFAULT_ZOOM));
-                   }
-               }
-           });
-       }
-       catch (SecurityException e){
-
-       }
-
-    }// showLastknowLocation
 
     @Override
     protected void onStart() {
         super.onStart();
     }
+    //----------------------Google Maps Functionality-----------------------
+    /**
+     * Get the Last Know Location of the user (maybe the current location)
+     */
+    private void showLastknownLocation() {
+        try{
+            Task<Location> lastLocation = mLocationProvider.getLastLocation();
+            lastLocation.addOnCompleteListener(this, new OnCompleteListener<Location>() {
+                @Override
+                public void onComplete(@NonNull Task<Location> task) {
+                    if (task.isComplete() && task.isSuccessful() && task.getResult()!=null) {
+                        mLastknownLocation = task.getResult();
+                        mMap.moveCamera(CameraUpdateFactory
+                                .newLatLngZoom(
+                                        new LatLng(mLastknownLocation.getLatitude(), mLastknownLocation.getLongitude())
+                                        , DEFAULT_ZOOM));
+                    }
+                }
+            });
+        }
+        catch (SecurityException e){
 
+        }
+
+    }// showLastknowLocation
+    private void updateUI() {
+        try{
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        }
+        catch (SecurityException e){
+
+        }
+    }
+
+    //------------------------------Activity UI Setup--------------------------------------------
+    /**
+     * Setup Drawer Layout
+     */
     private void drawerLayoutSetup(){
         //Account header
         AccountHeader accountHeader = new AccountHeaderBuilder()
@@ -177,22 +192,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mDrawer.getDrawerLayout().setFitsSystemWindows(false);
         }
     }
-    private void updateUI() {
-        try{
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setMyLocationButtonEnabled(false);
-        }
-        catch (SecurityException e){
 
-        }
-    }
-
+    /**
+     * Get Facebook User Profile in SharedPreference
+     */
     private void initUserInfoHeader(){
         SharedPreferences sharedPreferences = getSharedPreferences("UserInfo",0);
         mEmail = sharedPreferences.getString("email","");
         mName = sharedPreferences.getString("first_name","") + sharedPreferences.getString("last_name","");
         mProfileIconURL = sharedPreferences.getString("picture","");
     }
+
+    /**
+     * Setup Search Fragment
+     */
+    private void toolbarSetup(){
+        SearchFragment searchFragment = SearchFragment.newInstance(this);
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.toolbar_container,searchFragment);
+        fragmentTransaction.commit();
+        mSearchFragment = searchFragment;
+    }
+
     private void setWindowFlags(Activity activity, final int bits, boolean on){
         Window win = activity.getWindow();
         WindowManager.LayoutParams winParams = win.getAttributes();
@@ -204,11 +225,42 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         win.setAttributes(winParams);
     }
-    private void toolbarSetup(){
-        SearchFragment searchFragment = SearchFragment.newInstance(mMap,this,mDrawer);
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.toolbar_container,searchFragment);
-        fragmentTransaction.commit();
+
+    /**
+     * This is called when View in SearchFragment is created
+     */
+    @Override
+    public void onSearchFragmentViewCreated() {
+
     }
 
+    @Override
+    public void onSearchBarClicked() {
+
+    }
+
+    @Override
+    public void onSearchFragmentDestroy() {
+
+    }
+
+    @Override
+    public void onSearchFragmentResume() {
+
+    }
+
+    @Override
+    public void onSearchFragmentPause() {
+
+    }
+
+    @Override
+    public void onSearchFragmentStart() {
+
+    }
+
+    @Override
+    public void onSearchFragmentStop() {
+
+    }
 }
