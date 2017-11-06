@@ -103,7 +103,7 @@ public class WelcomeActivity extends AppCompatActivity {
         mCallbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
-            public void onSuccess(LoginResult loginResult) {
+            public void onSuccess(final LoginResult loginResult) {
                 GraphRequest graphRequest =  GraphRequest.newMeRequest(
                         loginResult.getAccessToken()
                         , new GraphRequest.GraphJSONObjectCallback() {
@@ -119,6 +119,7 @@ public class WelcomeActivity extends AppCompatActivity {
                                     editor.putString("last_name",object.getString("last_name"));
                                     editor.putString("picture",object.getJSONObject("picture").getJSONObject("data").getString("url"));
                                     editor.commit();
+                                    handleFacebookAccessToken(loginResult.getAccessToken());
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -131,7 +132,6 @@ public class WelcomeActivity extends AppCompatActivity {
                 graphRequest.setParameters(params);
                 graphRequest.executeAsync();
                 //FireBase Authentication
-                handleFacebookAccessToken(loginResult.getAccessToken());
 
             }
             @Override
