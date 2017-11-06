@@ -12,6 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -31,7 +34,7 @@ public class SearchFragment extends Fragment {
     }
     public interface SearchFragmentCallback{
          void onSearchFragmentViewCreated();
-         void onSearchBarClicked();
+         void onSearchBarClicked() throws GooglePlayServicesNotAvailableException, GooglePlayServicesRepairableException;
          void onSearchFragmentDestroy();
          void onSearchFragmentResume();
          void onSearchFragmentPause();
@@ -61,7 +64,12 @@ public class SearchFragment extends Fragment {
         mToolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((SearchFragmentCallback)mContext).onSearchBarClicked();
+                try{
+                    ((SearchFragmentCallback)mContext).onSearchBarClicked();
+                }
+                catch (Exception e){
+
+                }
             }
         });
         return view;

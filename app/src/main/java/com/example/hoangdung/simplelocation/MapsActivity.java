@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -33,10 +34,16 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -67,17 +74,29 @@ import com.squareup.picasso.Picasso;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, SearchFragment.SearchFragmentCallback{
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
+        SearchFragment.SearchFragmentCallback,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener{
 
-    //For Debugging
+    //UI component
     private String TAG = MapsActivity.class.getSimpleName();
+
     private int DEFAULT_ZOOM = 15;
-    private int statusBarHeight = 24; //dp
+
     private String mEmail;
+
     private String mName;
+
     private String mProfileIconURL;
+
     private SearchFragment mSearchFragment;
-    private FrameLayout mToolbarContainer;
+
+    @BindView(R.id.toolbar_container)
+    public FrameLayout mToolbarContainer;
+
+    private Drawer mDrawer;
+
     //Firebase Authentication
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
@@ -85,16 +104,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public FloatingActionButton mLocateBtn;
     //Google Map model
     private GoogleMap mMap;
-
+    private GoogleApiClient mGoogleApiClient;
     //Fused Location Provider
     private FusedLocationProviderClient mLocationProvider;
 
     //Last known location
     private Location mLastknownLocation;
 
-    //Drawer Layout
+    //Activity Request Code
+    private int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
 
-    private Drawer mDrawer;
+    //-----------------------------------------Activity LifeCycles---------------------------------------------------
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,14 +125,72 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        mLocationProvider = LocationServices.getFusedLocationProviderClient(this);
-        initUserInfoHeader();
+        initGoogleApiClient();
         drawerLayoutSetup();
         toolbarSetup();
         locateButtonSetup();
     }//onCreate
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }//OnStart
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mGoogleApiClient.disconnect();
+    }//OnPause
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+            handleSearchResult(resultCode,data);
+        }
+    }
+
+    //----------------------------------------Google API Setup and Callbacks---------------------------------------------------------
+    private void initGoogleApiClient(){
+        if(mGoogleApiClient == null){
+            mGoogleApiClient = new GoogleApiClient
+                    .Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+        mLocationProvider = LocationServices.getFusedLocationProviderClient(this);
+    }
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Log.d(TAG,"GoogleApiClient:connected");
+        showLastknownLocation();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.d(TAG,"GoogleApiClient:suspended");
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d(TAG,"GoogleApiClient:connect failure");
+        Toast.makeText(this, "Can't connect to Google Api Client", Toast.LENGTH_SHORT).show();
+    }
+
+    //----------------------------------------Google Maps Callbacks and Functionality------------------------------------
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -124,21 +203,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        updateUI();
+        updateMapUI();
         showLastknownLocation();
     }//onMapReady
-
-    @Override
-    protected void onResumeFragments() {
-        super.onResumeFragments();
-    }
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-    //----------------------Google Maps Functionality-----------------------
     /**
      * Get the Last Know Location of the user (maybe the current location)
      */
@@ -163,7 +230,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
     }// showLastknowLocation
-    private void updateUI() {
+
+    private void updateMapUI() {
         try{
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
@@ -171,13 +239,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         catch (SecurityException e){
 
         }
-    }
+    } //updateMapUI
 
-    //------------------------------Activity UI Setup--------------------------------------------
+
+
+    //--------------------------------------------Activity UI Setup--------------------------------------------
     /**
      * Setup Drawer Layout
      */
     private void drawerLayoutSetup(){
+        initUserInfoHeader();
         //Account header
         AccountHeader accountHeader = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -244,6 +315,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         win.setAttributes(winParams);
     }
+
     private void locateButtonSetup(){
         //mLocateBtn = findViewById(R.id.floating_btn);
         mLocateBtn.setOnClickListener(new View.OnClickListener() {
@@ -253,18 +325,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
     }
-    /**
-     * SearchFragment Interface
-     */
+
+    //------------------------------------------Search Fragment Callbacks and Search Functionality--------------------------------------------
     @Override
     public void onSearchFragmentViewCreated() {
         mDrawer.setToolbar(this,mSearchFragment.mToolbar);
-
     }
 
     @Override
     public void onSearchBarClicked() {
-
+        startSearchActivity();
     }
 
     @Override
@@ -291,4 +361,35 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onSearchFragmentStop() {
 
     }
+    private void startSearchActivity(){
+        try {
+            //Search Filter
+
+            //Start Activity
+            Intent intent = new PlaceAutocomplete
+                    .IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+                    .build(this);
+            startActivityForResult(intent,PLACE_AUTOCOMPLETE_REQUEST_CODE);
+        } catch (GooglePlayServicesRepairableException e) {
+            e.printStackTrace();
+            Log.d(TAG,e.getMessage());
+        } catch (GooglePlayServicesNotAvailableException e) {
+            e.printStackTrace();
+            Log.d(TAG,e.getMessage());
+        }
+    }
+    private void handleSearchResult(int resultCode,Intent data){
+        if(resultCode == RESULT_OK){
+            Log.d(TAG,"PlaceAutoComplete:success");
+        }
+        else if(resultCode == PlaceAutocomplete.RESULT_ERROR){
+            Log.d(TAG,"PlaceAutoComplete:error");
+        }
+        else if(resultCode == RESULT_CANCELED){
+            Log.d(TAG,"PlaceAutoComplete:canceled");
+        }
+    }
+
+
+
 }
