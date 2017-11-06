@@ -198,13 +198,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .withActivity(this)
                 //.withToolbar(toolbar)
                 .withAccountHeader(accountHeader)
-                //.withFullscreen(true)
+                .withFullscreen(true)
                 .build();
         if(Build.VERSION.SDK_INT >= 19){
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         }
         if(Build.VERSION.SDK_INT >= 21){
-            setWindowFlags(this,WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,false);
+            setWindowFlags(this,WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,true);
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
         if(Build.VERSION.SDK_INT >= 19){
@@ -258,6 +258,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     @Override
     public void onSearchFragmentViewCreated() {
+        mDrawer.setToolbar(this,mSearchFragment.mToolbar);
 
     }
 

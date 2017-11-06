@@ -2,6 +2,7 @@ package com.example.hoangdung.simplelocation;
 
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -23,7 +24,7 @@ import butterknife.Unbinder;
 public class SearchFragment extends Fragment {
     private AppCompatActivity mContext;
     public @BindView(R.id.toolbar_search)Toolbar mToolbar;
-    public @BindView(R.id.search_textview) TextView mSearchTextView;
+    //public @BindView(R.id.search_textview) TextView mSearchTextView;
     private Unbinder mUnbinder;
     public SearchFragment() {
         // Required empty public constructor
@@ -57,7 +58,19 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view  = inflater.inflate(R.layout.fragment_search,container,false);
         mUnbinder = ButterKnife.bind(this,view);
+        mToolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((SearchFragmentCallback)mContext).onSearchBarClicked();
+            }
+        });
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ((SearchFragmentCallback)mContext).onSearchFragmentViewCreated();
     }
 
     @Override
@@ -66,7 +79,10 @@ public class SearchFragment extends Fragment {
         mUnbinder.unbind();
     }
 
-    public void setText(String text){
+   /* public void setText(String text){
         mSearchTextView.setText(text);
+    }*/
+    public Toolbar getToolbar(){
+        return mToolbar;
     }
 }

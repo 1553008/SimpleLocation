@@ -8,10 +8,12 @@
         <item name="android:textColorPrimary">@android:color/white</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColorPrimaryInverse">@android:color/black</item>
-        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowTranslucentNavigation">true</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="windowActionBar">false</item>
+        <item name="android:statusBarColor">@color/colorStatusBar</item>
+        <item name="drawerArrowStyle">@style/AppTheme.DrawerArrow</item>
     </style>
     <style name="AppTheme.Transparent" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:navigationBarColor">@android:color/transparent</item>
@@ -19,5 +21,9 @@
     </style>
     <style name="Toolbar.Transparent" parent="MaterialDrawerTheme.ActionBar.TranslucentStatus">
         <item name="android:windowActionBarOverlay">true</item>
+    </style>
+    <style name="AppTheme.DrawerArrow" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="color">@android:color/white</item>
+        <item name="spinBars">true</item>
     </style>
 </resources>
