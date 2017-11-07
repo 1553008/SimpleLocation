@@ -10,8 +10,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
@@ -43,11 +46,17 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceFilter;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -71,11 +80,14 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
-        SearchFragment.SearchFragmentCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener{
 
@@ -105,6 +117,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Google Map model
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
+    private String mCountryCode;
     //Fused Location Provider
     private FusedLocationProviderClient mLocationProvider;
 
@@ -155,10 +168,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==PLACE_AUTOCOMPLETE_REQUEST_CODE) {
-            handleSearchResult(resultCode,data);
-        }
+        super.onActivityResult(requestCode,resultCode,data);
     }
 
     //----------------------------------------Google API Setup and Callbacks---------------------------------------------------------
@@ -190,6 +200,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Toast.makeText(this, "Can't connect to Google Api Client", Toast.LENGTH_SHORT).show();
     }
 
+    private void getCountryCode(){
+        Geocoder geocoder = new Geocoder(this,Locale.getDefault());
+        try {
+            List<Address> addressList = geocoder.getFromLocation(mLastknownLocation.getLatitude(),mLastknownLocation.getLongitude(),1);
+            Address address = addressList.get(0);
+            mCountryCode = address.getCountryCode();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     //----------------------------------------Google Maps Callbacks and Functionality------------------------------------
     /**
      * Manipulates the map once available.
@@ -217,10 +239,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public void onComplete(@NonNull Task<Location> task) {
                     if (task.isComplete() && task.isSuccessful() && task.getResult()!=null) {
                         mLastknownLocation = task.getResult();
+                        getCountryCode();
                         mMap.moveCamera(CameraUpdateFactory
                                 .newLatLngZoom(
                                         new LatLng(mLastknownLocation.getLatitude(), mLastknownLocation.getLongitude())
                                         , DEFAULT_ZOOM));
+                        SharedPreferences sharedPreferences = getSharedPreferences("UserInfo",0);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putLong("LastKnownLocationLat",Double.doubleToRawLongBits(mLastknownLocation.getLatitude()));
+                        editor.putLong("LastKnownLocationLng",Double.doubleToRawLongBits(mLastknownLocation.getLongitude()));
+                        editor.commit();
                     }
                 }
             });
@@ -240,8 +268,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         }
     } //updateMapUI
-
-
 
     //--------------------------------------------Activity UI Setup--------------------------------------------
     /**
@@ -302,6 +328,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         fragmentTransaction.add(R.id.toolbar_container,searchFragment);
         fragmentTransaction.commit();
         mSearchFragment = searchFragment;
+        searchFragment.setOnSearchFragmentCallback(new SearchFragment.OnSearchFragmentCallback() {
+            @Override
+            public void onSearchFragmentUIReady(SearchFragment searchFragment) {
+                mDrawer.setToolbar(MapsActivity.this,searchFragment.mToolbar);
+            }
+        });
+        searchFragment.setOnSearchResultCallback(new SearchFragment.OnSearchResultCallback() {
+            @Override
+            public void onSearchResult(Place searchPlace, SearchFragment searchFragment) {
+                Log.d(TAG,"OnSearchResult received");
+                mMap.addMarker(new MarkerOptions().position(searchPlace.getLatLng()));
+                CameraPosition cameraPosition = new CameraPosition(searchPlace.getLatLng(),DEFAULT_ZOOM,0,0);
+                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            }
+        });
     }
 
     private void setWindowFlags(Activity activity, final int bits, boolean on){
@@ -327,69 +368,5 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //------------------------------------------Search Fragment Callbacks and Search Functionality--------------------------------------------
-    @Override
-    public void onSearchFragmentViewCreated() {
-        mDrawer.setToolbar(this,mSearchFragment.mToolbar);
-    }
-
-    @Override
-    public void onSearchBarClicked() {
-        startSearchActivity();
-    }
-
-    @Override
-    public void onSearchFragmentDestroy() {
-
-    }
-
-    @Override
-    public void onSearchFragmentResume() {
-
-    }
-
-    @Override
-    public void onSearchFragmentPause() {
-
-    }
-
-    @Override
-    public void onSearchFragmentStart() {
-
-    }
-
-    @Override
-    public void onSearchFragmentStop() {
-
-    }
-    private void startSearchActivity(){
-        try {
-            //Search Filter
-
-            //Start Activity
-            Intent intent = new PlaceAutocomplete
-                    .IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
-                    .build(this);
-            startActivityForResult(intent,PLACE_AUTOCOMPLETE_REQUEST_CODE);
-        } catch (GooglePlayServicesRepairableException e) {
-            e.printStackTrace();
-            Log.d(TAG,e.getMessage());
-        } catch (GooglePlayServicesNotAvailableException e) {
-            e.printStackTrace();
-            Log.d(TAG,e.getMessage());
-        }
-    }
-    private void handleSearchResult(int resultCode,Intent data){
-        if(resultCode == RESULT_OK){
-            Log.d(TAG,"PlaceAutoComplete:success");
-        }
-        else if(resultCode == PlaceAutocomplete.RESULT_ERROR){
-            Log.d(TAG,"PlaceAutoComplete:error");
-        }
-        else if(resultCode == RESULT_CANCELED){
-            Log.d(TAG,"PlaceAutoComplete:canceled");
-        }
-    }
-
-
 
 }
