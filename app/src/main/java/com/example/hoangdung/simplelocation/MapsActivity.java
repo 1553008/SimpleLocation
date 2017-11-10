@@ -43,7 +43,9 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import java.io.IOException;
@@ -258,10 +260,27 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 })
                 .withHeaderBackground(R.drawable.drawerlayoutbackground)
                 .build();
+
+        // construct draw item
+        PrimaryDrawerItem myPlaceItem= new PrimaryDrawerItem()
+                .withIdentifier(this.getResources().getInteger(R.integer.my_place_drawer_item_id))
+                .withName("My places");
+
         //Drawer setup
         mDrawer = new DrawerBuilder()
                 .withActivity(this)
                 //.withToolbar(toolbar)
+                .addDrawerItems(myPlaceItem)
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        if (position == MapsActivity.this.getResources().getInteger(R.integer.my_place_drawer_item_id))
+                        {
+                            // TODO: Fire activity Choose My Plases
+                        }
+                        return true;
+                    }
+                })
                 .withAccountHeader(accountHeader)
                 .withFullscreen(true)
                 .build();
@@ -302,7 +321,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void locateButtonSetup(){
-        //mLocateBtn = findViewById(R.id.floating_btn);
+        //mLocateBtn = findViewBId(R.id.floating_btn);
         mLocateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
