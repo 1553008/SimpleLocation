@@ -52,7 +52,6 @@ public class SearchFragment extends Fragment {
     public Place mSearchPlace;
     public GeoDataClient mGeoClient;
     public Menu mMenu;
-    private OnSearchResultCallback mSearchResultCallback;
     private OnSearchFragmentCallback mSearchFragmentCallback;
 
     public SearchFragment() {
@@ -60,15 +59,12 @@ public class SearchFragment extends Fragment {
     }
     public interface OnSearchFragmentCallback{
         void onSearchFragmentUIReady(SearchFragment searchFragment);
+        void onSearchFragmentClicked(SearchFragment searchFragment);
+        void onSearchFragmentResumed(SearchFragment searchFragment);
+        void onSearchResult(Place searchPlace, SearchFragment searchFragment);
     }
     void setOnSearchFragmentCallback(OnSearchFragmentCallback callback){
         mSearchFragmentCallback = callback;
-    }
-    public interface OnSearchResultCallback{
-        void onSearchResult(Place searchPlace, SearchFragment searchFragment);
-    }
-    void setOnSearchResultCallback(OnSearchResultCallback callback){
-        mSearchResultCallback = callback;
     }
     public static SearchFragment newInstance(AppCompatActivity context) {
         SearchFragment fragment = new SearchFragment();
@@ -94,8 +90,7 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 try{
-                    Intent intent = new Intent(getActivity(), SearchActivity.class);
-                    startActivityForResult(intent,1);
+                    mSearchFragmentCallback.onSearchFragmentClicked(SearchFragment.this);
                 }
                 catch (Exception e){
 
@@ -132,7 +127,7 @@ public class SearchFragment extends Fragment {
                     if(task.isSuccessful() && task.getResult()!= null){
                         Log.d("MapsActivity","Place complete");
                         mSearchPlace = task.getResult().get(0).freeze();
-                        mSearchResultCallback.onSearchResult(mSearchPlace,SearchFragment.this);
+                        mSearchFragmentCallback.onSearchResult(mSearchPlace,SearchFragment.this);
                         task.getResult().release();
                         mMenu.findItem(R.id.find_direction).setVisible(true);
                     }
@@ -142,6 +137,17 @@ public class SearchFragment extends Fragment {
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(mSearchFragmentCallback!=null)
+            mSearchFragmentCallback.onSearchFragmentResumed(this);
+    }
+
+    public void startSearching(){
+        Intent intent = new Intent(getActivity(), SearchActivity.class);
+        startActivityForResult(intent,1);
+    }
     /* public void setText(String text){
             mSearchTextView.setText(text);
         }*/
