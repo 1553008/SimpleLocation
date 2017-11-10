@@ -28,6 +28,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -104,6 +105,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private SearchFragment mSearchFragment;
 
+    private FragmentManager mFragmentManager;
     @BindView(R.id.toolbar_container)
     public FrameLayout mToolbarContainer;
 
@@ -134,8 +136,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         ButterKnife.bind(this);
+        mFragmentManager = getSupportFragmentManager();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        SupportMapFragment mapFragment = (SupportMapFragment) mFragmentManager
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         initGoogleApiClient();
@@ -319,31 +322,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mProfileIconURL = sharedPreferences.getString("picture","");
     }
 
-    /**
-     * Setup Search Fragment
-     */
-    private void toolbarSetup(){
-        SearchFragment searchFragment = SearchFragment.newInstance(this);
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.toolbar_container,searchFragment);
-        fragmentTransaction.commit();
-        mSearchFragment = searchFragment;
-        searchFragment.setOnSearchFragmentCallback(new SearchFragment.OnSearchFragmentCallback() {
-            @Override
-            public void onSearchFragmentUIReady(SearchFragment searchFragment) {
-                mDrawer.setToolbar(MapsActivity.this,searchFragment.mToolbar);
-            }
-        });
-        searchFragment.setOnSearchResultCallback(new SearchFragment.OnSearchResultCallback() {
-            @Override
-            public void onSearchResult(Place searchPlace, SearchFragment searchFragment) {
-                Log.d(TAG,"OnSearchResult received");
-                mMap.addMarker(new MarkerOptions().position(searchPlace.getLatLng()));
-                CameraPosition cameraPosition = new CameraPosition(searchPlace.getLatLng(),DEFAULT_ZOOM,0,0);
-                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-            }
-        });
-    }
+
 
     private void setWindowFlags(Activity activity, final int bits, boolean on){
         Window win = activity.getWindow();
@@ -368,5 +347,61 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //------------------------------------------Search Fragment Callbacks and Search Functionality--------------------------------------------
+    //
+    private void toolbarSetup(){
+        SearchFragment searchFragment = SearchFragment.newInstance(this);
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.toolbar_container,searchFragment,SearchFragment.class.getSimpleName());
+        fragmentTransaction.addToBackStack(SearchFragment.class.getSimpleName());
+        fragmentTransaction.commit();
+        mSearchFragment = searchFragment;
+        searchFragment.setOnSearchFragmentCallback(new SearchFragment.OnSearchFragmentCallback() {
+            @Override
+            public void onSearchFragmentUIReady(SearchFragment searchFragment) {
+                mDrawer.setToolbar(MapsActivity.this,searchFragment.mToolbar);
+            }
+        });
+        searchFragment.setOnSearchResultCallback(new SearchFragment.OnSearchResultCallback() {
+            @Override
+            public void onSearchResult(Place searchPlace, SearchFragment searchFragment) {
+                Log.d(TAG,"OnSearchResult received");
+                handleSearchResult(searchPlace,searchFragment);
+            }
+        });
 
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode){
+            case KeyEvent.KEYCODE_BACK:
+            {
+                String fragmentTag = mFragmentManager.getBackStackEntryAt(mFragmentManager.getBackStackEntryCount()-1).getName();
+                if(fragmentTag.equals(SearchFragment.class.getSimpleName())){
+                    SearchFragment searchFragment = (SearchFragment) mFragmentManager.findFragmentByTag(fragmentTag);
+                    if(searchFragment.mSearchPlace != null) {
+                        mSearchFragment.mSearchPlace = null;
+                        mSearchFragment.mToolbar.setTitle("Search here");
+                        mSearchFragment.mMenu.findItem(R.id.find_direction).setVisible(false);
+                        mMap.clear();
+                        return true;
+                    }
+                    else{
+                        finish();
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    private void handleSearchResult(Place searchPlace,SearchFragment searchFragment){
+        if(searchPlace!=null){
+            mMap.clear();
+            mMap.addMarker(new MarkerOptions().position(searchPlace.getLatLng()));
+            CameraPosition cameraPosition = new CameraPosition(searchPlace.getLatLng(),DEFAULT_ZOOM,0,0);
+            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            searchFragment.mToolbar.setTitle(searchPlace.getName());
+        }
+    }
 }

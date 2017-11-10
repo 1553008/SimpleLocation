@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     tools:context="com.example.hoangdung.simplelocation.SearchFragment"
     app:theme="@style/AppTheme"
-    app:title="Search..."
+    app:title="Search here"
     android:clickable="true"
     >
 </android.support.v7.widget.Toolbar>

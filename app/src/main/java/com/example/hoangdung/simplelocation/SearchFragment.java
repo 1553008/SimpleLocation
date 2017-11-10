@@ -14,6 +14,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -49,8 +51,10 @@ public class SearchFragment extends Fragment {
     private Unbinder mUnbinder;
     public Place mSearchPlace;
     public GeoDataClient mGeoClient;
+    public Menu mMenu;
     private OnSearchResultCallback mSearchResultCallback;
     private OnSearchFragmentCallback mSearchFragmentCallback;
+
     public SearchFragment() {
         // Required empty public constructor
     }
@@ -76,7 +80,6 @@ public class SearchFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mGeoClient = Places.getGeoDataClient(getActivity(),null);
-
     }
 
     @Override
@@ -84,6 +87,9 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view  = inflater.inflate(R.layout.fragment_search,container,false);
         mUnbinder = ButterKnife.bind(this,view);
+        mToolbar.inflateMenu(R.menu.search_toolbar_menu);
+        mMenu = mToolbar.getMenu();
+        mMenu.findItem(R.id.find_direction).setVisible(false);
         mToolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -96,6 +102,7 @@ public class SearchFragment extends Fragment {
                 }
             }
         });
+        setHasOptionsMenu(true);
         return view;
     }
 
@@ -127,6 +134,7 @@ public class SearchFragment extends Fragment {
                         mSearchPlace = task.getResult().get(0).freeze();
                         mSearchResultCallback.onSearchResult(mSearchPlace,SearchFragment.this);
                         task.getResult().release();
+                        mMenu.findItem(R.id.find_direction).setVisible(true);
                     }
                 }
             });
@@ -137,7 +145,4 @@ public class SearchFragment extends Fragment {
     /* public void setText(String text){
             mSearchTextView.setText(text);
         }*/
-    public Toolbar getToolbar(){
-        return mToolbar;
-    }
 }
