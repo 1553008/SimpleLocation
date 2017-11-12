@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "161715523714-igi0ltv3gdtrmn75m6ae2itavv4v93k0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.hoangdung.simplelocation",
+            "certificate_hash": "02904fad095c16e45ad8d86246413773c37702a6"
+          }
+        },
+        {
           "client_id": "161715523714-qqqnjm2648lnlm2ibftn3u187chgt2r2.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
