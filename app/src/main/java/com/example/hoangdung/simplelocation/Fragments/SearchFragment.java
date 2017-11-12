@@ -1,39 +1,27 @@
-package com.example.hoangdung.simplelocation;
+package com.example.hoangdung.simplelocation.Fragments;
 
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.example.hoangdung.simplelocation.R;
+import com.example.hoangdung.simplelocation.Activity.SearchActivity;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBufferResponse;
-import com.google.android.gms.location.places.PlaceLikelihoodBufferResponse;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -63,7 +51,7 @@ public class SearchFragment extends Fragment {
         void onSearchFragmentResumed(SearchFragment searchFragment);
         void onSearchResult(Place searchPlace, SearchFragment searchFragment, int resultCode);
     }
-    void setOnSearchFragmentCallback(OnSearchFragmentCallback callback){
+    public void setOnSearchFragmentCallback(OnSearchFragmentCallback callback){
         mSearchFragmentCallback = callback;
     }
     public static SearchFragment newInstance(AppCompatActivity context) {

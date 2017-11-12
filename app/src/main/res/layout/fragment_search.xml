@@ -5,7 +5,7 @@
     android:id="@+id/toolbar_search"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context="com.example.hoangdung.simplelocation.SearchFragment"
+    tools:context="com.example.hoangdung.simplelocation.Fragments.SearchFragment"
     app:theme="@style/AppTheme"
     app:title="Search here"
     android:clickable="true"

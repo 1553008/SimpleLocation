@@ -1,4 +1,4 @@
-package com.example.hoangdung.simplelocation;
+package com.example.hoangdung.simplelocation.Activity;
 
 import android.Manifest;
 import android.content.Intent;
@@ -14,8 +14,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageView;
 
+import com.example.hoangdung.simplelocation.R;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;

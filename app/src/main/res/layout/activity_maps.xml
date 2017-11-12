@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".MapsActivity"
+    tools:context=".Activity.MapsActivity"
     android:fitsSystemWindows="false"
     android:id="@+id/drawerlayout_container">
 
@@ -13,7 +13,7 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.example.hoangdung.simplelocation.MapsActivity" />
+        tools:context="com.example.hoangdung.simplelocation.Activity.MapsActivity" />
     <FrameLayout
         android:id="@+id/toolbar_container"
         android:layout_width="match_parent"

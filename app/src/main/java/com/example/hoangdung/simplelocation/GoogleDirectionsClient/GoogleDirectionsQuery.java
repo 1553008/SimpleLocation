@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO.DirectionsResponse;
-import com.example.hoangdung.simplelocation.MapsActivity;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
