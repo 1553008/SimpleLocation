@@ -8,6 +8,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,7 +17,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -32,7 +32,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -50,6 +49,8 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -94,6 +95,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Last known location
     private Location mLastknownLocation;
 
+    //Choose places on Maps
+
+    private ArrayList<LatLng> mMarkerPlaces = new ArrayList<>();
     //Activity Request Code
     private int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
 
@@ -355,27 +359,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 {
                     mMap.clear();
                     showLastknownLocation();
+                    mMarkerPlaces.clear();
                 }
                 mDrawer.setToolbar(MapsActivity.this,searchFragment.mToolbar,true);
+
             }
 
             @Override
-            public void onSearchResult(Place searchPlace, SearchFragment searchFragment) {
-                handleSearchResultAndUpdateUI(searchPlace,searchFragment);
+            public void onSearchResult(Place searchPlace, SearchFragment searchFragment,int resultCode) {
             }
         });
     }
-
-    private void handleSearchResultAndUpdateUI(Place searchPlace, SearchFragment searchFragment){
-        if(searchPlace!=null){
-            mMap.clear();
-            mMap.addMarker(new MarkerOptions().position(searchPlace.getLatLng()));
-            CameraPosition cameraPosition = new CameraPosition(searchPlace.getLatLng(),DEFAULT_ZOOM,0,0);
-            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-            searchFragment.mToolbar.setTitle(searchPlace.getName());
-        }
-    }
-
 
     private void initRealSearchFragment(){
         SearchFragment realSearchFragment = SearchFragment.newInstance(MapsActivity.this);
@@ -398,13 +392,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 mDrawer.setToolbar(MapsActivity.this,searchFragment.mToolbar,true);
                 if(searchFragment.mSearchPlace!= null){
-                    handleSearchResultAndUpdateUI(searchFragment.mSearchPlace,searchFragment);
+                    handleSearchResult(searchFragment.mSearchPlace,searchFragment,RESULT_OK);
                 }
             }
 
             @Override
-            public void onSearchResult(Place searchPlace, SearchFragment searchFragment) {
-                handleSearchResultAndUpdateUI(searchPlace,searchFragment);
+            public void onSearchResult(Place searchPlace, SearchFragment searchFragment,int resultCode) {
+                handleSearchResult(searchPlace,searchFragment,resultCode);
             }
         });
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
@@ -412,5 +406,37 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
+
+
+    private void handleSearchResult(final Place searchPlace, final SearchFragment searchFragment, int resultCode){
+        if(resultCode == RESULT_OK){
+            if(searchPlace!=null){
+                mMap.clear();
+                mMap.addMarker(new MarkerOptions().position(searchPlace.getLatLng()));
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(searchPlace.getLatLng(), DEFAULT_ZOOM));
+
+                    }
+                },50);
+                searchFragment.mToolbar.setTitle(searchPlace.getName());
+            }
+        }
+        else if( resultCode == RESULT_CANCELED){
+            if(searchPlace==null)
+                getSupportFragmentManager().popBackStack();
+        }
+    }
+
+    private void addMarkers(List<LatLng> markers){
+        if(markers == null)
+            return;
+        for(LatLng marker : markers){
+            mMap.addMarker(new MarkerOptions().position(new LatLng(marker.latitude,marker.longitude)));
+        }
+    }
+    //----------------------------------------Directions Functionality--------------------------------------
+
 
 }

@@ -61,7 +61,7 @@ public class SearchFragment extends Fragment {
         void onSearchFragmentUIReady(SearchFragment searchFragment);
         void onSearchFragmentClicked(SearchFragment searchFragment);
         void onSearchFragmentResumed(SearchFragment searchFragment);
-        void onSearchResult(Place searchPlace, SearchFragment searchFragment);
+        void onSearchResult(Place searchPlace, SearchFragment searchFragment, int resultCode);
     }
     void setOnSearchFragmentCallback(OnSearchFragmentCallback callback){
         mSearchFragmentCallback = callback;
@@ -114,7 +114,7 @@ public class SearchFragment extends Fragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, final int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d("MapsActivity","SearchFragment:onActivityResult");
         if(data!=null)
@@ -127,12 +127,15 @@ public class SearchFragment extends Fragment {
                     if(task.isSuccessful() && task.getResult()!= null){
                         Log.d("MapsActivity","Place complete");
                         mSearchPlace = task.getResult().get(0).freeze();
-                        mSearchFragmentCallback.onSearchResult(mSearchPlace,SearchFragment.this);
+                        mSearchFragmentCallback.onSearchResult(mSearchPlace,SearchFragment.this,resultCode);
                         task.getResult().release();
                         mMenu.findItem(R.id.find_direction).setVisible(true);
                     }
                 }
             });
+        }
+        if(resultCode == getActivity().RESULT_CANCELED){
+            mSearchFragmentCallback.onSearchResult(mSearchPlace,SearchFragment.this,resultCode);
         }
 
     }
@@ -140,6 +143,7 @@ public class SearchFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Log.d("MapsActivity","SearchFragment:onResume");
         if(mSearchFragmentCallback!=null)
             mSearchFragmentCallback.onSearchFragmentResumed(this);
     }

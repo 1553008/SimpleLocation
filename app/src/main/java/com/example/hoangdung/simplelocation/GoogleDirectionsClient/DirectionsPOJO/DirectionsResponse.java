@@ -10,6 +10,7 @@ import java.util.ArrayList;
  */
 
 public class DirectionsResponse {
+
     @SerializedName("status")
     @Expose
     String status;

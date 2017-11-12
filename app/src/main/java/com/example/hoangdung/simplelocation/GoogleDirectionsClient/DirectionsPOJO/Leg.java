@@ -41,6 +41,15 @@ public class Leg {
     @SerializedName("duration_in_traffic")
     @Expose
     Duration durationInTraffic;
+
+    public Duration getDurationInTraffic() {
+        return durationInTraffic;
+    }
+
+    public void setDurationInTraffic(Duration durationInTraffic) {
+        this.durationInTraffic = durationInTraffic;
+    }
+
     public ArrayList<Step> getSteps() {
         return steps;
     }
