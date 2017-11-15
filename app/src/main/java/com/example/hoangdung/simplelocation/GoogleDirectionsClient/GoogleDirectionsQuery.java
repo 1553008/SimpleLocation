@@ -7,7 +7,10 @@ import com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJ
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -43,8 +46,8 @@ public class GoogleDirectionsQuery {
         PESSIMISTIC,
         OPTIMISTIC
     };
-    final int RESPONSE_FAILURE = 0;
-    final int RESPONSE_SUCCESS = 1;
+    public final static int RESPONSE_FAILURE = 0;
+    public final static int RESPONSE_SUCCESS = 1;
     private Retrofit retrofit;
     private static String url = "https://maps.googleapis.com/maps/";
     private LatLng origin;
@@ -63,7 +66,7 @@ public class GoogleDirectionsQuery {
         void onDirectionsResult(DirectionsResponse directionsResponse, int resultCode);
     }
 
-    void query(final OnDirectionsResultListener directionsResultListener){
+    public void query(final OnDirectionsResultListener directionsResultListener){
         Call<DirectionsResponse> responseCall =  googleDirectionsClient.getDirections(
                 GoogleDirectionsParamsBuilder.getParamsByLatLng(origin),
                 GoogleDirectionsParamsBuilder.getParamsByLatLng(destination),
@@ -93,33 +96,43 @@ public class GoogleDirectionsQuery {
     }
     public static class Builder{
         GoogleDirectionsQuery googleDirectionsQuery = new GoogleDirectionsQuery();
-        void withOrigin(@NonNull LatLng origin){
+        public Builder withOrigin(@NonNull LatLng origin){
             googleDirectionsQuery.origin = origin;
+            return this;
         }
 
-        void withDestination(@NonNull LatLng destination){
+        public Builder withDestination(@NonNull LatLng destination){
             googleDirectionsQuery.destination = destination;
+            return this;
         }
 
-        void withTransitMode(@NonNull GoogleDirectionsQuery.TRANSIT_MODE transitMode){
+        public Builder withTransitMode(@NonNull GoogleDirectionsQuery.TRANSIT_MODE transitMode){
             googleDirectionsQuery.transit_mode = transitMode;
-
+            return this;
         }
-        void withTravelMode(@NonNull GoogleDirectionsQuery.TRAVEL_MODE travelMode){
+        public Builder withTravelMode(@NonNull GoogleDirectionsQuery.TRAVEL_MODE travelMode){
             googleDirectionsQuery.travelMode = travelMode;
+            return this;
         }
-        void withTransitPreference(@NonNull GoogleDirectionsQuery.TRANSIT_ROUTING_PREFERENCE transitPreference){
+        public Builder withTransitPreference(@NonNull GoogleDirectionsQuery.TRANSIT_ROUTING_PREFERENCE transitPreference){
             googleDirectionsQuery.transitRoutingPreference = transitPreference;
-
+            return this;
         }
-        void withWaypoints(ArrayList<LatLng> latLngArrayList){
+        public Builder withWaypoints(ArrayList<LatLng> latLngArrayList){
             googleDirectionsQuery.waypoints = latLngArrayList;
+            return this;
         }
 
-        GoogleDirectionsQuery buid(){
+        public GoogleDirectionsQuery buid(){
+            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
+            OkHttpClient httpClient = new OkHttpClient.Builder()
+                    .addInterceptor(interceptor)
+                    .build();
             googleDirectionsQuery.retrofit = new Retrofit
                     .Builder()
                     .baseUrl(url)
+                    .client(httpClient)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
             googleDirectionsQuery.googleDirectionsClient = googleDirectionsQuery.retrofit.create(RetroGoogleDirectionsClient.class);

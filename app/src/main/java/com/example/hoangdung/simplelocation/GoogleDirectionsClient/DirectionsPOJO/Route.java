@@ -19,6 +19,18 @@ public class Route {
     @Expose
     ArrayList<Leg> legs = new ArrayList<>();
 
+    @SerializedName("overview_polyline")
+    @Expose
+    Polyline overviewPolyline;
+
+    public Polyline getOverviewPolyline() {
+        return overviewPolyline;
+    }
+
+    public void setOverviewPolyline(Polyline overviewPolyline) {
+        this.overviewPolyline = overviewPolyline;
+    }
+
     public String getCopyrights() {
         return copyrights;
     }

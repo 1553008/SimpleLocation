@@ -63,8 +63,6 @@ public class PlaceAutoCompleteAdapter extends RecyclerView.Adapter<PlaceAutoComp
                 mPlaceClickCallback.onPlaceClick(mPredictPlaces,position);
             }
         });
-        Log.d("MapsActivity",  holder.primaryText.getText().toString());
-        Log.d("MapsActivity",  holder.primaryText.getText().toString());
     }
 
     @Override
@@ -76,7 +74,6 @@ public class PlaceAutoCompleteAdapter extends RecyclerView.Adapter<PlaceAutoComp
     }
     @Override
     public Filter getFilter() {
-        Log.d("MapsActivity","getFilter");
         Filter filter = new Filter() {
             @Override
             protected FilterResults performFiltering(final CharSequence constraint) {
@@ -93,7 +90,6 @@ public class PlaceAutoCompleteAdapter extends RecyclerView.Adapter<PlaceAutoComp
                                 if(task.getResult().getCount() != 0){
                                     for (AutocompletePrediction prediction : task.getResult()) {
                                         mPredictPlaces.add(prediction.freeze());
-                                        Log.d("MapsActivity", (String) prediction.getFullText(null));
                                     }
                                     task.getResult().release();
                                     filterResults.values = mPredictPlaces;
@@ -113,7 +109,6 @@ public class PlaceAutoCompleteAdapter extends RecyclerView.Adapter<PlaceAutoComp
 
                                                 for (AutocompletePrediction prediction : newTask.getResult()) {
                                                     mPredictPlaces.add(prediction.freeze());
-                                                    Log.d("MapsActivity", (String) prediction.getFullText(null));
                                                 }
                                                 newTask.getResult().release();
                                                 filterResults.values = mPredictPlaces;

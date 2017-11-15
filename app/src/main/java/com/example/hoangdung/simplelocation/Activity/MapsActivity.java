@@ -17,15 +17,24 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.hoangdung.simplelocation.Fragments.DirectionsFragment;
 import com.example.hoangdung.simplelocation.Fragments.SearchFragment;
+import com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO.DirectionsResponse;
+import com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO.Leg;
+import com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO.Route;
+import com.example.hoangdung.simplelocation.GoogleDirectionsClient.GoogleDirectionsQuery;
+import com.example.hoangdung.simplelocation.MyPlace;
 import com.example.hoangdung.simplelocation.R;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -36,10 +45,12 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.maps.android.PolyUtil;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -48,6 +59,8 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -78,6 +91,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @BindView(R.id.toolbar_container)
     public FrameLayout mToolbarContainer;
 
+    @BindView(R.id.progressBar)
+    public ProgressBar mProgressBar;
     private Drawer mDrawer;
 
     //Firebase Authentication
@@ -337,6 +352,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //------------------------------------------Search Fragment Callbacks and Search Functionality--------------------------------------------
     //
+
+    /**
+     * Initiates Search Fragment Holder, it is actually a Search Fragment but with no state
+     * This implementation works, but it is somehow not readable
+     * In future I will reimplement this by creating new Holder Fragment acting as a toolbar
+     */
     private void toolbarSetup(){
         SearchFragment searchFragmentHolder = SearchFragment.newInstance(this);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -364,20 +385,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mDrawer.setToolbar(MapsActivity.this,searchFragment.mToolbar,true);
 
             }
-
             @Override
-            public void onSearchResult(Place searchPlace, SearchFragment searchFragment,int resultCode) {
+            public void onSearchFragmentFindDirectionsClicked(SearchFragment searchFragment) {
+
             }
         });
     }
 
+    /**
+     * Create Search Fragment and replace the Holder with this
+     */
     private void initRealSearchFragment(){
         SearchFragment realSearchFragment = SearchFragment.newInstance(MapsActivity.this);
         realSearchFragment.setOnSearchFragmentCallback(new SearchFragment.OnSearchFragmentCallback() {
             @Override
             public void onSearchFragmentUIReady(SearchFragment searchFragment) {
                 mDrawer.setToolbar(MapsActivity.this,searchFragment.mToolbar,true);
-                searchFragment.mToolbar.callOnClick();
+                if(searchFragment.mSearchPlace==null)
+                    searchFragment.mToolbar.callOnClick();
             }
 
             @Override
@@ -395,10 +420,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     handleSearchResult(searchFragment.mSearchPlace,searchFragment,RESULT_OK);
                 }
             }
-
             @Override
-            public void onSearchResult(Place searchPlace, SearchFragment searchFragment,int resultCode) {
-                handleSearchResult(searchPlace,searchFragment,resultCode);
+            public void onSearchFragmentFindDirectionsClicked(SearchFragment searchFragment) {
+                startDirectionsFragment(searchFragment);
             }
         });
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
@@ -421,6 +445,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 },50);
                 searchFragment.mToolbar.setTitle(searchPlace.getName());
+                searchFragment.mImageView.setVisibility(View.VISIBLE);
             }
         }
         else if( resultCode == RESULT_CANCELED){
@@ -437,6 +462,90 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
     //----------------------------------------Directions Functionality--------------------------------------
+
+    private void startDirectionsFragment(SearchFragment searchFragment){
+        Log.d("MapsActivity","startDirectionsFragment");
+
+        MyPlace firstLocation = new MyPlace();
+        firstLocation.setLatlng(new LatLng(mLastknownLocation.getLatitude(),mLastknownLocation.getLongitude()));
+        firstLocation.setFullName("Your location");
+
+        MyPlace secondLocation = new MyPlace();
+        secondLocation.setPlace(searchFragment.mSearchPlace);
+        DirectionsFragment directionsFragment = DirectionsFragment.Companion.newInstance(this,firstLocation,secondLocation);
+        directionsFragment.setDirectionsFragmentCallback(new DirectionsFragment.DirectionsFragmentCallback() {
+            @Override
+            public void onDirectionsFragmentUIReady(@NotNull DirectionsFragment directionsFragment) {
+                setSupportActionBar(directionsFragment.toolbar);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setTitle("");
+            }
+
+            @Override
+            public void onLocationChanged(@NotNull ArrayList<MyPlace> locationList, @NotNull DirectionsFragment directionsFragment) {
+                findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+                final LatLng origin;
+                final LatLng destination;
+                ArrayList<LatLng> waypoints = new ArrayList<>();
+                //if it only contains the LatLng
+                if(locationList.get(0).getPlace() == null)
+                    origin = locationList.get(0).getLatlng();
+                else // if contains Place
+                    origin = locationList.get(0).getPlace().getLatLng();
+
+                if(locationList.get(locationList.size()-1).getPlace() == null)
+                    destination = locationList.get(locationList.size()-1).getLatlng();
+                else
+                    destination = locationList.get(locationList.size()-1).getPlace().getLatLng();
+
+                for(int i = 1 ; i < locationList.size()-2 ; ++i){
+                    if(locationList.get(i).getPlace() == null)
+                        waypoints.add(locationList.get(i).getLatlng());
+                    else
+                        waypoints.add(locationList.get(i).getPlace().getLatLng());
+                }
+
+                //Create Request to get directions
+                GoogleDirectionsQuery mDirectionsQuery = new GoogleDirectionsQuery
+                        .Builder()
+                        .withOrigin(origin)
+                        .withDestination(destination)
+                        .withWaypoints(waypoints)
+                        .buid();
+                //Starting Query Request
+                mDirectionsQuery.query(new GoogleDirectionsQuery.OnDirectionsResultListener() {
+                    @Override
+                    public void onDirectionsResult(DirectionsResponse directionsResponse, int resultCode) {
+                        Log.d("MapsActivity","onDirectionsResult");
+                        findViewById(R.id.progressBar).setVisibility(View.GONE);
+                        if(resultCode == GoogleDirectionsQuery.RESPONSE_SUCCESS){
+                            //Clear the old one
+                            mMap.clear();
+                            //Set marker at the destination
+                            mMap.addMarker(new MarkerOptions().position(destination));
+                            //Draw the polyline of route
+                            for(Route route : directionsResponse.getRoutes()){
+                                String encoded = route.getOverviewPolyline().getPoints();
+                                List<LatLng> polyLine = PolyUtil.decode(encoded);
+                                mMap.addPolyline(new PolylineOptions()
+                                        .addAll(polyLine)
+                                        .width(20)
+                                        .color(Color.GREEN)
+                                        .geodesic(true));
+                            }
+                        }
+                        else if( resultCode == GoogleDirectionsQuery.RESPONSE_FAILURE){
+                            Toast.makeText(MapsActivity.this,"Something wrong, Try again later!",Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+            }
+        });
+        FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.toolbar_container,directionsFragment,directionsFragment.getClass().getSimpleName());
+        fragmentTransaction.addToBackStack(directionsFragment.getClass().getSimpleName());
+        fragmentTransaction.commit();
+    }
 
 
 }

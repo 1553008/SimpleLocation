@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.example.hoangdung.simplelocation.R;
 import com.example.hoangdung.simplelocation.Activity.SearchActivity;
@@ -25,6 +26,7 @@ import com.google.android.gms.tasks.Task;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 /**
@@ -35,13 +37,12 @@ import butterknife.Unbinder;
 public class SearchFragment extends Fragment {
     private AppCompatActivity mContext;
     public @BindView(R.id.toolbar_search)Toolbar mToolbar;
-    //public @BindView(R.id.search_textview) TextView mSearchTextView;
+    public @BindView(R.id.find_direction)ImageView mImageView;
     private Unbinder mUnbinder;
     public Place mSearchPlace;
     public GeoDataClient mGeoClient;
     public Menu mMenu;
     private OnSearchFragmentCallback mSearchFragmentCallback;
-
     public SearchFragment() {
         // Required empty public constructor
     }
@@ -49,7 +50,7 @@ public class SearchFragment extends Fragment {
         void onSearchFragmentUIReady(SearchFragment searchFragment);
         void onSearchFragmentClicked(SearchFragment searchFragment);
         void onSearchFragmentResumed(SearchFragment searchFragment);
-        void onSearchResult(Place searchPlace, SearchFragment searchFragment, int resultCode);
+        void onSearchFragmentFindDirectionsClicked(SearchFragment searchFragment);
     }
     public void setOnSearchFragmentCallback(OnSearchFragmentCallback callback){
         mSearchFragmentCallback = callback;
@@ -63,28 +64,16 @@ public class SearchFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("MapsActivity","SearchFragment:onCreate");
         mGeoClient = Places.getGeoDataClient(getActivity(),null);
     }
-
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d("MapsActivity","SearchFragment:onCreateView");
         View view  = inflater.inflate(R.layout.fragment_search,container,false);
         mUnbinder = ButterKnife.bind(this,view);
-        mToolbar.inflateMenu(R.menu.search_toolbar_menu);
-        mMenu = mToolbar.getMenu();
-        mMenu.findItem(R.id.find_direction).setVisible(false);
-        mToolbar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try{
-                    mSearchFragmentCallback.onSearchFragmentClicked(SearchFragment.this);
-                }
-                catch (Exception e){
-
-                }
-            }
-        });
+        mImageView.setVisibility(View.INVISIBLE);
         setHasOptionsMenu(true);
         return view;
     }
@@ -92,7 +81,8 @@ public class SearchFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mSearchFragmentCallback.onSearchFragmentUIReady(this);
+        if(mSearchFragmentCallback!=null)
+            mSearchFragmentCallback.onSearchFragmentUIReady(this);
     }
 
     @Override
@@ -107,27 +97,27 @@ public class SearchFragment extends Fragment {
         Log.d("MapsActivity","SearchFragment:onActivityResult");
         if(data!=null)
         {
+            getActivity().findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
             String placeID = data.getStringExtra("PlaceID");
             Task<PlaceBufferResponse> task = mGeoClient.getPlaceById(placeID);
             task.addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
                 @Override
                 public void onComplete(@NonNull Task<PlaceBufferResponse> task) {
                     if(task.isSuccessful() && task.getResult()!= null){
-                        Log.d("MapsActivity","Place complete");
                         mSearchPlace = task.getResult().get(0).freeze();
-                        mSearchFragmentCallback.onSearchResult(mSearchPlace,SearchFragment.this,resultCode);
+                        mImageView.setVisibility(View.VISIBLE);
+                        getActivity().findViewById(R.id.progressBar).setVisibility(View.GONE);
+                        mSearchFragmentCallback.onSearchFragmentResumed(SearchFragment.this);
                         task.getResult().release();
-                        mMenu.findItem(R.id.find_direction).setVisible(true);
                     }
+                    getActivity().findViewById(R.id.progressBar).setVisibility(View.GONE);
                 }
             });
         }
         if(resultCode == getActivity().RESULT_CANCELED){
-            mSearchFragmentCallback.onSearchResult(mSearchPlace,SearchFragment.this,resultCode);
         }
 
     }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -140,7 +130,13 @@ public class SearchFragment extends Fragment {
         Intent intent = new Intent(getActivity(), SearchActivity.class);
         startActivityForResult(intent,1);
     }
-    /* public void setText(String text){
-            mSearchTextView.setText(text);
-        }*/
+
+    @OnClick(R.id.find_direction)
+    void onFindDirectionsClicked(View view){
+        mSearchFragmentCallback.onSearchFragmentFindDirectionsClicked(this);
+    }
+    @OnClick(R.id.toolbar_search)
+    void onSearchToolbarClicked(View view){
+        mSearchFragmentCallback.onSearchFragmentClicked(this);
+    }
 }
