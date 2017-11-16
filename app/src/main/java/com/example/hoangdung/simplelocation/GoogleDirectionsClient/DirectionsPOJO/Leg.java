@@ -34,9 +34,9 @@ public class Leg {
     @Expose
     String endAddress;
 
-    /*@SerializedName("steps")
+    @SerializedName("steps")
     @Expose
-    ArrayList<Step> steps = new ArrayList<>();*/
+    ArrayList<Step> steps = new ArrayList<>();
 
     @SerializedName("duration_in_traffic")
     @Expose
@@ -50,13 +50,13 @@ public class Leg {
         this.durationInTraffic = durationInTraffic;
     }
 
-    /*public ArrayList<Step> getSteps() {
+    public ArrayList<Step> getSteps() {
         return steps;
-    }*/
+    }
 
-   /* public void setSteps(ArrayList<Step> steps) {
+    public void setSteps(ArrayList<Step> steps) {
         this.steps = steps;
-    }*/
+    }
 
     public Distance getDistance() {
         return distance;

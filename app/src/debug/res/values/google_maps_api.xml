@@ -2,7 +2,7 @@
     <!--
     TODO: Before you run your application, you need a Google Maps API key.
 
-    To get one, follow this link, follow the directions and press "Create" at the end:
+    To get one, follow this link, follow directionsResponseions and press "Create" at the end:
 
     https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=6F:AC:97:47:7F:5C:1E:F4:70:43:B9:7F:0B:90:68:9B:41:15:64:16%3Bcom.example.hoangdung.simplelocation
 
@@ -14,7 +14,7 @@
     SHA-1 certificate fingerprint:
     6F:AC:97:47:7F:5C:1E:F4:70:43:B9:7F:0B:90:68:9B:41:15:64:16
 
-    Alternatively, follow the directions here:
+    Alternatively, follow directionsResponseions here:
     https://developers.google.com/maps/documentation/android/start#get-key
 
     Once you have your key (it starts with "AIza"), replace the "google_maps_key"

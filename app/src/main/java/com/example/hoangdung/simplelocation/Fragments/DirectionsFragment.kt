@@ -4,31 +4,27 @@ package com.example.hoangdung.simplelocation.Fragments
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.location.Location
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import butterknife.BindView
 import com.example.hoangdung.simplelocation.Activity.SearchActivity
 import com.example.hoangdung.simplelocation.Adapter.DirectionsAdapter
 import com.example.hoangdung.simplelocation.MyPlace
 
 import com.example.hoangdung.simplelocation.R
-import com.google.android.gms.location.places.Place
 import com.google.android.gms.location.places.PlaceBufferResponse
 import com.google.android.gms.location.places.Places
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import kotlinx.android.synthetic.main.fragment_directions.*
 
 
 /**
- * DirectionsFragment shows up when user presses button to find directions
+ * DirectionsFragment shows up when user presses button to find directionsResponse
  * It handles all UI operations that user interacts and notify listener when the list of locations changes
  */
 class DirectionsFragment constructor(): Fragment() {
@@ -38,12 +34,10 @@ class DirectionsFragment constructor(): Fragment() {
     var directionsFragmentCallback:  DirectionsFragmentCallback? = null
     lateinit var mContext: Context
     lateinit var toolbar: Toolbar
-
-
-    //Listener for DirectionsFragment
     interface DirectionsFragmentCallback{
         fun onDirectionsFragmentUIReady(directionsFragment: DirectionsFragment)
         fun onLocationChanged(locationList: ArrayList<MyPlace>, directionsFragment: DirectionsFragment)
+        fun onTabChanged(position: Int);
     }
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -57,7 +51,7 @@ class DirectionsFragment constructor(): Fragment() {
         directionsRecycler.adapter = directionsAdapter
         directionsRecycler.setHasFixedSize(true)
         directionsRecycler.layoutManager = LinearLayoutManager(activity)
-        toolbar = directionsToolbar;
+        toolbar = directionsToolbar
         directionsFragmentCallback?.onDirectionsFragmentUIReady(this)
         directionsFragmentCallback?.onLocationChanged(directionsAdapter.mPlacesList,this)
     }

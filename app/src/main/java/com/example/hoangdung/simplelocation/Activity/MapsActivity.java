@@ -26,6 +26,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.hoangdung.simplelocation.Fragments.DirectionsFragment;
+import com.example.hoangdung.simplelocation.Fragments.InfoTabFragment;
 import com.example.hoangdung.simplelocation.Fragments.SearchFragment;
 import com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO.DirectionsResponse;
 import com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO.Leg;
@@ -95,6 +96,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public ProgressBar mProgressBar;
     private Drawer mDrawer;
 
+    private DirectionsResponse drivingReponse;
+    private DirectionsResponse busResponse;
     //Firebase Authentication
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
@@ -125,8 +128,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         ButterKnife.bind(this);
         mFragmentManager = getSupportFragmentManager();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) mFragmentManager
-                .findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = SupportMapFragment.newInstance();
+        FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.map,mapFragment);
+        fragmentTransaction.commit();
         mapFragment.getMapAsync(this);
         initGoogleApiClient();
         drawerLayoutSetup();
@@ -472,8 +477,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         MyPlace secondLocation = new MyPlace();
         secondLocation.setPlace(searchFragment.mSearchPlace);
+        final InfoTabFragment infoTabFragment = new InfoTabFragment();
         DirectionsFragment directionsFragment = DirectionsFragment.Companion.newInstance(this,firstLocation,secondLocation);
         directionsFragment.setDirectionsFragmentCallback(new DirectionsFragment.DirectionsFragmentCallback() {
+            @Override
+            public void onTabChanged(int position) {
+
+            }
+
             @Override
             public void onDirectionsFragmentUIReady(@NotNull DirectionsFragment directionsFragment) {
                 setSupportActionBar(directionsFragment.toolbar);
@@ -483,69 +494,108 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             @Override
             public void onLocationChanged(@NotNull ArrayList<MyPlace> locationList, @NotNull DirectionsFragment directionsFragment) {
-                findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
-                final LatLng origin;
-                final LatLng destination;
-                ArrayList<LatLng> waypoints = new ArrayList<>();
-                //if it only contains the LatLng
-                if(locationList.get(0).getPlace() == null)
-                    origin = locationList.get(0).getLatlng();
-                else // if contains Place
-                    origin = locationList.get(0).getPlace().getLatLng();
+                Log.d("MapsActivity","onLocationChanged");
 
-                if(locationList.get(locationList.size()-1).getPlace() == null)
-                    destination = locationList.get(locationList.size()-1).getLatlng();
-                else
-                    destination = locationList.get(locationList.size()-1).getPlace().getLatLng();
-
-                for(int i = 1 ; i < locationList.size()-2 ; ++i){
-                    if(locationList.get(i).getPlace() == null)
-                        waypoints.add(locationList.get(i).getLatlng());
-                    else
-                        waypoints.add(locationList.get(i).getPlace().getLatLng());
-                }
-
-                //Create Request to get directions
-                GoogleDirectionsQuery mDirectionsQuery = new GoogleDirectionsQuery
-                        .Builder()
-                        .withOrigin(origin)
-                        .withDestination(destination)
-                        .withWaypoints(waypoints)
-                        .buid();
-                //Starting Query Request
-                mDirectionsQuery.query(new GoogleDirectionsQuery.OnDirectionsResultListener() {
+                //Query Driving Mode
+                GoogleDirectionsQuery drivingQuery = getDirectionsQuery(locationList,directionsFragment, GoogleDirectionsQuery.TRAVEL_MODE.DRIVING);
+                drivingQuery.query(new GoogleDirectionsQuery.OnDirectionsResultListener() {
                     @Override
                     public void onDirectionsResult(DirectionsResponse directionsResponse, int resultCode) {
                         Log.d("MapsActivity","onDirectionsResult");
                         findViewById(R.id.progressBar).setVisibility(View.GONE);
                         if(resultCode == GoogleDirectionsQuery.RESPONSE_SUCCESS){
-                            //Clear the old one
-                            mMap.clear();
-                            //Set marker at the destination
-                            mMap.addMarker(new MarkerOptions().position(destination));
-                            //Draw the polyline of route
-                            for(Route route : directionsResponse.getRoutes()){
-                                String encoded = route.getOverviewPolyline().getPoints();
-                                List<LatLng> polyLine = PolyUtil.decode(encoded);
-                                mMap.addPolyline(new PolylineOptions()
-                                        .addAll(polyLine)
-                                        .width(20)
-                                        .color(Color.GREEN)
-                                        .geodesic(true));
-                            }
+                            //Save the response
+                            drivingReponse = directionsResponse;
+                            infoTabFragment.setDrivingReponse(drivingReponse);
+                            updateUIFromDirectionsResponse(0);
+
                         }
                         else if( resultCode == GoogleDirectionsQuery.RESPONSE_FAILURE){
                             Toast.makeText(MapsActivity.this,"Something wrong, Try again later!",Toast.LENGTH_LONG).show();
                         }
+                        findViewById(R.id.progressBar).setVisibility(View.GONE);
                     }
                 });
+
+                //Query Bus Mode
+                GoogleDirectionsQuery busQuery = getDirectionsQuery(locationList,directionsFragment, GoogleDirectionsQuery.TRAVEL_MODE.TRANSIT);
+                busQuery.query(new GoogleDirectionsQuery.OnDirectionsResultListener() {
+                    @Override
+                    public void onDirectionsResult(DirectionsResponse directionsResponse, int resultCode) {
+                        Log.d("MapsActivity","onDirectionsResult");
+                        findViewById(R.id.progressBar).setVisibility(View.GONE);
+                        if(resultCode == GoogleDirectionsQuery.RESPONSE_SUCCESS){
+                            //Save the response
+                            busResponse = directionsResponse;
+                            infoTabFragment.setBusReponse(busResponse);
+                            //updateUIFromDirectionsResponse(0);
+                        }
+                        else if( resultCode == GoogleDirectionsQuery.RESPONSE_FAILURE){
+                            Toast.makeText(MapsActivity.this,"Something wrong, Try again later!",Toast.LENGTH_LONG).show();
+                        }
+                        findViewById(R.id.progressBar).setVisibility(View.GONE);
+                    }
+                });
+
+
             }
         });
+
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.toolbar_container,directionsFragment,directionsFragment.getClass().getSimpleName());
+        fragmentTransaction.add(R.id.below_toolbar_container,infoTabFragment,infoTabFragment.getClass().getSimpleName());
         fragmentTransaction.addToBackStack(directionsFragment.getClass().getSimpleName());
         fragmentTransaction.commit();
     }
+    private GoogleDirectionsQuery getDirectionsQuery(@NotNull ArrayList<MyPlace> locationList, @NotNull final DirectionsFragment directionsFragment, final GoogleDirectionsQuery.TRAVEL_MODE travelMode){
+        findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+        final LatLng origin;
+        final LatLng destination;
+        ArrayList<LatLng> waypoints = new ArrayList<>();
+        //if it only contains the LatLng
+        if(locationList.get(0).getPlace() == null)
+            origin = locationList.get(0).getLatlng();
+        else // if contains Place
+            origin = locationList.get(0).getPlace().getLatLng();
 
+        if(locationList.get(locationList.size()-1).getPlace() == null)
+            destination = locationList.get(locationList.size()-1).getLatlng();
+        else
+            destination = locationList.get(locationList.size()-1).getPlace().getLatLng();
 
+        for(int i = 1 ; i < locationList.size()-2 ; ++i){
+            if(locationList.get(i).getPlace() == null)
+                waypoints.add(locationList.get(i).getLatlng());
+            else
+                waypoints.add(locationList.get(i).getPlace().getLatLng());
+        }
+
+        //Create Request to get directionsResponse
+        GoogleDirectionsQuery mDirectionsQuery = new GoogleDirectionsQuery
+                .Builder()
+                .withOrigin(origin)
+                .withDestination(destination)
+                .withTravelMode(GoogleDirectionsQuery.TRAVEL_MODE.DRIVING)
+                .withWaypoints(waypoints)
+                .buid();
+        return mDirectionsQuery;
+
+    }
+    private void updateUIFromDirectionsResponse(int curTabPosition){
+        //If the current tab belongs to driving mode
+
+        mMap.clear();
+        DirectionsResponse response = null;
+        if(curTabPosition == 0)
+            response = drivingReponse;
+        else if(curTabPosition == 1)
+            response = busResponse;
+
+        for (Route route: response.getRoutes()){
+            List<LatLng> polyline = PolyUtil.decode(route.getOverviewPolyline().getPoints());
+            mMap.addPolyline(new PolylineOptions()
+                    .addAll(polyline)
+                    .geodesic(true));
+        }
+    }
 }

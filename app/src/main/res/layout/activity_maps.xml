@@ -8,21 +8,12 @@
     android:fitsSystemWindows="false"
     android:id="@+id/drawerlayout_container">
 
-    <fragment xmlns:tools="http://schemas.android.com/tools"
+    <FrameLayout
         android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.example.hoangdung.simplelocation.Activity.MapsActivity" />
-    <FrameLayout
-        android:id="@+id/toolbar_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start|top"
-        android:layout_marginTop="24dp"
-        android:background="@drawable/toolbar_style"
-        >
-    </FrameLayout>
+        />
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/floating_btn"
         android:layout_width="56dp"
@@ -34,6 +25,21 @@
         android:layout_alignBottom="@id/map"
         android:src="@drawable/ic_navigate"
         />
+    <FrameLayout
+        android:id="@+id/toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|top"
+        android:layout_marginTop="24dp"
+        >
+    </FrameLayout>
+    <FrameLayout
+        android:id="@+id/below_toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar_container"
+        >
+    </FrameLayout>
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
