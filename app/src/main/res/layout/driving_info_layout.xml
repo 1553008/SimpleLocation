@@ -10,24 +10,26 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="15dp">
+        android:id="@+id/drivingInfoHeader">
         <TextView
             android:id="@+id/distanceText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
-            android:textSize="20sp"
+            android:textSize="16sp"
             android:textColor="@android:color/black"
-            android:layout_marginLeft="20dp"/>
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="10dp"/>
         <TextView
             android:id="@+id/durationText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toLeftOf="@id/distanceText"
-            android:textSize="20sp"
-            android:textColor="@android:color/darker_gray"
+            android:layout_toRightOf="@id/distanceText"
+            android:textSize="16sp"
+            android:textColor="@android:color/tertiary_text_dark"
             android:layout_marginLeft="20dp"
+            android:layout_marginTop="10dp"
             />
         <TextView
             android:layout_width="wrap_content"
@@ -36,18 +38,20 @@
             android:text="Best route"
             android:layout_below="@id/distanceText"
             android:layout_marginLeft="20dp"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"/>
     </RelativeLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@android:color/darker_gray"
-        android:elevation="3dp"
+        android:elevation="2dp"
         />
     <android.support.v7.widget.RecyclerView
         android:id="@+id/stepRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
     </android.support.v7.widget.RecyclerView>
 </LinearLayout>

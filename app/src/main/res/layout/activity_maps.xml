@@ -1,52 +1,67 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawerlayout_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".Activity.MapsActivity"
     android:fitsSystemWindows="false"
-    android:id="@+id/drawerlayout_container">
+    tools:context=".Activity.MapsActivity">
 
-    <FrameLayout
-        android:id="@+id/map"
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        />
+        android:id="@+id/map"
+        tools:context=".Activity.MapsActivity"
+        android:name="com.google.android.gms.maps.SupportMapFragment" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/floating_btn"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_gravity="bottom|end"
-        android:layout_marginBottom="53dp"
-        android:layout_marginRight="5dp"
-        android:layout_alignEnd="@id/map"
-        android:layout_alignBottom="@id/map"
-        android:src="@drawable/ic_navigate"
-        />
+
     <FrameLayout
         android:id="@+id/toolbar_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="start|top"
-        android:layout_marginTop="24dp"
-        >
-    </FrameLayout>
+        android:layout_marginTop="24dp"></FrameLayout>
+
     <FrameLayout
-        android:id="@+id/below_toolbar_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar_container"
-        >
+        android:layout_below="@id/toolbar_container">
+
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end">
+            <android.support.design.widget.FloatingActionButton xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/floating_btn"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_alignBottom="@id/map"
+                android:layout_alignEnd="@id/map"
+                android:layout_gravity="bottom|end"
+                android:layout_marginBottom="53dp"
+                android:layout_marginRight="5dp"
+                android:src="@drawable/ic_navigate">
+
+            </android.support.design.widget.FloatingActionButton>
+        </android.support.design.widget.CoordinatorLayout>
+
+        <FrameLayout
+            android:id="@+id/below_toolbar_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </FrameLayout>
+
     </FrameLayout>
+
+
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:indeterminate="true"
         android:layout_centerInParent="true"
-        android:visibility="gone"
-        />
+        android:indeterminate="true"
+        android:visibility="gone" />
 </RelativeLayout>
 

@@ -1,6 +1,7 @@
 package com.example.hoangdung.simplelocation.Activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -12,17 +13,20 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.hoangdung.simplelocation.Fragments.DirectionsFragment;
@@ -32,6 +36,7 @@ import com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJ
 import com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO.Leg;
 import com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO.Route;
 import com.example.hoangdung.simplelocation.GoogleDirectionsClient.GoogleDirectionsQuery;
+import com.example.hoangdung.simplelocation.MyApplication;
 import com.example.hoangdung.simplelocation.MyPlace;
 import com.example.hoangdung.simplelocation.R;
 import com.google.android.gms.common.ConnectionResult;
@@ -98,6 +103,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private DirectionsResponse drivingReponse;
     private DirectionsResponse busResponse;
+
+    private Context mContext;
     //Firebase Authentication
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
@@ -127,11 +134,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_maps);
         ButterKnife.bind(this);
         mFragmentManager = getSupportFragmentManager();
+        mContext = getApplicationContext();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = SupportMapFragment.newInstance();
-        FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.map,mapFragment);
-        fragmentTransaction.commit();
+        SupportMapFragment mapFragment = (SupportMapFragment) mFragmentManager.findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         initGoogleApiClient();
         drawerLayoutSetup();
@@ -424,6 +429,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if(searchFragment.mSearchPlace!= null){
                     handleSearchResult(searchFragment.mSearchPlace,searchFragment,RESULT_OK);
                 }
+                //Setting up Locate Button position
+                CoordinatorLayout.LayoutParams floatingBtnLayoutParams =(CoordinatorLayout.LayoutParams) mLocateBtn.getLayoutParams();
+                floatingBtnLayoutParams.bottomMargin = (int) (MyApplication.getNavigationBarHeight(mContext,
+                                        mContext.getResources().getConfiguration().orientation) +
+                                        mContext.getResources().getDimension(R.dimen.myplaceButtonMarginBottom));
             }
             @Override
             public void onSearchFragmentFindDirectionsClicked(SearchFragment searchFragment) {
@@ -536,8 +546,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         findViewById(R.id.progressBar).setVisibility(View.GONE);
                     }
                 });
-
-
             }
         });
 
@@ -546,6 +554,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         fragmentTransaction.add(R.id.below_toolbar_container,infoTabFragment,infoTabFragment.getClass().getSimpleName());
         fragmentTransaction.addToBackStack(directionsFragment.getClass().getSimpleName());
         fragmentTransaction.commit();
+        
     }
     private GoogleDirectionsQuery getDirectionsQuery(@NotNull ArrayList<MyPlace> locationList, @NotNull final DirectionsFragment directionsFragment, final GoogleDirectionsQuery.TRAVEL_MODE travelMode){
         findViewById(R.id.progressBar).setVisibility(View.VISIBLE);

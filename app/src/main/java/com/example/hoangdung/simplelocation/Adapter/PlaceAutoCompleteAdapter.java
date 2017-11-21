@@ -139,9 +139,9 @@ public class PlaceAutoCompleteAdapter extends RecyclerView.Adapter<PlaceAutoComp
     }
 
     public class PlaceViewHolder extends RecyclerView.ViewHolder{
-        TextView primaryText;
-        TextView secondaryText;
-        View parentLayout;
+        public TextView primaryText;
+        public TextView secondaryText;
+        public View parentLayout;
         public PlaceViewHolder(View item){
             super(item);
             primaryText = item.findViewById(R.id.search_text_primary);

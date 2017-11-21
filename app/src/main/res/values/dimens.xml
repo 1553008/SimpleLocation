@@ -2,4 +2,8 @@
 <resources>
     <dimen name="directionsBarSize">150dp</dimen>
     <dimen name="navigationBarSize">48dp</dimen>
+    <dimen name="myplaceButtonSize">48dp</dimen>
+    <dimen name="slidingUpPanelHeight">56dp</dimen>
+    <dimen name="myplaceButtonMarginBottom">10dp</dimen>
+    <dimen name="myplaceButtonMarginRight">5dp</dimen>
 </resources>

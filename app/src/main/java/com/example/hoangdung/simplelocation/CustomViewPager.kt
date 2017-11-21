@@ -19,4 +19,13 @@ class CustomViewPager : ViewPager {
     override fun onTouchEvent(ev: MotionEvent): Boolean {
         return swipable && super.onTouchEvent(ev)
     }
+
+    override fun canScrollHorizontally(direction: Int): Boolean {
+        return swipable && super.canScrollHorizontally(direction)
+    }
+
+    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+        return swipable && super.onInterceptTouchEvent(ev)
+    }
+
 }

@@ -31,9 +31,11 @@ class InfoTabFragment : Fragment() {
             //When reponse is change the InfoTabFragment UI needs also to be updated
 
             //Changing DrivingInfoFragment UI
+            Log.d("MapsActivity",value?.routes?.get(0)?.legs?.get(0)?.distance?.text)
+            Log.d("MapsActivity",value?.routes?.get(0)?.legs?.get(0)?.durationInTraffic?.text)
             drivingInfoFragment?.distanceText?.text = value?.routes?.get(0)?.legs?.get(0)?.distance?.text
             drivingInfoFragment?.durationText?.text = value?.routes?.get(0)?.legs?.get(0)?.durationInTraffic?.text
-            drivingInfoFragment?.mAdapter?.directionResponse = drivingReponse
+            drivingInfoFragment?.mAdapter?.directionResponse = field
         }
     var busReponse: DirectionsResponse? = null
         set(value) {

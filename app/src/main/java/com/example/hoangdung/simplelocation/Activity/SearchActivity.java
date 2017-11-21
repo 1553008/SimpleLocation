@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -43,6 +44,14 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
     private GeoDataClient mGeoDataClient;
     private PlaceAutoCompleteAdapter mAdapter;
     private String mCountryCode;
+
+    //Search Edit text auto complete
+    long delay = 1000; // 1 seconds after user stops typing
+    long last_text_edit = 0;
+    Handler handler = new Handler();
+    private Runnable input_finish_checker;
+    private Editable editable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +65,17 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
         mListView.setLayoutManager(new LinearLayoutManager(this));
         mListView.setHasFixedSize(true);
         mListView.setAdapter(mAdapter);
+
+        //Search Edit Text Setup
+        input_finish_checker = new Runnable() {
+            @Override
+            public void run() {
+                if(System.currentTimeMillis() > (last_text_edit + delay - 500)){
+                    mAdapter.clearData();
+                    mAdapter.getFilter().filter(editable);
+                }
+            }
+        };
         mSearchText.requestFocus();
         mSearchText.setCursorVisible(true);
         mSearchText.addTextChangedListener(new TextWatcher() {
@@ -66,13 +86,16 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mAdapter.clearData();
-                mAdapter.getFilter().filter(s);
+                handler.removeCallbacks(input_finish_checker);
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                if(s.length() > 0){
+                    last_text_edit = System.currentTimeMillis();
+                    handler.postDelayed(input_finish_checker,delay);
+                    editable = s;
+                }
             }
         });
         setSupportActionBar(mToolbar);
@@ -116,4 +139,5 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
         setResult(RESULT_OK,data);
         finish();
     }
+
 }
