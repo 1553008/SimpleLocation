@@ -15,6 +15,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 
+import com.example.hoangdung.simplelocation.FirebaseCenter;
+import com.example.hoangdung.simplelocation.Interface.FirebaseAuthCommand;
 import com.example.hoangdung.simplelocation.R;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -27,10 +29,6 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FacebookAuthProvider;
-import com.google.firebase.auth.FirebaseAuth;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,6 +40,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class WelcomeActivity extends AppCompatActivity {
+    private FirebaseCenter firebaseCenter = new FirebaseCenter();
     //For Debugging
     private final String TAG = WelcomeActivity.class.getSimpleName();
     //Request code
@@ -52,7 +51,6 @@ public class WelcomeActivity extends AppCompatActivity {
     public @BindView(R.id.loginBtn) Button mLoginBtn;
     private CallbackManager mCallbackManager;
     //Facebook and Firebase
-    private FirebaseAuth mAuth;
     //Read Permission
     private List<String> readPermissions = Arrays.asList(
             "email","public_profile");
@@ -62,7 +60,6 @@ public class WelcomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_welcome);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         ButterKnife.bind(this);
-        initializeFirebaseAuth();
         getLocationPermission();
         loginSetup();
 
@@ -119,7 +116,21 @@ public class WelcomeActivity extends AppCompatActivity {
                                     editor.putString("last_name",object.getString("last_name"));
                                     editor.putString("picture",object.getJSONObject("picture").getJSONObject("data").getString("url"));
                                     editor.commit();
-                                    handleFacebookAccessToken(loginResult.getAccessToken());
+
+                                    // Firebase authentication with facebook
+                                    firebaseCenter.handleFacebookAccessToken(loginResult.getAccessToken(),
+                                            new FirebaseAuthCommand() {
+                                                @Override
+                                                public void onSuccess() {
+                                                    goToMapsActivity();
+                                                    finish();
+                                                }
+
+                                                @Override
+                                                public void onFail() {
+                                                    finish();
+                                                }
+                                            });
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -131,7 +142,6 @@ public class WelcomeActivity extends AppCompatActivity {
                 params.putString("fields","email,first_name,last_name,picture");
                 graphRequest.setParameters(params);
                 graphRequest.executeAsync();
-                //FireBase Authentication
 
             }
             @Override
@@ -157,28 +167,8 @@ public class WelcomeActivity extends AppCompatActivity {
     private void startLogin(){
         LoginManager.getInstance().logInWithReadPermissions(WelcomeActivity.this,readPermissions);
     }
-    //------------------------------Facebook and Firebase--------------------------------------
-    private void initializeFirebaseAuth(){
-        mAuth = FirebaseAuth.getInstance();
-    }
-    private void handleFacebookAccessToken(AccessToken token){
-        Log.d(TAG,"handleFacebookAccessToken:" + token);
-        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()){
-                            Log.d(TAG,"signInWithCredential:success");
-                            goToMapsActivity();
-                            finish();
-                        }else{
-                            Log.d(TAG,"signInWithCredential:failure");
-                            finish();
-                        }
-                    }
-                });
-    }
+    //------------------------------Facebook--------------------------------------
+
     /**
      * Request Result Callback Method
      * @param requestCode
