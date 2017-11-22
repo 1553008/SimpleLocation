@@ -23,6 +23,9 @@ public class DirectionsResponse {
     @Expose
     ArrayList<Route> routes = new ArrayList<>();
 
+
+
+
     public ArrayList<Route> getRoutes() {
         return routes;
     }

@@ -30,6 +30,7 @@ import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.swipeLeft;
 import static android.support.test.espresso.action.ViewActions.swipeRight;
+import static android.support.test.espresso.action.ViewActions.swipeUp;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
@@ -77,6 +78,7 @@ public class DirectionsTest {
 
         onView(isRoot())
                 .perform(waitFor(30000));
+
     }
 
 
@@ -111,5 +113,36 @@ public class DirectionsTest {
                 return item.primaryText.getText().toString().contains("Hau Giang");
             }
         };
+    }
+    public static ViewAction throughLastPosition(final Matcher<View> matcher){
+        return new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return new BoundedMatcher<View,RecyclerView>(RecyclerView.class) {
+
+                    @Override
+                    public void describeTo(Description description) {
+
+                    }
+
+                    @Override
+                    protected boolean matchesSafely(RecyclerView item) {
+                        return true;
+                    }
+                };
+            }
+
+            @Override
+            public String getDescription() {
+                return null;
+            }
+
+            @Override
+            public void perform(UiController uiController, View view) {
+                RecyclerView recyclerView = (RecyclerView) view;
+                recyclerView.scrollToPosition(recyclerView.getAdapter().getItemCount()-1);
+            }
+        };
+
     }
 }

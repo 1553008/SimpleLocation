@@ -3,6 +3,8 @@ package com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPO
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+
 /**
  * Created by hoangdung on 11/11/17.
  */
@@ -36,6 +38,32 @@ public class Step {
     @SerializedName("polyline")
     @Expose
     Polyline polyline;
+
+    @SerializedName("maneuver")
+    @Expose
+    String maneuver;
+
+    @SerializedName("steps")
+    @Expose
+    ArrayList<Step> steps = new ArrayList<>();
+
+    public String getManeuver() {
+        return maneuver;
+    }
+
+    public void setManeuver(String maneuver) {
+        this.maneuver = maneuver;
+    }
+
+    public ArrayList<Step> getSteps() {
+        return steps;
+    }
+
+    public void setSteps(ArrayList<Step> steps) {
+        this.steps = steps;
+    }
+
+
 
     public Distance getDistance() {
         return distance;

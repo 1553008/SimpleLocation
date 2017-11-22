@@ -37,7 +37,6 @@ class DirectionsFragment constructor(): Fragment() {
     interface DirectionsFragmentCallback{
         fun onDirectionsFragmentUIReady(directionsFragment: DirectionsFragment)
         fun onLocationChanged(locationList: ArrayList<MyPlace>, directionsFragment: DirectionsFragment)
-        fun onTabChanged(position: Int);
     }
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {

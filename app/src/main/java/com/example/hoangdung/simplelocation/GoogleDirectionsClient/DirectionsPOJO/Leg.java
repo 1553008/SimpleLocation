@@ -42,6 +42,30 @@ public class Leg {
     @Expose
     Duration durationInTraffic;
 
+    @SerializedName("arrival_time")
+    @Expose
+    Time arriveTime;
+
+    @SerializedName("departure_time")
+    @Expose
+    Time departTime;
+
+    public Time getArriveTime() {
+        return arriveTime;
+    }
+
+    public void setArriveTime(Time arriveTime) {
+        this.arriveTime = arriveTime;
+    }
+
+    public Time getDepartTime() {
+        return departTime;
+    }
+
+    public void setDepartTime(Time departTime) {
+        this.departTime = departTime;
+    }
+
     public Duration getDurationInTraffic() {
         return durationInTraffic;
     }

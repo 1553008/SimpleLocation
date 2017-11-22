@@ -23,27 +23,29 @@ class InfoTabFragment : Fragment() {
 
 
     private val numOfTabs = 2;
+    var curTabs = 0;
+    var listeners: OnTabListener? = null
+    lateinit var mTabLayout: TabLayout
     var drivingInfoFragment : DrivingInfoFragment? = null
     var busInfoFragment: BusInfoFragment? =null
     var drivingReponse: DirectionsResponse? = null
         set(value) {
             field = value
             //When reponse is change the InfoTabFragment UI needs also to be updated
-
-            //Changing DrivingInfoFragment UI
-            Log.d("MapsActivity",value?.routes?.get(0)?.legs?.get(0)?.distance?.text)
-            Log.d("MapsActivity",value?.routes?.get(0)?.legs?.get(0)?.durationInTraffic?.text)
-            drivingInfoFragment?.distanceText?.text = value?.routes?.get(0)?.legs?.get(0)?.distance?.text
-            drivingInfoFragment?.durationText?.text = value?.routes?.get(0)?.legs?.get(0)?.durationInTraffic?.text
-            drivingInfoFragment?.mAdapter?.directionResponse = field
+            drivingInfoFragment?.directionsReponse = drivingReponse
         }
     var busReponse: DirectionsResponse? = null
         set(value) {
             field = value
             //When response is changed the InfoTabFragment UI needs also to be updated
             //Changing BusInfoFragment UI
+            busInfoFragment?.directionsReponse = busReponse
 
         }
+
+    public interface OnTabListener{
+        public fun onTabChanged(position: Int, response: DirectionsResponse?);
+    }
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -65,7 +67,7 @@ class InfoTabFragment : Fragment() {
                 }
                 else if(position == 1) // Bus Info Tab
                 {
-                    busInfoFragment = BusInfoFragment()
+                    busInfoFragment = BusInfoFragment.newInstance(context)
                     return busInfoFragment!!
                 }
                 else
@@ -81,6 +83,7 @@ class InfoTabFragment : Fragment() {
             }
         }
         viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
+        mTabLayout = tabLayout
         tabLayout.setupWithViewPager(viewPager)
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
             override fun onTabReselected(tab: TabLayout.Tab?) {
@@ -92,9 +95,13 @@ class InfoTabFragment : Fragment() {
 
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 Log.d("Maps","onTabSelected:position" + tab?.position)
+                curTabs = tab?.position!!;
+                if(curTabs == 0)
+                    listeners?.onTabChanged(curTabs,drivingReponse)
+                else if(curTabs == 1)
+                    listeners?.onTabChanged(curTabs,busReponse)
             }
         })
     }//onViewCreated
-
 
 }// Required empty public constructor

@@ -45,12 +45,19 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Dash;
+import com.google.android.gms.maps.model.Dot;
+import com.google.android.gms.maps.model.Gap;
+import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -70,6 +77,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -478,23 +486,33 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     //----------------------------------------Directions Functionality--------------------------------------
 
+    /**
+     * When the user clicks find directions icon from the search fragment, this function will be called
+     * This will replace the search fragment with direction fragment
+     * Using place data of search fragment as destination
+     * Initialize neccessary listeners to observe changes in searching lists and tab changed
+     */
     private void startDirectionsFragment(SearchFragment searchFragment){
         Log.d("MapsActivity","startDirectionsFragment");
 
+        //Get origin and destination
         MyPlace firstLocation = new MyPlace();
         firstLocation.setLatlng(new LatLng(mLastknownLocation.getLatitude(),mLastknownLocation.getLongitude()));
         firstLocation.setFullName("Your location");
-
         MyPlace secondLocation = new MyPlace();
         secondLocation.setPlace(searchFragment.mSearchPlace);
+        //Create InfoTabFragment and add listener for changes
         final InfoTabFragment infoTabFragment = new InfoTabFragment();
+        infoTabFragment.setListeners(new InfoTabFragment.OnTabListener() {
+            @Override
+            public void onTabChanged(int position, DirectionsResponse response) {
+                updateUIFromDirectionsResponse(position,response);
+            }
+        });
+        //Create Directions Fragment and add listener for changes
         DirectionsFragment directionsFragment = DirectionsFragment.Companion.newInstance(this,firstLocation,secondLocation);
         directionsFragment.setDirectionsFragmentCallback(new DirectionsFragment.DirectionsFragmentCallback() {
-            @Override
-            public void onTabChanged(int position) {
-
-            }
-
+            //When the fragment is ready
             @Override
             public void onDirectionsFragmentUIReady(@NotNull DirectionsFragment directionsFragment) {
                 setSupportActionBar(directionsFragment.toolbar);
@@ -507,7 +525,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Log.d("MapsActivity","onLocationChanged");
 
                 //Query Driving Mode
-                GoogleDirectionsQuery drivingQuery = getDirectionsQuery(locationList,directionsFragment, GoogleDirectionsQuery.TRAVEL_MODE.DRIVING);
+                GoogleDirectionsQuery drivingQuery = getDirectionsQuery(locationList, GoogleDirectionsQuery.TRAVEL_MODE.DRIVING);
                 drivingQuery.query(new GoogleDirectionsQuery.OnDirectionsResultListener() {
                     @Override
                     public void onDirectionsResult(DirectionsResponse directionsResponse, int resultCode) {
@@ -517,8 +535,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             //Save the response
                             drivingReponse = directionsResponse;
                             infoTabFragment.setDrivingReponse(drivingReponse);
-                            updateUIFromDirectionsResponse(0);
-
+                            if(infoTabFragment.getCurTabs() == 0)
+                            {
+                                updateUIFromDirectionsResponse(infoTabFragment.getCurTabs(),directionsResponse);
+                            }
                         }
                         else if( resultCode == GoogleDirectionsQuery.RESPONSE_FAILURE){
                             Toast.makeText(MapsActivity.this,"Something wrong, Try again later!",Toast.LENGTH_LONG).show();
@@ -528,7 +548,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 });
 
                 //Query Bus Mode
-                GoogleDirectionsQuery busQuery = getDirectionsQuery(locationList,directionsFragment, GoogleDirectionsQuery.TRAVEL_MODE.TRANSIT);
+                GoogleDirectionsQuery busQuery = getDirectionsQuery(locationList, GoogleDirectionsQuery.TRAVEL_MODE.TRANSIT);
                 busQuery.query(new GoogleDirectionsQuery.OnDirectionsResultListener() {
                     @Override
                     public void onDirectionsResult(DirectionsResponse directionsResponse, int resultCode) {
@@ -538,7 +558,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             //Save the response
                             busResponse = directionsResponse;
                             infoTabFragment.setBusReponse(busResponse);
-                            //updateUIFromDirectionsResponse(0);
+                            if(infoTabFragment.getCurTabs() == 1)
+                            {
+                                updateUIFromDirectionsResponse(infoTabFragment.getCurTabs(),directionsResponse);
+                            }
                         }
                         else if( resultCode == GoogleDirectionsQuery.RESPONSE_FAILURE){
                             Toast.makeText(MapsActivity.this,"Something wrong, Try again later!",Toast.LENGTH_LONG).show();
@@ -556,11 +579,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         fragmentTransaction.commit();
         
     }
-    private GoogleDirectionsQuery getDirectionsQuery(@NotNull ArrayList<MyPlace> locationList, @NotNull final DirectionsFragment directionsFragment, final GoogleDirectionsQuery.TRAVEL_MODE travelMode){
+    private GoogleDirectionsQuery getDirectionsQuery(@NotNull ArrayList<MyPlace> locationList, final GoogleDirectionsQuery.TRAVEL_MODE travelMode){
         findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
-        final LatLng origin;
-        final LatLng destination;
         ArrayList<LatLng> waypoints = new ArrayList<>();
+        LatLng origin;
+        LatLng destination;
         //if it only contains the LatLng
         if(locationList.get(0).getPlace() == null)
             origin = locationList.get(0).getLatlng();
@@ -584,27 +607,58 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .Builder()
                 .withOrigin(origin)
                 .withDestination(destination)
-                .withTravelMode(GoogleDirectionsQuery.TRAVEL_MODE.DRIVING)
+                .withTravelMode(travelMode)
                 .withWaypoints(waypoints)
                 .buid();
         return mDirectionsQuery;
 
     }
-    private void updateUIFromDirectionsResponse(int curTabPosition){
+    private void updateUIFromDirectionsResponse(int curTabPosition, final DirectionsResponse response){
         //If the current tab belongs to driving mode
 
+        if(response == null)
+            return;
         mMap.clear();
-        DirectionsResponse response = null;
+        List<PatternItem> patternItems = null;
+        int color = 0;
+        //Driving tab
         if(curTabPosition == 0)
-            response = drivingReponse;
-        else if(curTabPosition == 1)
-            response = busResponse;
+        {
+            color = mContext.getResources().getColor(R.color.colorPolylineDirectionsDriving);
+        }
+        else if(curTabPosition == 1) //Bus tab
+        {
+            color = mContext.getResources().getColor(R.color.colorPolylineDirectionsBus);
+            final int PATTERN_DASH_LENGTH = 20;
+            final int PATTERN_GAP_LENGTH = 20;
+            PatternItem dot = new Dot();
+            PatternItem dash = new Dash(PATTERN_DASH_LENGTH);
+            PatternItem gap = new Gap(PATTERN_GAP_LENGTH);
+            patternItems = Arrays.asList(dot,gap,dash,gap);
+        }
 
-        for (Route route: response.getRoutes()){
+        for (final Route route: response.getRoutes()){
             List<LatLng> polyline = PolyUtil.decode(route.getOverviewPolyline().getPoints());
             mMap.addPolyline(new PolylineOptions()
                     .addAll(polyline)
+                    .color(color)
+                    .pattern(patternItems)
+                    .jointType(JointType.ROUND)
                     .geodesic(true));
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if(route.getBound() != null)
+                    {
+                        LatLng northeast = new LatLng(route.getBound().getNortheast().getLat(),route.getBound().getNortheast().getLng());
+                        LatLng southwest = new LatLng(route.getBound().getSouthwest().getLat(),route.getBound().getSouthwest().getLng());
+                        LatLngBounds latLngBounds = new LatLngBounds(southwest,northeast);
+                        final int padding = 50;
+                        mMap.animateCamera(CameraUpdateFactory
+                                .newLatLngBounds(latLngBounds,padding));
+                    }
+                }
+            }, 50);
         }
     }
 }

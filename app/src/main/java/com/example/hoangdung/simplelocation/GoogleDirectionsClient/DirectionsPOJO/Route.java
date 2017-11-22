@@ -23,6 +23,18 @@ public class Route {
     @Expose
     Polyline overviewPolyline;
 
+    @SerializedName("bounds")
+    @Expose
+    Bound bound;
+
+    public Bound getBound() {
+        return bound;
+    }
+
+    public void setBound(Bound bound) {
+        this.bound = bound;
+    }
+
     public Polyline getOverviewPolyline() {
         return overviewPolyline;
     }

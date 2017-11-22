@@ -27,7 +27,8 @@
                 android:textColor="#000"
                 android:textSize="20sp"
                 android:backgroundTint="@android:color/transparent"
-                android:cursorVisible="true"/>
+                android:cursorVisible="true"
+                android:textCursorDrawable="@null"/>
         </android.support.v7.widget.Toolbar>
     </android.support.v7.widget.CardView>
 

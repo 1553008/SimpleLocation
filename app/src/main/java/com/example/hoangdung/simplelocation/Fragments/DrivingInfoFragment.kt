@@ -38,6 +38,13 @@ class DrivingInfoFragment() : Fragment() {
 
     lateinit var mAdapter : Adapter
     lateinit var mContext : Context
+    var directionsReponse: DirectionsResponse? = null
+        set(value) {
+            field = value
+            distanceText?.text = value?.routes?.getOrNull(0)?.legs?.getOrNull(0)?.distance?.text
+            durationText?.text = value?.routes?.getOrNull(0)?.legs?.getOrNull(0)?.duration?.text
+            mAdapter.directionResponse = value
+        }
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -54,17 +61,17 @@ class DrivingInfoFragment() : Fragment() {
         stepRecyclerView.adapter = mAdapter
 
         //Setting up panel
-        var slidingUpLayoutParams = slidingUpPanel.layoutParams as FrameLayout.LayoutParams
+        var slidingUpLayoutParams = DrivingSlidingUpPanel.layoutParams as FrameLayout.LayoutParams
         slidingUpLayoutParams.bottomMargin = MyApplication.getNavigationBarHeight(context,context.resources.configuration.orientation)
-        slidingUpPanel.layoutParams = slidingUpLayoutParams
+        DrivingSlidingUpPanel.layoutParams = slidingUpLayoutParams
         drivingInfoHeader.viewTreeObserver.addOnGlobalLayoutListener{
-            slidingUpPanel?.panelHeight = drivingInfoHeader?.height!!
+            DrivingSlidingUpPanel?.panelHeight = drivingInfoHeader?.height!!
         }
 
         //Setting up floating action button
         var btnLayoutParams = activity.findViewById<FloatingActionButton>(R.id.floating_btn).layoutParams as CoordinatorLayout.LayoutParams
         btnLayoutParams.bottomMargin = MyApplication.getNavigationBarHeight(context,resources.configuration.orientation)+
-                slidingUpPanel.panelHeight +
+                DrivingSlidingUpPanel.panelHeight +
                 context.resources.getDimension(R.dimen.myplaceButtonMarginBottom).toInt()
 
 
@@ -75,8 +82,9 @@ class DrivingInfoFragment() : Fragment() {
             parentFragment?.viewPager?.swipable = false
             return@setOnTouchListener false
         }
-        //Control to back button
         drivingInfoLayout.setOnTouchListener{v, event ->
+
+            Log.d("MapsActivity","onTouchListener" + event.toString());
             parentFragment?.viewPager?.swipable = true
             return@setOnTouchListener false
         }
@@ -99,22 +107,25 @@ class DrivingInfoFragment() : Fragment() {
                 notifyDataSetChanged()
             }
         override fun getItemCount(): Int {
-            return directionResponse?.routes?.get(0)?.legs?.get(0)?.steps?.size ?: 0
+            return directionResponse?.routes?.getOrNull(0)?.legs?.getOrNull(0)?.steps?.size ?: 0
 
         }
 
         override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
             //Parse step instruction into ViewHolder
-            holder?.stepText?.text = Html.fromHtml(directionResponse?.routes?.get(0)?.legs?.get(0)?.steps?.get(position)?.htmlInstructions)
-            holder?.beforeheadDistance?.text = directionResponse?.routes?.get(0)?.legs?.get(0)?.steps?.get(position)?.distance?.text
+            val step = directionResponse?.routes?.getOrNull(0)?.legs?.getOrNull(0)?.steps?.getOrNull(position)
+            holder?.stepText?.text = Html.fromHtml(step?.htmlInstructions)
+            holder?.beforeheadDistance?.text = step?.distance?.text
+            holder?.durationStepText?.text = step?.duration?.text
 
+            val maneuver = step?.maneuver
             //Assign Icon directions
-            if(holder?.stepText?.text!!.contains("turn left",true))
-                holder?.directionIcon.setImageResource(R.drawable.icon_turn_left)
-            else if(holder?.stepText?.text!!.contains("turn right",true))
-                holder?.directionIcon.setImageResource(R.drawable.icon_turn_right)
-            else if(holder?.stepText?.text!!.contains("head",true))
-                holder?.directionIcon.setImageResource(R.drawable.icon_straight_ahead)
+            if(maneuver?.equals("turn-right") ?: false)
+                holder?.directionIcon?.setImageResource(R.drawable.icon_turn_right)
+            else if(maneuver?.equals("turn-left") ?: false)
+                holder?.directionIcon?.setImageResource(R.drawable.icon_turn_left)
+            else
+                holder?.directionIcon?.setImageResource(R.drawable.icon_straight_ahead)
 
         }
 
@@ -130,6 +141,7 @@ class DrivingInfoFragment() : Fragment() {
             var stepText = item.findViewById<TextView>(R.id.stepText)
             var beforeheadDistance = item.findViewById<TextView>(R.id.beforeheadDistance)
             var directionIcon = item.findViewById<ImageView>(R.id.directionIcon)
+            var durationStepText = item.findViewById<TextView>(R.id.durationStepText)
         }
     }
 

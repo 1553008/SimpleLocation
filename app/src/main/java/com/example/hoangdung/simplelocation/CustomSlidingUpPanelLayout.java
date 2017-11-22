@@ -28,10 +28,24 @@ public class CustomSlidingUpPanelLayout extends SlidingUpPanelLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
+        Log.d("MapsActivity","CustomPanel:onTouchEvent");
         super.onTouchEvent(ev);
         return false;
     }
 
+  /*  @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        Log.d("MapsActivity","CustomPanel:onDispatchEvent");
 
+        super.dispatchTouchEvent(ev);
+        return false;
+    }*/
+
+   /* @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        Log.d("MapsActivity","CustomPanel:onInterceptTouchEvent");
+
+        return false;
+    }*/
 
 }
