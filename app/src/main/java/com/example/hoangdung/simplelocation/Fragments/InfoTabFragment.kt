@@ -44,7 +44,7 @@ class InfoTabFragment : Fragment() {
         }
 
     public interface OnTabListener{
-        public fun onTabChanged(position: Int, response: DirectionsResponse?);
+        public fun onTabChanged(position: Int, response: DirectionsResponse?)
     }
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {

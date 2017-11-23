@@ -1,5 +1,8 @@
 package com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -7,28 +10,40 @@ import com.google.gson.annotations.SerializedName;
  * Created by hoangdung on 11/11/17.
  */
 
-public class GeocodedWaypoint {
+public class GeocodedWaypoint implements Parcelable{
     @SerializedName("geocoder_status")
     @Expose
-    String geocoderStatus;
+    public String geocoderStatus;
 
     @SerializedName("place_id")
     @Expose
-    String placeID;
+    public String placeID;
 
-    public String getGeocoderStatus() {
-        return geocoderStatus;
+    protected GeocodedWaypoint(Parcel in) {
+        geocoderStatus = in.readString();
+        placeID = in.readString();
     }
 
-    public void setGeocoderStatus(String geocoderStatus) {
-        this.geocoderStatus = geocoderStatus;
+    public static final Creator<GeocodedWaypoint> CREATOR = new Creator<GeocodedWaypoint>() {
+        @Override
+        public GeocodedWaypoint createFromParcel(Parcel in) {
+            return new GeocodedWaypoint(in);
+        }
+
+        @Override
+        public GeocodedWaypoint[] newArray(int size) {
+            return new GeocodedWaypoint[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    public String getPlaceID() {
-        return placeID;
-    }
-
-    public void setPlaceID(String placeID) {
-        this.placeID = placeID;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(geocoderStatus);
+        dest.writeString(placeID);
     }
 }

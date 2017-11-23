@@ -80,12 +80,14 @@ class DrivingInfoFragment() : Fragment() {
 
         drivingInfoBlank.setOnTouchListener { v, event ->
             parentFragment?.viewPager?.swipable = false
+            DrivingSlidingUpPanel?.swipeable = false
             return@setOnTouchListener false
         }
         drivingInfoLayout.setOnTouchListener{v, event ->
 
             Log.d("MapsActivity","onTouchListener" + event.toString());
             parentFragment?.viewPager?.swipable = true
+            DrivingSlidingUpPanel?.swipeable = true
             return@setOnTouchListener false
         }
 

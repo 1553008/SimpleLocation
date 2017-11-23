@@ -34,11 +34,6 @@ public class GoogleDirectionsParamsBuilder {
             stringBuilder.append(':');
             return stringBuilder.toString();
         }
-
-        for(LatLng latLng : latLngArrayList){
-            stringBuilder.append(getParamsByLatLng(latLng));
-            stringBuilder.append('|');
-        }
         return stringBuilder.toString();
     }
 

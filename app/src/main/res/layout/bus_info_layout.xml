@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/busInfoHeader">
         <TextView
-            android:id="@+id/BusdistanceText"
+            android:id="@+id/BusDistanceText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -22,10 +22,10 @@
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"/>
         <TextView
-            android:id="@+id/BusdurationText"
+            android:id="@+id/BusDurationText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/BusdistanceText"
+            android:layout_toRightOf="@id/BusDistanceText"
             android:textSize="16sp"
             android:textColor="@android:color/tertiary_text_dark"
             android:layout_marginLeft="20dp"
@@ -36,15 +36,15 @@
             android:layout_height="wrap_content"
             android:textSize="12sp"
             android:text="Best route"
-            android:layout_below="@id/BusdistanceText"
+            android:layout_below="@id/BusDistanceText"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"/>
         <TextView
-            android:id="@+id/departureAndArriveTime"
+            android:id="@+id/DepartureAndArriveTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/BusdurationText"
+            android:layout_toRightOf="@id/BusDurationText"
             android:layout_marginTop="5dp"
             android:layout_marginLeft="10dp"
             android:textSize="16sp"
@@ -58,7 +58,7 @@
         android:elevation="2dp"
         />
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/BusstepRecyclerView"
+        android:id="@+id/BusStepListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >

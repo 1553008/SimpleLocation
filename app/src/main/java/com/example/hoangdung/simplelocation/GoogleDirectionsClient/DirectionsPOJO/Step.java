@@ -1,5 +1,8 @@
 package com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -9,115 +12,90 @@ import java.util.ArrayList;
  * Created by hoangdung on 11/11/17.
  */
 
-public class Step {
+public class Step implements Parcelable {
 
     @SerializedName("distance")
     @Expose
-    Distance distance;
+    public Distance distance;
 
     @SerializedName("duration")
     @Expose
-    Duration duration;
+    public Duration duration;
 
     @SerializedName("start_location")
     @Expose
-    Location startLocation;
+    public Location startLocation;
 
     @SerializedName("end_location")
     @Expose
-    Location endLocation;
+    public Location endLocation;
 
     @SerializedName("html_instructions")
     @Expose
-    String htmlInstructions;
+    public String htmlInstructions;
 
     @SerializedName("travel_mode")
     @Expose
-    String travelMode;
+    public String travelMode;
 
     @SerializedName("polyline")
     @Expose
-    Polyline polyline;
+    public Polyline polyline;
 
     @SerializedName("maneuver")
     @Expose
-    String maneuver;
+    public String maneuver;
 
     @SerializedName("steps")
     @Expose
-    ArrayList<Step> steps = new ArrayList<>();
+    public ArrayList<Step> steps = new ArrayList<>();
 
-    public String getManeuver() {
-        return maneuver;
+    @SerializedName("transit_details")
+    @Expose
+    public TransitDetails transitDetails;
+
+    protected Step(Parcel in) {
+        distance = in.readParcelable(Distance.class.getClassLoader());
+        duration = in.readParcelable(Duration.class.getClassLoader());
+        startLocation = in.readParcelable(Location.class.getClassLoader());
+        endLocation = in.readParcelable(Location.class.getClassLoader());
+        htmlInstructions = in.readString();
+        travelMode = in.readString();
+        polyline = in.readParcelable(Polyline.class.getClassLoader());
+        maneuver = in.readString();
+        steps = in.createTypedArrayList(Step.CREATOR);
     }
 
-    public void setManeuver(String maneuver) {
-        this.maneuver = maneuver;
+    public static final Creator<Step> CREATOR = new Creator<Step>() {
+        @Override
+        public Step createFromParcel(Parcel in) {
+            return new Step(in);
+        }
+
+        @Override
+        public Step[] newArray(int size) {
+            return new Step[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    public ArrayList<Step> getSteps() {
-        return steps;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(distance, flags);
+        dest.writeParcelable(duration, flags);
+        dest.writeParcelable(startLocation, flags);
+        dest.writeParcelable(endLocation, flags);
+        dest.writeString(htmlInstructions);
+        dest.writeString(travelMode);
+        dest.writeParcelable(polyline, flags);
+        dest.writeString(maneuver);
+        dest.writeTypedList(steps);
     }
 
-    public void setSteps(ArrayList<Step> steps) {
-        this.steps = steps;
-    }
 
-
-
-    public Distance getDistance() {
-        return distance;
-    }
-
-    public void setDistance(Distance distance) {
-        this.distance = distance;
-    }
-
-    public Duration getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Duration duration) {
-        this.duration = duration;
-    }
-
-    public Location getStartLocation() {
-        return startLocation;
-    }
-
-    public void setStartLocation(Location startLocation) {
-        this.startLocation = startLocation;
-    }
-
-    public Location getEndLocation() {
-        return endLocation;
-    }
-
-    public void setEndLocation(Location endLocation) {
-        this.endLocation = endLocation;
-    }
-
-    public String getHtmlInstructions() {
-        return htmlInstructions;
-    }
-
-    public void setHtmlInstructions(String htmlInstructions) {
-        this.htmlInstructions = htmlInstructions;
-    }
-
-    public String getTravelMode() {
-        return travelMode;
-    }
-
-    public void setTravelMode(String travelMode) {
-        this.travelMode = travelMode;
-    }
-
-    public Polyline getPolyline() {
-        return polyline;
-    }
-
-    public void setPolyline(Polyline polyline) {
-        this.polyline = polyline;
-    }
+    //-------------------------------Parcelable Parts----------------------------------------------
 }

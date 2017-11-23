@@ -18,6 +18,7 @@ public class CustomSlidingUpPanelLayout extends SlidingUpPanelLayout {
         super(context);
     }
 
+    public boolean swipeable = true;
     public CustomSlidingUpPanelLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -29,8 +30,7 @@ public class CustomSlidingUpPanelLayout extends SlidingUpPanelLayout {
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         Log.d("MapsActivity","CustomPanel:onTouchEvent");
-        super.onTouchEvent(ev);
-        return false;
+        return swipeable && super.onTouchEvent(ev);
     }
 
   /*  @Override

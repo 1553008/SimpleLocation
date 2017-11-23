@@ -54,14 +54,14 @@ public class DirectionsTest {
         //Type Hau Giang
 
         onView(withId(R.id.search_editText))
-                .perform(typeText("Hau Giang"));
+                .perform(typeText("Nam Ky Khoi Nghia"));
 
         onView(isRoot())
                 .perform(waitFor(3000));
 
         //Choose Search Places
         onView(withId(R.id.recycler_view))
-                .perform(RecyclerViewActions.actionOnItemAtPosition(2, click()))
+                .perform(RecyclerViewActions.actionOnItemAtPosition(1, click()))
                 .withFailureHandler(new FailureHandler() {
                     @Override
                     public void handle(Throwable error, Matcher<View> viewMatcher) {
@@ -85,12 +85,10 @@ public class DirectionsTest {
                 .perform(swipeLeft());
 
         //Click information bus tab
-        onView(withId(R.id.busInfoHeader))
-                .perform(click());
-        onView(withId(R.id.busInfoHeader))
-                .perform(click());
-        onView(withId(R.id.busInfoHeader))
-                .perform(swipeRight());
+
+
+        onView(isRoot())
+                .perform(waitFor(10000));
 
 
     }

@@ -1,5 +1,8 @@
 package com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -9,124 +12,89 @@ import java.util.ArrayList;
  * Created by hoangdung on 11/11/17.
  */
 
-public class Leg {
+public class Leg implements Parcelable{
     @SerializedName("distance")
     @Expose
-    Distance distance;
+    public Distance distance;
 
     @SerializedName("duration")
     @Expose
-    Duration duration;
+    public Duration duration;
 
     @SerializedName("start_location")
     @Expose
-    Location startLocation;
+    public Location startLocation;
 
     @SerializedName("end_location")
     @Expose
-    Location endLocation;
+    public Location endLocation;
 
     @SerializedName("start_address")
     @Expose
-    String startAddress;
+    public String startAddress;
 
     @SerializedName("end_address")
     @Expose
-    String endAddress;
+    public String endAddress;
 
     @SerializedName("steps")
     @Expose
-    ArrayList<Step> steps = new ArrayList<>();
+    public ArrayList<Step> steps = new ArrayList<>();
 
     @SerializedName("duration_in_traffic")
     @Expose
-    Duration durationInTraffic;
+    public Duration durationInTraffic;
 
     @SerializedName("arrival_time")
     @Expose
-    Time arriveTime;
+    public Time arriveTime;
 
     @SerializedName("departure_time")
     @Expose
-    Time departTime;
+    public Time departTime;
 
-    public Time getArriveTime() {
-        return arriveTime;
+
+    protected Leg(Parcel in) {
+        distance = in.readParcelable(Distance.class.getClassLoader());
+        duration = in.readParcelable(Duration.class.getClassLoader());
+        startLocation = in.readParcelable(Location.class.getClassLoader());
+        endLocation = in.readParcelable(Location.class.getClassLoader());
+        startAddress = in.readString();
+        endAddress = in.readString();
+        steps = in.createTypedArrayList(Step.CREATOR);
+        durationInTraffic = in.readParcelable(Duration.class.getClassLoader());
+        arriveTime = in.readParcelable(Time.class.getClassLoader());
+        departTime = in.readParcelable(Time.class.getClassLoader());
     }
 
-    public void setArriveTime(Time arriveTime) {
-        this.arriveTime = arriveTime;
+    public static final Creator<Leg> CREATOR = new Creator<Leg>() {
+        @Override
+        public Leg createFromParcel(Parcel in) {
+            return new Leg(in);
+        }
+
+        @Override
+        public Leg[] newArray(int size) {
+            return new Leg[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    public Time getDepartTime() {
-        return departTime;
-    }
-
-    public void setDepartTime(Time departTime) {
-        this.departTime = departTime;
-    }
-
-    public Duration getDurationInTraffic() {
-        return durationInTraffic;
-    }
-
-    public void setDurationInTraffic(Duration durationInTraffic) {
-        this.durationInTraffic = durationInTraffic;
-    }
-
-    public ArrayList<Step> getSteps() {
-        return steps;
-    }
-
-    public void setSteps(ArrayList<Step> steps) {
-        this.steps = steps;
-    }
-
-    public Distance getDistance() {
-        return distance;
-    }
-
-    public void setDistance(Distance distance) {
-        this.distance = distance;
-    }
-
-    public Duration getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Duration duration) {
-        this.duration = duration;
-    }
-
-    public Location getStartLocation() {
-        return startLocation;
-    }
-
-    public void setStartLocation(Location startLocation) {
-        this.startLocation = startLocation;
-    }
-
-    public Location getEndLocation() {
-        return endLocation;
-    }
-
-    public void setEndLocation(Location endLocation) {
-        this.endLocation = endLocation;
-    }
-
-    public String getStartAddress() {
-        return startAddress;
-    }
-
-    public void setStartAddress(String startAddress) {
-        this.startAddress = startAddress;
-    }
-
-    public String getEndAddress() {
-        return endAddress;
-    }
-
-    public void setEndAddress(String endAddress) {
-        this.endAddress = endAddress;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(distance, flags);
+        dest.writeParcelable(duration, flags);
+        dest.writeParcelable(startLocation, flags);
+        dest.writeParcelable(endLocation, flags);
+        dest.writeString(startAddress);
+        dest.writeString(endAddress);
+        dest.writeTypedList(steps);
+        dest.writeParcelable(durationInTraffic, flags);
+        dest.writeParcelable(arriveTime, flags);
+        dest.writeParcelable(departTime, flags);
     }
 }

@@ -1,5 +1,8 @@
 package com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -9,53 +12,57 @@ import java.util.ArrayList;
  * Created by hoangdung on 11/11/17.
  */
 
-public class Route {
+public class Route implements Parcelable {
 
     @SerializedName("copyrights")
     @Expose
-    String copyrights;
+    public String copyrights;
 
     @SerializedName("legs")
     @Expose
-    ArrayList<Leg> legs = new ArrayList<>();
+    public ArrayList<Leg> legs = new ArrayList<>();
 
     @SerializedName("overview_polyline")
     @Expose
-    Polyline overviewPolyline;
+    public Polyline overviewPolyline;
 
     @SerializedName("bounds")
     @Expose
-    Bound bound;
+    public Bound bound;
 
-    public Bound getBound() {
-        return bound;
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    public void setBound(Bound bound) {
-        this.bound = bound;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.copyrights);
+        dest.writeTypedList(this.legs);
+        dest.writeParcelable(this.overviewPolyline, flags);
+        dest.writeParcelable(this.bound, flags);
     }
 
-    public Polyline getOverviewPolyline() {
-        return overviewPolyline;
+    public Route() {
     }
 
-    public void setOverviewPolyline(Polyline overviewPolyline) {
-        this.overviewPolyline = overviewPolyline;
+    protected Route(Parcel in) {
+        this.copyrights = in.readString();
+        this.legs = in.createTypedArrayList(Leg.CREATOR);
+        this.overviewPolyline = in.readParcelable(Polyline.class.getClassLoader());
+        this.bound = in.readParcelable(Bound.class.getClassLoader());
     }
 
-    public String getCopyrights() {
-        return copyrights;
-    }
+    public static final Parcelable.Creator<Route> CREATOR = new Parcelable.Creator<Route>() {
+        @Override
+        public Route createFromParcel(Parcel source) {
+            return new Route(source);
+        }
 
-    public void setCopyrights(String copyrights) {
-        this.copyrights = copyrights;
-    }
-
-    public ArrayList<Leg> getLegs() {
-        return legs;
-    }
-
-    public void setLegs(ArrayList<Leg> legs) {
-        this.legs = legs;
-    }
+        @Override
+        public Route[] newArray(int size) {
+            return new Route[size];
+        }
+    };
 }

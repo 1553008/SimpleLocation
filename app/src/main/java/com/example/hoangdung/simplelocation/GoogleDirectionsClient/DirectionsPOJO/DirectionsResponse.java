@@ -13,40 +13,14 @@ public class DirectionsResponse {
 
     @SerializedName("status")
     @Expose
-    String status;
+    public String status;
 
     @SerializedName("geocoded_waypoints")
     @Expose
-    ArrayList<GeocodedWaypoint> geocodedWaypoints = new ArrayList<>();
+    public ArrayList<GeocodedWaypoint> geocodedWaypoints = new ArrayList<>();
 
     @SerializedName("routes")
     @Expose
-    ArrayList<Route> routes = new ArrayList<>();
+    public ArrayList<Route> routes = new ArrayList<>();
 
-
-
-
-    public ArrayList<Route> getRoutes() {
-        return routes;
-    }
-
-    public void setRoutes(ArrayList<Route> routes) {
-        this.routes = routes;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public ArrayList<GeocodedWaypoint> getGeocodedWaypoints() {
-        return geocodedWaypoints;
-    }
-
-    public void setGeocodedWaypoints(ArrayList<GeocodedWaypoint> geocodedWaypoints) {
-        this.geocodedWaypoints = geocodedWaypoints;
-    }
 }

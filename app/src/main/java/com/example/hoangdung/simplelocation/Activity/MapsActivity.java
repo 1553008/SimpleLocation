@@ -620,7 +620,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void updateUIFromDirectionsResponse(int curTabPosition, final DirectionsResponse response){
         //If the current tab belongs to driving mode
 
-        final int stroke = 50; //width of pen
+        final int stroke = 20; //width of pen
         if(response == null)
             return;
         mMap.clear();
@@ -634,7 +634,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         else if(curTabPosition == 1) //Bus tab
         {
             //Declare Route Pattern
-            color = mContext.getResources().getColor(R.color.colorPolylineDirectionsBus);
+            color = mContext.getResources().getColor(R.color.colorPolylineDirectionsDriving);
             final int PATTERN_DASH_LENGTH = 20;
             final int PATTERN_GAP_LENGTH = 20;
             PatternItem dot = new Dot();
@@ -643,8 +643,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             patternItems = Arrays.asList(dot,gap,dash,gap);
         }
 
-        for (final Route route: response.getRoutes()){
-            final List<LatLng> polyline = PolyUtil.decode(route.getOverviewPolyline().getPoints());
+        for (final Route route: response.routes){
+            final List<LatLng> polyline = PolyUtil.decode(route.overviewPolyline.points);
             mMap.addPolyline(new PolylineOptions()
                     .addAll(polyline)
                     .color(color)
@@ -656,13 +656,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public void run() {
                     //if bound exists
-                    if(route.getBound() != null)
+                    if(route.bound != null)
                     {
                         // If there are more than two points exist, animate camera
                         if(polyline.size() > 1)
                         {
-                            LatLng northeast = new LatLng(route.getBound().getNortheast().getLat(),route.getBound().getNortheast().getLng());
-                            LatLng southwest = new LatLng(route.getBound().getSouthwest().getLat(),route.getBound().getSouthwest().getLng());
+                            LatLng northeast = new LatLng(route.bound.northeast.lat,route.bound.northeast.lng);
+                            LatLng southwest = new LatLng(route.bound.southwest.lat,route.bound.southwest.lng);
                             LatLngBounds latLngBounds = new LatLngBounds(southwest,northeast);
                             final int padding = 50;
                             mMap.animateCamera(CameraUpdateFactory
