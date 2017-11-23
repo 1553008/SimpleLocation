@@ -1,6 +1,9 @@
 package com.example.hoangdung.simplelocation;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.example.hoangdung.simplelocation.Interface.FirebaseAuthCommand;
 import com.facebook.AccessToken;
@@ -10,6 +13,14 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+
 /**
  * Created by USER on 11/17/2017.
  */
@@ -17,6 +28,98 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class FirebaseCenter {
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+    public ArrayList<Location> getMyPlaces() {
+        return myPlaces;
+    }
+
+    private ArrayList<Location> myPlaces = new ArrayList<Location>();
+    static public class Location implements Parcelable
+    {
+      public String label;
+      public String address;
+      public double lat;
+      public double lng;
+
+
+      public Location(String label, double lat, double lng)
+      {
+          this.label = label;
+          this.lat = lat;
+          this.lng = lng;
+      }
+      public Location(Parcel in)
+      {
+          label = in.readString();
+          address = in.readString();
+          lat = in.readDouble();
+          lng = in.readDouble();
+      }
+
+        public Location() {
+
+        }
+
+        @Override
+        public String toString() {
+            return "Location{" +
+                    "label='" + label + '\'' +
+                    ", address='" + address + '\'' +
+                    ", lat=" + lat +
+                    ", lng=" + lng +
+                    '}';
+        }
+
+        public  static final Parcelable.Creator CREATOR = new Parcelable.Creator()
+      {
+          @Override
+          public Object createFromParcel(Parcel source) {
+              return new Location(source);
+          }
+
+          @Override
+          public Location[] newArray(int size) {
+              return new Location[size] ;
+          }
+      };
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(label);
+            dest.writeString(address);
+            dest.writeDouble(lat);
+            dest.writeDouble(lng);
+        }
+    }
+
+    // start keep track of my place list on database
+    public void listenForMyPlaceDatabase()
+    {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("user1/places");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // for each place
+                for (DataSnapshot placeSnapShot: dataSnapshot.getChildren())
+                {
+                    // add it to list
+                    Location place = placeSnapShot.getValue(Location.class);
+                    place.label = placeSnapShot.getKey();
+                    myPlaces.add(place);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
 
     public void handleFacebookAccessToken(AccessToken token, final FirebaseAuthCommand cmd)
     {
@@ -26,7 +129,10 @@ public class FirebaseCenter {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful())
+                        {
+                            listenForMyPlaceDatabase();
                             cmd.onSuccess();
+                        }
                         else
                             cmd.onFail();
                     }

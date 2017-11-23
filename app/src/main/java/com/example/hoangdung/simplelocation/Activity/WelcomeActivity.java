@@ -29,6 +29,7 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -85,6 +86,9 @@ public class WelcomeActivity extends AppCompatActivity {
                 startLogin();
             }
         });
+
+        // start keeping track of my place list in database
+        firebaseCenter.listenForMyPlaceDatabase();
         //if already loggined
         if(checkAlreadyLoggined()){
             mLoginBtn.setVisibility(View.INVISIBLE);
