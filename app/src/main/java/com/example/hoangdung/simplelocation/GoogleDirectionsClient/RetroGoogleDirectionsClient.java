@@ -17,7 +17,7 @@ public interface RetroGoogleDirectionsClient {
     @GET("api/directions/json?key=AIzaSyD4Eh3glQzLczWlpMMBboXpF4ed6oCpJcY")
     Call<DirectionsResponse> getDirections(@Query("origin")String origin,
                                            @Query("destination")String destination,
-                                           @Query("waypoints:via")String waypoints,
+                                           @Query("waypoints")String waypoints,
                                            @Query("mode")String mode,
                                            @Query("transit_mode")String transitMode,
                                            @Query("traffic_model")String trafficModel,

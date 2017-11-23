@@ -77,7 +77,21 @@ public class DirectionsTest {
                 .perform(click());
 
         onView(isRoot())
-                .perform(waitFor(30000));
+                .perform(waitFor(3000));
+
+        //Swipe to Bus Tab
+
+        onView(withId(R.id.drivingInfoHeader))
+                .perform(swipeLeft());
+
+        //Click information bus tab
+        onView(withId(R.id.busInfoHeader))
+                .perform(click());
+        onView(withId(R.id.busInfoHeader))
+                .perform(click());
+        onView(withId(R.id.busInfoHeader))
+                .perform(swipeRight());
+
 
     }
 

@@ -118,7 +118,7 @@ class BusInfoFragment : Fragment() {
             //Parse step instruction into ViewHolder
             val (index, innerIndex) = dict[position]!!
             val step = directionResponse?.routes?.getOrNull(0)?.legs?.getOrNull(0)?.steps?.getOrNull(index)?.steps?.getOrNull(innerIndex)
-            holder?.stepText?.text = Html.fromHtml(step?.htmlInstructions)
+            holder?.stepText?.text = Html.fromHtml(step?.htmlInstructions?: "")
             holder?.beforeheadDistance?.text = step?.distance?.text
             holder?.durationStepText?.text = step?.duration?.text
             val maneuver = step?.maneuver

@@ -114,7 +114,7 @@ class DrivingInfoFragment() : Fragment() {
         override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
             //Parse step instruction into ViewHolder
             val step = directionResponse?.routes?.getOrNull(0)?.legs?.getOrNull(0)?.steps?.getOrNull(position)
-            holder?.stepText?.text = Html.fromHtml(step?.htmlInstructions)
+            holder?.stepText?.text = Html.fromHtml(step?.htmlInstructions?:"")
             holder?.beforeheadDistance?.text = step?.distance?.text
             holder?.durationStepText?.text = step?.duration?.text
 

@@ -50,6 +50,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Dash;
 import com.google.android.gms.maps.model.Dot;
 import com.google.android.gms.maps.model.Gap;
@@ -248,7 +250,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     if (task.isComplete() && task.isSuccessful() && task.getResult()!=null) {
                         mLastknownLocation = task.getResult();
                         getCountryCode();
-                        mMap.moveCamera(CameraUpdateFactory
+                        mMap.animateCamera(CameraUpdateFactory
                                 .newLatLngZoom(
                                         new LatLng(mLastknownLocation.getLatitude(), mLastknownLocation.getLongitude())
                                         , DEFAULT_ZOOM));
@@ -459,7 +461,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if(resultCode == RESULT_OK){
             if(searchPlace!=null){
                 mMap.clear();
-                mMap.addMarker(new MarkerOptions().position(searchPlace.getLatLng()));
+                addMarkers(Arrays.asList(searchPlace.getLatLng()),R.drawable.ic_normal_marker);
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -477,11 +479,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void addMarkers(List<LatLng> markers){
+    private void addMarkers(List<LatLng> markers,int drawable){
         if(markers == null)
             return;
         for(LatLng marker : markers){
-            mMap.addMarker(new MarkerOptions().position(new LatLng(marker.latitude,marker.longitude)));
+            mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(marker.latitude,marker.longitude))
+                    .icon(BitmapDescriptorFactory.fromResource(drawable)));
         }
     }
     //----------------------------------------Directions Functionality--------------------------------------
@@ -595,7 +599,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         else
             destination = locationList.get(locationList.size()-1).getPlace().getLatLng();
 
-        for(int i = 1 ; i < locationList.size()-2 ; ++i){
+        for(int i = 1 ; i <= locationList.size()-2 ; ++i){
             if(locationList.get(i).getPlace() == null)
                 waypoints.add(locationList.get(i).getLatlng());
             else
@@ -616,6 +620,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void updateUIFromDirectionsResponse(int curTabPosition, final DirectionsResponse response){
         //If the current tab belongs to driving mode
 
+        final int stroke = 50; //width of pen
         if(response == null)
             return;
         mMap.clear();
@@ -628,6 +633,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         else if(curTabPosition == 1) //Bus tab
         {
+            //Declare Route Pattern
             color = mContext.getResources().getColor(R.color.colorPolylineDirectionsBus);
             final int PATTERN_DASH_LENGTH = 20;
             final int PATTERN_GAP_LENGTH = 20;
@@ -638,24 +644,41 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         for (final Route route: response.getRoutes()){
-            List<LatLng> polyline = PolyUtil.decode(route.getOverviewPolyline().getPoints());
+            final List<LatLng> polyline = PolyUtil.decode(route.getOverviewPolyline().getPoints());
             mMap.addPolyline(new PolylineOptions()
                     .addAll(polyline)
                     .color(color)
                     .pattern(patternItems)
                     .jointType(JointType.ROUND)
+                    .width(stroke)
                     .geodesic(true));
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    //if bound exists
                     if(route.getBound() != null)
                     {
-                        LatLng northeast = new LatLng(route.getBound().getNortheast().getLat(),route.getBound().getNortheast().getLng());
-                        LatLng southwest = new LatLng(route.getBound().getSouthwest().getLat(),route.getBound().getSouthwest().getLng());
-                        LatLngBounds latLngBounds = new LatLngBounds(southwest,northeast);
-                        final int padding = 50;
-                        mMap.animateCamera(CameraUpdateFactory
-                                .newLatLngBounds(latLngBounds,padding));
+                        // If there are more than two points exist, animate camera
+                        if(polyline.size() > 1)
+                        {
+                            LatLng northeast = new LatLng(route.getBound().getNortheast().getLat(),route.getBound().getNortheast().getLng());
+                            LatLng southwest = new LatLng(route.getBound().getSouthwest().getLat(),route.getBound().getSouthwest().getLng());
+                            LatLngBounds latLngBounds = new LatLngBounds(southwest,northeast);
+                            final int padding = 50;
+                            mMap.animateCamera(CameraUpdateFactory
+                                    .newLatLngBounds(latLngBounds,padding));
+
+                            //add Markers at destination
+                            addMarkers(Arrays.asList(polyline.get(polyline.size()-1)),R.drawable.ic_destination_marker);
+
+                            //If bus mode is selected, add marker for bus stops
+
+                        }
+                        else //If search directions contain only origin, show last known location
+                        {
+                            showLastknownLocation();
+                        }
+
                     }
                 }
             }, 50);

@@ -28,6 +28,7 @@ public class GoogleDirectionsParamsBuilder {
         StringBuilder stringBuilder = new StringBuilder();
         if(encoded)
         {
+            stringBuilder.append("via:");
             stringBuilder.append("enc:");
             stringBuilder.append(PolyUtil.encode(latLngArrayList));
             stringBuilder.append(':');
