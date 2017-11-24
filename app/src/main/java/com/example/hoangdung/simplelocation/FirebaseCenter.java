@@ -26,7 +26,14 @@ import java.util.ArrayList;
  */
 
 
+// Singleton
 public class FirebaseCenter {
+    private static FirebaseCenter firebaseCenter = new FirebaseCenter();
+
+    private FirebaseCenter(){}
+
+    public static FirebaseCenter getInstance(){return  firebaseCenter;}
+
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     public ArrayList<Location> getMyPlaces() {
@@ -42,9 +49,10 @@ public class FirebaseCenter {
       public double lng;
 
 
-      public Location(String label, double lat, double lng)
+      public Location(String label, String address, double lat, double lng)
       {
           this.label = label;
+          this.address = address;
           this.lat = lat;
           this.lng = lng;
       }
@@ -100,7 +108,7 @@ public class FirebaseCenter {
     // start keep track of my place list on database
     public void listenForMyPlaceDatabase()
     {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("user1/places");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("myplace/user1");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

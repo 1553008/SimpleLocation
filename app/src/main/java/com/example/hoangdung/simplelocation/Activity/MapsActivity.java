@@ -317,18 +317,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         if (position == MapsActivity.this.getResources().getInteger(R.integer.my_place_drawer_item_id))
                         {
-                            // TODO: Fire activity Choose My Plases
-                            //Intent intent = new Intent(MapsActivity.this, MyPlacesActivity.class);
-//                            String[] labels = new String[]{"hello", "every", "one"};
-//                            String[] places = new String[]{"mot", "hai", "ba"};
-//                            intent.putExtra("placeLabels", labels);
-//                            intent.putExtra("places", places);
-                            //ArrayList<FirebaseCenter.Location> locList = new ArrayList<FirebaseCenter.Location>();
-                            //locList.add(new FirebaseCenter.Location("home",10,20));
-                            //locList.add(new FirebaseCenter.Location("work",30,40));
+                            // Fire activity Choose My Plases and show my place list, which
+                            // is gotten from firebaseCenter
 
-                            //intent.putExtra("place", locList);
-                            //startActivity(intent);
+                            Intent intent = new Intent(MapsActivity.this, MyPlacesActivity.class);
+                            ArrayList<FirebaseCenter.Location> locList = FirebaseCenter.getInstance().getMyPlaces();
+                            intent.putParcelableArrayListExtra("place", locList);
+                            startActivity(intent);
                         }
                         return true;
                     }
