@@ -41,7 +41,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class WelcomeActivity extends AppCompatActivity {
-    private FirebaseCenter firebaseCenter = new FirebaseCenter();
     //For Debugging
     private final String TAG = WelcomeActivity.class.getSimpleName();
     //Request code
@@ -88,7 +87,7 @@ public class WelcomeActivity extends AppCompatActivity {
         });
 
         // start keeping track of my place list in database
-        firebaseCenter.listenForMyPlaceDatabase();
+        FirebaseCenter.getInstance().listenForMyPlaceDatabase();
         //if already loggined
         if(checkAlreadyLoggined()){
             mLoginBtn.setVisibility(View.INVISIBLE);
@@ -122,7 +121,7 @@ public class WelcomeActivity extends AppCompatActivity {
                                     editor.commit();
 
                                     // Firebase authentication with facebook
-                                    firebaseCenter.handleFacebookAccessToken(loginResult.getAccessToken(),
+                                    FirebaseCenter.getInstance().handleFacebookAccessToken(loginResult.getAccessToken(),
                                             new FirebaseAuthCommand() {
                                                 @Override
                                                 public void onSuccess() {
