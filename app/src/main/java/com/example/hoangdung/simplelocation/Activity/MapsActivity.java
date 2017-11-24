@@ -250,7 +250,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public void onComplete(@NonNull Task<Location> task) {
                     if (task.isComplete() && task.isSuccessful() && task.getResult()!=null) {
                         mLastknownLocation = task.getResult();
-                        getCountryCode();
+                        //getCountryCode();
                         mMap.animateCamera(CameraUpdateFactory
                                 .newLatLngZoom(
                                         new LatLng(mLastknownLocation.getLatitude(), mLastknownLocation.getLongitude())

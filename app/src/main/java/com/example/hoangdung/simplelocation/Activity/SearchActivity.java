@@ -110,8 +110,10 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
             double lat = Double.longBitsToDouble(sharedPreferences.getLong("LastKnownLocationLat",0)) ;
             double lng = Double.longBitsToDouble(sharedPreferences.getLong("LastKnownLocationLng",0)) ;
             List<Address> addressList = geocoder.getFromLocation(lat,lng,1);
-            Address address = addressList.get(0);
-            mCountryCode = address.getCountryCode();
+            if(addressList.size() > 0){
+                Address address = addressList.get(0);
+                mCountryCode = address.getCountryCode();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
