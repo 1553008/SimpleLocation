@@ -29,6 +29,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.example.hoangdung.simplelocation.FirebaseCenter;
 import com.example.hoangdung.simplelocation.Fragments.DirectionsFragment;
 import com.example.hoangdung.simplelocation.Fragments.InfoTabFragment;
 import com.example.hoangdung.simplelocation.Fragments.SearchFragment;
@@ -317,6 +318,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         if (position == MapsActivity.this.getResources().getInteger(R.integer.my_place_drawer_item_id))
                         {
                             // TODO: Fire activity Choose My Plases
+                            //Intent intent = new Intent(MapsActivity.this, MyPlacesActivity.class);
+//                            String[] labels = new String[]{"hello", "every", "one"};
+//                            String[] places = new String[]{"mot", "hai", "ba"};
+//                            intent.putExtra("placeLabels", labels);
+//                            intent.putExtra("places", places);
+                            //ArrayList<FirebaseCenter.Location> locList = new ArrayList<FirebaseCenter.Location>();
+                            //locList.add(new FirebaseCenter.Location("home",10,20));
+                            //locList.add(new FirebaseCenter.Location("work",30,40));
+
+                            //intent.putExtra("place", locList);
+                            //startActivity(intent);
                         }
                         return true;
                     }
