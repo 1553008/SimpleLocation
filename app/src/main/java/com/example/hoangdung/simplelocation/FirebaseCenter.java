@@ -13,11 +13,14 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -129,7 +132,7 @@ public class FirebaseCenter {
         });
     }
 
-    public void handleFacebookAccessToken(AccessToken token, final FirebaseAuthCommand cmd)
+    public void handleFacebookAccessToken(AccessToken token, final JSONObject userInfo, final FirebaseAuthCommand cmd)
     {
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(credential)
@@ -139,6 +142,7 @@ public class FirebaseCenter {
                         if (task.isSuccessful())
                         {
                             listenForMyPlaceDatabase();
+                            addNewUser(userInfo);
                             cmd.onSuccess();
                         }
                         else
@@ -147,5 +151,11 @@ public class FirebaseCenter {
                 });
     }
 
+    private void addNewUser(JSONObject userInfo){
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users");
+        MyUser user = new MyUser();
+        user.parseJSON(userInfo);
+        ref.child(mAuth.getUid()).setValue(user);
+    }
 
 }

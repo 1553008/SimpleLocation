@@ -123,6 +123,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
                                     // Firebase authentication with facebook
                                     FirebaseCenter.getInstance().handleFacebookAccessToken(loginResult.getAccessToken(),
+                                            object,
                                             new FirebaseAuthCommand() {
                                                 @Override
                                                 public void onSuccess() {
