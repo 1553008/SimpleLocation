@@ -454,7 +454,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
             @Override
             public void onSearchFragmentFindDirectionsClicked(SearchFragment searchFragment) {
-                startDirectionsFragment(searchFragment);
+                MyPlace firstLocation = new MyPlace();
+                firstLocation.setLatlng(new LatLng(mLastknownLocation.getLatitude(),mLastknownLocation.getLongitude()));
+                firstLocation.setFullName("Your location");
+                MyPlace secondLocation = new MyPlace();
+                secondLocation.setPlace(searchFragment.mSearchPlace);
+                startDirectionsFragment(firstLocation,secondLocation);
             }
         });
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
@@ -503,15 +508,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Using place data of search fragment as destination
      * Initialize neccessary listeners to observe changes in searching lists and tab changed
      */
-    private void startDirectionsFragment(SearchFragment searchFragment){
+    private void startDirectionsFragment(@NotNull MyPlace firstLocation, @NonNull MyPlace secondLocation){
         Log.d("MapsActivity","startDirectionsFragment");
-
-        //Get origin and destination
-        MyPlace firstLocation = new MyPlace();
-        firstLocation.setLatlng(new LatLng(mLastknownLocation.getLatitude(),mLastknownLocation.getLongitude()));
-        firstLocation.setFullName("Your location");
-        MyPlace secondLocation = new MyPlace();
-        secondLocation.setPlace(searchFragment.mSearchPlace);
         //Create InfoTabFragment and add listener for changes
         final InfoTabFragment infoTabFragment = new InfoTabFragment();
         infoTabFragment.setListeners(new InfoTabFragment.OnTabListener() {
