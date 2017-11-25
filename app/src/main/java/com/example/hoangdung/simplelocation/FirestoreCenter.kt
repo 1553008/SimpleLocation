@@ -1,10 +1,7 @@
 package com.example.hoangdung.simplelocation
 
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
-import com.google.firebase.storage.FirebaseStorage
+import android.util.Log
+import com.google.firebase.firestore.*
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -25,24 +22,31 @@ public class FirestoreCenter {
     }
 
     var dbRef = FirebaseFirestore.getInstance()
-    var dbAuth = FirebaseAuth.getInstance()
-    fun addUser(user: FireStoreUser){
-        dbRef.collection(DB_USERS_PATH).document(user.ID).set(user, SetOptions.merge())
+    var dbAuth = FirestoreAuth.instance.dbAuth
+    fun addUser(userID: String, user: FireStoreUser){
+        dbRef.collection(DB_USERS_PATH)
+                .document(userID)
+                .set(user, SetOptions.merge())
+                .addOnSuccessListener{
+                    Log.d("MapsActivity","User: " + dbAuth.currentUser?.uid!! + "is added successfully")
+                }
     }
 
+    @IgnoreExtraProperties
     abstract class FireStoreUser{
-        lateinit var ID: String
-        open fun parseJSON(ID:String, json: JSONObject){
-            this.ID = ID
+        @Exclude
+        open fun parseJSON(json: JSONObject){
         }
     }
+    @IgnoreExtraProperties
     class FacebookUser : FireStoreUser(){
         lateinit var first_name: String
         lateinit var last_name: String
         lateinit var photo_url: String
         lateinit var email: String
-        override fun parseJSON(ID: String, json: JSONObject) {
-            super.parseJSON(ID, json)
+        @Exclude
+        override fun parseJSON(json: JSONObject) {
+            super.parseJSON(json)
             try {
                 first_name = json.getString("first_name")
                 last_name = json.getString("last_name")

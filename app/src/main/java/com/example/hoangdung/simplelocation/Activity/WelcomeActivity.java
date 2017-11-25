@@ -130,9 +130,8 @@ public class WelcomeActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onSuccess() {
                                                     FirestoreCenter.FireStoreUser userInfo = new FirestoreCenter.FacebookUser();
-                                                    userInfo.parseJSON(FirestoreAuth.Companion.getInstance().getDbAuth().getUid(),
-                                                            object);
-                                                    FirestoreCenter.Companion.getInstance().addUser(userInfo);
+                                                    userInfo.parseJSON(object);
+                                                    FirestoreCenter.Companion.getInstance().addUser(FirestoreAuth.Companion.getInstance().getDbAuth().getCurrentUser().getUid(), userInfo);
                                                     goToMapsActivity();
                                                     finish();
                                                 }
@@ -169,7 +168,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private boolean checkAlreadyLoggined(){
         //If the user is already loggin, go straight to the MapsActivity
-        return AccessToken.getCurrentAccessToken()!= null && Profile.getCurrentProfile() != null;
+        return FirestoreAuth.Companion.getInstance().getDbAuth().getCurrentUser() != null;
     }
     private void goToMapsActivity(){
         Intent intent = new Intent(WelcomeActivity.this,MapsActivity.class);
