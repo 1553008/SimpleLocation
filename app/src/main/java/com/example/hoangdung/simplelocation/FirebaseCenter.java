@@ -37,13 +37,13 @@ public class FirebaseCenter {
 
     public static FirebaseCenter getInstance(){return  firebaseCenter;}
 
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     public ArrayList<Location> getMyPlaces() {
         return myPlaces;
     }
 
     private ArrayList<Location> myPlaces = new ArrayList<Location>();
+
     static public class Location implements Parcelable
     {
       public String label;
@@ -132,17 +132,16 @@ public class FirebaseCenter {
         });
     }
 
-    public void handleFacebookAccessToken(AccessToken token, final JSONObject userInfo, final FirebaseAuthCommand cmd)
+    public void handleFacebookAccessToken(AccessToken token, final FirebaseAuthCommand cmd)
     {
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-        mAuth.signInWithCredential(credential)
+        FirestoreAuth.Companion.getInstance().getDbAuth().signInWithCredential(credential)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful())
                         {
                             listenForMyPlaceDatabase();
-                            addNewUser(userInfo);
                             cmd.onSuccess();
                         }
                         else
@@ -150,12 +149,4 @@ public class FirebaseCenter {
                     }
                 });
     }
-
-    private void addNewUser(JSONObject userInfo){
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users");
-        MyUser user = new MyUser();
-        user.parseJSON(userInfo);
-        ref.child(mAuth.getUid()).setValue(user);
-    }
-
 }

@@ -16,6 +16,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 
 import com.example.hoangdung.simplelocation.FirebaseCenter;
+import com.example.hoangdung.simplelocation.FirestoreAuth;
+import com.example.hoangdung.simplelocation.FirestoreCenter;
 import com.example.hoangdung.simplelocation.Interface.FirebaseAuthCommand;
 import com.example.hoangdung.simplelocation.R;
 import com.facebook.AccessToken;
@@ -30,6 +32,7 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONException;
@@ -109,7 +112,7 @@ public class WelcomeActivity extends AppCompatActivity {
                         loginResult.getAccessToken()
                         , new GraphRequest.GraphJSONObjectCallback() {
                             @Override
-                            public void onCompleted(JSONObject object, GraphResponse response) {
+                            public void onCompleted(final JSONObject object, GraphResponse response) {
                                 Intent intent = new Intent(WelcomeActivity.this,MapsActivity.class);
                                 try {
                                     //Store User Information From Facebook into SharePreferences
@@ -123,10 +126,13 @@ public class WelcomeActivity extends AppCompatActivity {
 
                                     // Firebase authentication with facebook
                                     FirebaseCenter.getInstance().handleFacebookAccessToken(loginResult.getAccessToken(),
-                                            object,
                                             new FirebaseAuthCommand() {
                                                 @Override
                                                 public void onSuccess() {
+                                                    FirestoreCenter.FireStoreUser userInfo = new FirestoreCenter.FacebookUser();
+                                                    userInfo.parseJSON(FirestoreAuth.Companion.getInstance().getDbAuth().getUid(),
+                                                            object);
+                                                    FirestoreCenter.Companion.getInstance().addUser(userInfo);
                                                     goToMapsActivity();
                                                     finish();
                                                 }
