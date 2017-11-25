@@ -137,6 +137,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Activity Request Code
     private int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
 
+    private  boolean returnedFromMyPlaceList = false;
+    private FirebaseCenter.Location chosenPlaceFromMyPlaceList;
     //-----------------------------------------Activity LifeCycles---------------------------------------------------
 
     @Override
@@ -180,6 +182,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode,resultCode,data);
+
+        // if user chooses a place in MyPlacesActivity
+        if (resultCode == RESULT_OK && requestCode == 0)
+        {
+            if (data.hasExtra("chosenPlace"))
+            {
+                // these info will be used in onsearchFragmentResumed() to show directions
+                chosenPlaceFromMyPlaceList = FirebaseCenter.getInstance().getMyPlaces().get(data.getIntExtra("chosenPlace", 0));
+                returnedFromMyPlaceList = true;
+            }
+        }
     }
 
     //----------------------------------------Google API Setup and Callbacks---------------------------------------------------------
@@ -197,7 +210,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.d(TAG,"GoogleApiClient:connected");
-        showLastknownLocation();
+        //showLastknownLocation();
     }
 
     @Override
@@ -323,7 +336,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             Intent intent = new Intent(MapsActivity.this, MyPlacesActivity.class);
                             ArrayList<FirebaseCenter.Location> locList = FirebaseCenter.getInstance().getMyPlaces();
                             intent.putParcelableArrayListExtra("place", locList);
-                            startActivity(intent);
+                            startActivityForResult(intent, 0);
                         }
                         return true;
                     }
@@ -406,8 +419,34 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if(mMap!=null)
                 {
                     mMap.clear();
-                    showLastknownLocation();
-                    mMarkerPlaces.clear();
+
+                    // if return from myplacesActivity
+                    if (returnedFromMyPlaceList)
+                    {
+                        returnedFromMyPlaceList = false;
+
+                        // current location
+                        MyPlace firstLocation = new MyPlace();
+                        firstLocation.setLatlng(new LatLng(mLastknownLocation.getLatitude(),mLastknownLocation.getLongitude()));
+                        firstLocation.setFullName("Your location");
+
+                        // chosen location
+                        MyPlace secondLocation = new MyPlace();
+                        secondLocation.setLatlng(new LatLng(chosenPlaceFromMyPlaceList.lat, chosenPlaceFromMyPlaceList.lng));
+                        secondLocation.setFullName(chosenPlaceFromMyPlaceList.address);
+
+                        // start find direction
+                        startDirectionsFragment(firstLocation,secondLocation);
+                    }
+                    else
+                    {
+                        showLastknownLocation();
+                        mMarkerPlaces.clear();
+                    }
+
+
+                    Log.d(TAG, "onSearchFragmentResumed");
+                    Log.d(TAG, "showLastKnowLocation from onsearchFragmentResumed");
                 }
                 mDrawer.setToolbar(MapsActivity.this,searchFragment.mToolbar,true);
 

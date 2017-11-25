@@ -4,14 +4,12 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.view.View;
 
 import com.example.hoangdung.simplelocation.Adapter.RecyclerViewAdapterMyPlace;
 import com.example.hoangdung.simplelocation.FirebaseCenter;
+import com.example.hoangdung.simplelocation.Interface.ItemClickListener;
 import com.example.hoangdung.simplelocation.R;
 
 import java.util.ArrayList;
@@ -22,6 +20,22 @@ public class MyPlacesActivity extends AppCompatActivity {
     RecyclerView mRecyclerView;
     RecyclerViewAdapterMyPlace mRcvAdapter;
     List<FirebaseCenter.Location> data;
+
+
+    int chosenPlaceIndex = -1;
+
+    @Override
+    public void finish() {
+        Intent data = new Intent();
+        if (chosenPlaceIndex >= 0)
+        {
+            data.putExtra("chosenPlace", chosenPlaceIndex);
+            setResult(RESULT_OK,data);
+        }
+        else
+            setResult(RESULT_CANCELED);
+        super.finish();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +53,13 @@ public class MyPlacesActivity extends AppCompatActivity {
             ArrayList<FirebaseCenter.Location> loc = receivedIntent.getParcelableArrayListExtra("place");
 
 
-            mRcvAdapter = new RecyclerViewAdapterMyPlace(loc);
+            mRcvAdapter = new RecyclerViewAdapterMyPlace(loc, new ItemClickListener() {
+                @Override
+                public void onClick(View view, int position) {
+                    chosenPlaceIndex = position;
+                    finish();
+                }
+            });
 
             LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
             layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
