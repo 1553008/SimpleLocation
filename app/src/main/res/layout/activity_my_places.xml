@@ -6,13 +6,7 @@
     android:layout_height="match_parent"
     tools:context="com.example.hoangdung.simplelocation.Activity.MyPlacesActivity">
 
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/map"
-        tools:context=".Activity.MapsActivity"
-        android:name="com.google.android.gms.maps.SupportMapFragment" />
+
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
@@ -26,5 +20,15 @@
         android:id="@+id/add_place_button"
         android:layout_width="56dp"
         android:layout_height="56dp"
+        android:onClick="onClickAddPlaceButton"
         android:layout_gravity="bottom|end"/>
+
+
+    <FrameLayout
+        android:layout_marginTop="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/fragment_search_myplace"></FrameLayout>
 </FrameLayout>
+
+

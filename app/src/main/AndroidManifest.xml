@@ -32,7 +32,7 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-        <!--             The API key for Facebook and associated Facebook activities -->
+        <!-- The API key for Facebook and associated Facebook activities -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
@@ -53,11 +53,11 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
-        <!--             My Apps activities -->
+        <!-- My Apps activities -->
         <activity
             android:name=".Activity.MapsActivity"
             android:label="@string/title_activity_maps"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".Activity.WelcomeActivity"
             android:theme="@style/AppTheme.Transparent">
@@ -68,7 +68,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activity.SearchActivity" />
-        <activity android:name=".Activity.MyPlacesActivity"></activity>
+        <activity android:name=".Activity.MyPlacesActivity" />
+        <activity android:name=".Activity.AddPlaceActivity"></activity>
     </application>
 
 </manifest>

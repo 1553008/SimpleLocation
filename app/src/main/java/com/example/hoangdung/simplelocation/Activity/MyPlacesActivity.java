@@ -1,31 +1,38 @@
 package com.example.hoangdung.simplelocation.Activity;
 
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.hoangdung.simplelocation.Adapter.RecyclerViewAdapterMyPlace;
 import com.example.hoangdung.simplelocation.FirebaseCenter;
+import com.example.hoangdung.simplelocation.Fragments.SearchFragment;
 import com.example.hoangdung.simplelocation.Interface.ItemClickListener;
+import com.example.hoangdung.simplelocation.MyApplication;
+import com.example.hoangdung.simplelocation.MyPlace;
 import com.example.hoangdung.simplelocation.R;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class MyPlacesActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MyPlacesActivity extends AppCompatActivity {
     RecyclerView mRecyclerView;
     RecyclerViewAdapterMyPlace mRcvAdapter;
     List<FirebaseCenter.Location> data;
 
-    GoogleMap googleMap;
     int chosenPlaceIndex = -1;
 
     @Override
@@ -45,8 +52,11 @@ public class MyPlacesActivity extends AppCompatActivity implements OnMapReadyCal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_places);
-        SupportMapFragment fragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        fragment.getMapAsync(this);
+
+
+
+
+
         mRecyclerView = (RecyclerView)findViewById(R.id.recycler_view_my_place);
         Intent receivedIntent = getIntent();
         if (receivedIntent != null)
@@ -76,8 +86,9 @@ public class MyPlacesActivity extends AppCompatActivity implements OnMapReadyCal
         }
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        this.googleMap = googleMap;
+
+    public void onClickAddPlaceButton(View view) {
+        Intent intent = new Intent(this, AddPlaceActivity.class);
+        startActivity(intent);
     }
 }
