@@ -20,6 +20,7 @@ import com.example.hoangdung.simplelocation.Activity.SearchActivity;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBufferResponse;
+import com.google.android.gms.location.places.PlacePhotoMetadata;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -98,7 +99,7 @@ public class SearchFragment extends Fragment {
         if(data!=null)
         {
             getActivity().findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
-            String placeID = data.getStringExtra("PlaceID");
+            final String placeID = data.getStringExtra("PlaceID");
             Task<PlaceBufferResponse> task = mGeoClient.getPlaceById(placeID);
             task.addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
                 @Override

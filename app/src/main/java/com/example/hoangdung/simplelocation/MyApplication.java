@@ -45,4 +45,18 @@ public class MyApplication extends Application {
         }
         return 0;
     }
+
+    public static boolean hasSoftNavBar (Context context)
+    {
+        int id = context.getResources().getIdentifier("config_showNavigationBar", "bool", "android");
+        return id > 0 && context.getResources().getBoolean(id);
+    }
+    public static int getStatusBarHeight(Context context) {
+        int result = 0;
+        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = context.getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
 }

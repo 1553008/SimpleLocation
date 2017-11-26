@@ -3,13 +3,19 @@ package com.example.hoangdung.simplelocation.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.hoangdung.simplelocation.Adapter.RecyclerViewAdapterMyPlace;
@@ -27,9 +33,16 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 
 public class MyPlacesActivity extends AppCompatActivity {
-    RecyclerView mRecyclerView;
+
+
+    public @BindView(R.id.recycler_view_my_place) RecyclerView mRecyclerView;
+    public @BindView(R.id.add_place_button) FloatingActionButton mAddBtn;
+    public @BindView(R.id.my_place_toolbar) Toolbar mToolbar;
     RecyclerViewAdapterMyPlace mRcvAdapter;
     List<FirebaseCenter.Location> data;
 
@@ -52,12 +65,33 @@ public class MyPlacesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_places);
+        ButterKnife.bind(this);
+
+        //Prepare UI for Toolbar
+        final int statusBarHeight = MyApplication.getStatusBarHeight(getApplicationContext());
+        RelativeLayout.LayoutParams toolbarParams = (RelativeLayout.LayoutParams) mToolbar.getLayoutParams();
+        toolbarParams.topMargin +=statusBarHeight;
+        mToolbar.setLayoutParams(toolbarParams);
+
+        //Prepare UI for Add Place Button
+
+        final int navigationBarHeight = MyApplication.getNavigationBarHeight(getApplicationContext(),
+                getApplicationContext()
+                        .getResources()
+                        .getConfiguration()
+                        .orientation);
+        if(MyApplication.hasSoftNavBar(getApplicationContext())){
+            RelativeLayout.LayoutParams addBtnParams = (RelativeLayout.LayoutParams) mAddBtn.getLayoutParams();
+            addBtnParams.bottomMargin = (int) (navigationBarHeight +
+                    getApplicationContext()
+                            .getResources()
+                            .getDimension(R.dimen.addMyPlaceButtonMarginBottom));
+            addBtnParams.rightMargin = (int) getApplicationContext().getResources().getDimension(R.dimen.addMyPlaceButtonMarginRight);
+        }
+        setSupportActionBar(mToolbar);
 
 
 
-
-
-        mRecyclerView = (RecyclerView)findViewById(R.id.recycler_view_my_place);
         Intent receivedIntent = getIntent();
         if (receivedIntent != null)
         {

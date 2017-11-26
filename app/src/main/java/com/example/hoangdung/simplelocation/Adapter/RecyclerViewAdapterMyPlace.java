@@ -1,6 +1,8 @@
 package com.example.hoangdung.simplelocation.Adapter;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,6 +27,9 @@ import java.util.List;
 public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerViewAdapterMyPlace.RecyclerViewHolder>
 {
 
+    Context mContext;
+    final String LABEL_FONT = "HelveticaNeue-Roman.otf";
+    final String ADDRESS_FONT = "HelveticaNeue-Roman.otf";
     private List<FirebaseCenter.Location> data = new ArrayList<>();
     private ItemClickListener itemClickListener;
     public RecyclerViewAdapterMyPlace(List<FirebaseCenter.Location> data, ItemClickListener itemClickListener)
@@ -38,6 +43,7 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
     @Override
     public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
+        mContext = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.recycler_view_my_places_row, parent, false);
         return new RecyclerViewHolder(view);
@@ -47,7 +53,9 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
     public void onBindViewHolder(RecyclerViewHolder holder, int position) {
         holder.label.setText(data.get(position).label);
         holder.address.setText(data.get(position).address);
-
+        Typeface lableFont = Typeface.createFromAsset(mContext.getAssets(),LABEL_FONT);
+        holder.label.setTypeface(lableFont);
+        Typeface addressFont = Typeface.createFromAsset(mContext.getAssets(),ADDRESS_FONT);
         holder.setItemClickListener(itemClickListener);
     }
 
