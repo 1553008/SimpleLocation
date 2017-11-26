@@ -1,5 +1,6 @@
 package com.example.hoangdung.simplelocation.Activity;
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,17 +12,20 @@ import com.example.hoangdung.simplelocation.Adapter.RecyclerViewAdapterMyPlace;
 import com.example.hoangdung.simplelocation.FirebaseCenter;
 import com.example.hoangdung.simplelocation.Interface.ItemClickListener;
 import com.example.hoangdung.simplelocation.R;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class MyPlacesActivity extends AppCompatActivity {
+public class MyPlacesActivity extends AppCompatActivity implements OnMapReadyCallback {
     RecyclerView mRecyclerView;
     RecyclerViewAdapterMyPlace mRcvAdapter;
     List<FirebaseCenter.Location> data;
 
-
+    GoogleMap googleMap;
     int chosenPlaceIndex = -1;
 
     @Override
@@ -41,9 +45,9 @@ public class MyPlacesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_places);
-
+        SupportMapFragment fragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        fragment.getMapAsync(this);
         mRecyclerView = (RecyclerView)findViewById(R.id.recycler_view_my_place);
-
         Intent receivedIntent = getIntent();
         if (receivedIntent != null)
         {
@@ -70,5 +74,10 @@ public class MyPlacesActivity extends AppCompatActivity {
 
 
         }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        this.googleMap = googleMap;
     }
 }
