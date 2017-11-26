@@ -23,6 +23,7 @@
         >
 
         <android.support.design.widget.FloatingActionButton
+            android:id="@+id/floating_btn_add"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_gravity="bottom|end"
@@ -31,6 +32,7 @@
             />
 
         <android.support.design.widget.FloatingActionButton
+            android:id="@+id/floating_btn_search"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_gravity="bottom|end"
@@ -38,6 +40,7 @@
             android:src="@drawable/places_ic_search"
             android:layout_marginTop="7dp"
             android:layout_marginBottom="7dp"
+            android:onClick="onClickAddplaceSearchButton"
             />
 
     </LinearLayout>
