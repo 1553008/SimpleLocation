@@ -46,12 +46,14 @@ public class FirebaseCenter {
 
     static public class Location implements Parcelable
     {
+      public String placeID;
       public String label;
       public String address;
       public double lat;
       public double lng;
-      public Location(String label, String address, double lat, double lng)
+      public Location(String placeID, String label, String address, double lat, double lng)
       {
+          this.placeID = placeID;
           this.label = label;
           this.address = address;
           this.lat = lat;
@@ -59,6 +61,7 @@ public class FirebaseCenter {
       }
       public Location(Parcel in)
       {
+          placeID = in.readString();
           label = in.readString();
           address = in.readString();
           lat = in.readDouble();
@@ -72,7 +75,8 @@ public class FirebaseCenter {
         @Override
         public String toString() {
             return "Location{" +
-                    "label='" + label + '\'' +
+                    "placeID='" + placeID + '\'' +
+                    ", label='" + label + '\'' +
                     ", address='" + address + '\'' +
                     ", lat=" + lat +
                     ", lng=" + lng +
@@ -99,6 +103,7 @@ public class FirebaseCenter {
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(placeID);
             dest.writeString(label);
             dest.writeString(address);
             dest.writeDouble(lat);
