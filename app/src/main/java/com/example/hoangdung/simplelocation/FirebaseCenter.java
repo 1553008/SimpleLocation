@@ -50,8 +50,6 @@ public class FirebaseCenter {
       public String address;
       public double lat;
       public double lng;
-
-
       public Location(String label, String address, double lat, double lng)
       {
           this.label = label;
