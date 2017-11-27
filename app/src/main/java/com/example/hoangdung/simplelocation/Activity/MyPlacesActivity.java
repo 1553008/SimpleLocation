@@ -120,5 +120,6 @@ public class MyPlacesActivity extends AppCompatActivity {
     public void onClickAddPlaceButton(View view) {
         Intent intent = new Intent(this, AddPlaceActivity.class);
         startActivity(intent);
+
     }
 }

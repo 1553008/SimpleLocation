@@ -1,34 +1,144 @@
 package com.example.hoangdung.simplelocation.Activity;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.example.hoangdung.simplelocation.Fragments.SearchFragment;
 import com.example.hoangdung.simplelocation.R;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.GeoDataClient;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBufferResponse;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
-public class AddPlaceActivity extends AppCompatActivity implements OnMapReadyCallback {
+import butterknife.BindView;
 
+public class AddPlaceActivity extends AppCompatActivity implements OnMapReadyCallback,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener
+{
+    private TextView textViewAddress;
+
+    private FloatingActionButton floatingActionButtonAdd;
+
+    private  FloatingActionButton floatingActionButtonSearch;
 
     private GoogleMap googleMap;
+    GoogleApiClient mGoogleApiClient;
+    private FusedLocationProviderClient mLocationProvider;
+    private GeoDataClient mGeoDataClient;
+    private Place currentChosenPlace;
 
+    private void initGoogleApiClient(){
+        if(mGoogleApiClient == null){
+            mGoogleApiClient = new GoogleApiClient
+                    .Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+        mLocationProvider = LocationServices.getFusedLocationProviderClient(this);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_place);
-        GoogleMap googleMap;
+
+        textViewAddress = (TextView)findViewById(R.id.textViewAddress);
+        floatingActionButtonAdd = (FloatingActionButton)findViewById(R.id.floating_btn_add);
+        floatingActionButtonSearch= (FloatingActionButton)findViewById(R.id.floating_btn_search);
+
+
+
+
+        textViewAddress.setVisibility(View.INVISIBLE);
+        floatingActionButtonAdd.setVisibility(View.INVISIBLE);
+
+        // fragment map
         SupportMapFragment fragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         fragment.getMapAsync(this);
-
+        mGeoDataClient = Places.getGeoDataClient(this, null);
     }
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
-        Intent intent = new Intent(this, SearchActivity.class);
-        startActivity(intent);
+
+        initGoogleApiClient();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // if user did choose a location
+        if (requestCode == 0 && resultCode == RESULT_OK)
+        {
+
+            textViewAddress.setVisibility(View.VISIBLE);
+            floatingActionButtonAdd.setVisibility(View.VISIBLE);
+
+
+            // get place information
+            Task<PlaceBufferResponse> task = mGeoDataClient.getPlaceById(data.getStringExtra("PlaceID"));
+            task.addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
+                @Override
+                public void onComplete(@NonNull Task<PlaceBufferResponse> task) {
+                    currentChosenPlace = task.getResult().get(0);
+
+                    // show address
+                    textViewAddress.setText(currentChosenPlace.getAddress().toString());
+
+                    // locate address on map
+                    googleMap.clear();
+                    googleMap.addMarker(new MarkerOptions()
+                    .position(currentChosenPlace.getLatLng())
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_normal_marker)));
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentChosenPlace.getLatLng(), 15));
+                }
+            });
+
+        }
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    public void onClickAddplaceSearchButton(View view) {
+        // let user choose location
+        Intent intent = new Intent(this, SearchActivity.class);
+        startActivityForResult(intent, 0);
+    }
 }
