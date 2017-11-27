@@ -108,7 +108,7 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
                                 // Get the attribution text.
                                 CharSequence attribution = photoMetadata.getAttributions();
                                 // Get a full-size bitmap for the photo.
-                                Task<PlacePhotoResponse> photoResponse = mGeoClient.getPhoto(photoMetadata);
+                                final Task<PlacePhotoResponse> photoResponse = mGeoClient.getPhoto(photoMetadata);
                                 photoResponse.addOnCompleteListener(new OnCompleteListener<PlacePhotoResponse>() {
                                     @Override
                                     public void onComplete(@NonNull Task<PlacePhotoResponse> task) {

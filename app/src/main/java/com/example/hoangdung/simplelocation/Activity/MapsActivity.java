@@ -337,6 +337,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             ArrayList<FirebaseCenter.Location> locList = FirebaseCenter.getInstance().getMyPlaces();
                             intent.putParcelableArrayListExtra("place", locList);
                             startActivityForResult(intent, 0);
+                            mDrawer.closeDrawer();
                         }
                         return true;
                     }

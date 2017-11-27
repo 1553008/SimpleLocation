@@ -23,6 +23,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
 public class MyPlacesActivity extends AppCompatActivity {
@@ -111,12 +112,11 @@ public class MyPlacesActivity extends AppCompatActivity {
             mRecyclerView.setLayoutManager(layoutManager);
             mRecyclerView.setAdapter(mRcvAdapter);
 
-
-
         }
     }
 
 
+    @OnClick(R.id.add_place_button)
     public void onClickAddPlaceButton(View view) {
         Intent intent = new Intent(this, AddPlaceActivity.class);
         startActivity(intent);
