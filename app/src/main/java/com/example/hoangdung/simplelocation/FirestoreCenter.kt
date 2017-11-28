@@ -23,9 +23,9 @@ public class FirestoreCenter {
 
     var dbRef = FirebaseFirestore.getInstance()
     var dbAuth = FirestoreAuth.instance.dbAuth
-    fun addUser(userID: String, user: FireStoreUser){
+    fun addUser(user: FireStoreUser){
         dbRef.collection(DB_USERS_PATH)
-                .document(userID)
+                .document(user.ID)
                 .set(user, SetOptions.merge())
                 .addOnSuccessListener{
                     Log.d("MapsActivity","User: " + dbAuth.currentUser?.uid!! + "is added successfully")
@@ -34,12 +34,14 @@ public class FirestoreCenter {
 
     @IgnoreExtraProperties
     abstract class FireStoreUser{
+        abstract var ID: String
         @Exclude
         open fun parseJSON(json: JSONObject){
         }
     }
     @IgnoreExtraProperties
     class FacebookUser : FireStoreUser(){
+        override lateinit var ID: String
         lateinit var first_name: String
         lateinit var last_name: String
         lateinit var photo_url: String
@@ -48,6 +50,7 @@ public class FirestoreCenter {
         override fun parseJSON(json: JSONObject) {
             super.parseJSON(json)
             try {
+                ID = FirestoreAuth.instance.dbAuth.uid!!
                 first_name = json.getString("first_name")
                 last_name = json.getString("last_name")
                 email = json.getString("email")
@@ -55,7 +58,6 @@ public class FirestoreCenter {
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
-
         }
     }
 }

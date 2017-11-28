@@ -131,7 +131,7 @@ public class WelcomeActivity extends AppCompatActivity {
                                                 public void onSuccess() {
                                                     FirestoreCenter.FireStoreUser userInfo = new FirestoreCenter.FacebookUser();
                                                     userInfo.parseJSON(object);
-                                                    FirestoreCenter.Companion.getInstance().addUser(FirestoreAuth.Companion.getInstance().getDbAuth().getCurrentUser().getUid(), userInfo);
+                                                    FirestoreCenter.Companion.getInstance().addUser(userInfo);
                                                     goToMapsActivity();
                                                     finish();
                                                 }

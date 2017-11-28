@@ -85,46 +85,33 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
 
 
         //Get Place Photo and bind it the ImageView
-        GooglePlacesGeoQuery query = new GooglePlacesGeoQuery.Builder()
-                .withLatLng(new LatLng(data.get(position).lat,data.get(position).lng))
-                .build();
-        query.query(new GooglePlacesGeoQuery.OnPlacesResponseListener() {
+        String placeID = data.get(position).placeID;
+        Log.d("MapsActivity","place ID: " + placeID + "received success" );
+        Task<PlacePhotoMetadataResponse> photoMetadataResponse = mGeoClient.getPlacePhotos(placeID);
+        photoMetadataResponse.addOnCompleteListener(new OnCompleteListener<PlacePhotoMetadataResponse>() {
             @Override
-            public void onPlacesResponse(String placeID, int resultCode) {
-                if(resultCode == GooglePlacesGeoQuery.RESPONE_SUCCESS)
-                {
-                    Log.d("MapsActivity","place ID: " + placeID + "received success" );
-                    Task<PlacePhotoMetadataResponse> photoMetadataResponse = mGeoClient.getPlacePhotos(placeID);
-                    photoMetadataResponse.addOnCompleteListener(new OnCompleteListener<PlacePhotoMetadataResponse>() {
+            public void onComplete(@NonNull Task<PlacePhotoMetadataResponse> task) {
+                // Get the list of photos.
+                PlacePhotoMetadataResponse photos = task.getResult();
+                // Get the PlacePhotoMetadataBuffer (metadata for all of the photos).
+                final PlacePhotoMetadataBuffer photoMetadataBuffer = photos.getPhotoMetadata();
+                // Get the first photo in the list.
+                if(photoMetadataBuffer.getCount() !=0){
+                    final PlacePhotoMetadata photoMetadata = photoMetadataBuffer.get(0);
+                    // Get the attribution text.
+                    CharSequence attribution = photoMetadata.getAttributions();
+                    // Get a full-size bitmap for the photo.
+                    final Task<PlacePhotoResponse> photoResponse = mGeoClient.getPhoto(photoMetadata);
+                    photoResponse.addOnCompleteListener(new OnCompleteListener<PlacePhotoResponse>() {
                         @Override
-                        public void onComplete(@NonNull Task<PlacePhotoMetadataResponse> task) {
-                            // Get the list of photos.
-                            PlacePhotoMetadataResponse photos = task.getResult();
-                            // Get the PlacePhotoMetadataBuffer (metadata for all of the photos).
-                            final PlacePhotoMetadataBuffer photoMetadataBuffer = photos.getPhotoMetadata();
-                            // Get the first photo in the list.
-                            if(photoMetadataBuffer.getCount() !=0){
-                                final PlacePhotoMetadata photoMetadata = photoMetadataBuffer.get(0);
-                                // Get the attribution text.
-                                CharSequence attribution = photoMetadata.getAttributions();
-                                // Get a full-size bitmap for the photo.
-                                final Task<PlacePhotoResponse> photoResponse = mGeoClient.getPhoto(photoMetadata);
-                                photoResponse.addOnCompleteListener(new OnCompleteListener<PlacePhotoResponse>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<PlacePhotoResponse> task) {
-                                        PlacePhotoResponse photo = task.getResult();
-                                        Bitmap bitmap = photo.getBitmap();
-                                        holder.image.setImageBitmap(bitmap);
-                                        holder.image.setScaleType(ImageView.ScaleType.FIT_XY);
-                                        photoMetadataBuffer.release();
-                                    }
-                                });
-                            }
+                        public void onComplete(@NonNull Task<PlacePhotoResponse> task) {
+                            PlacePhotoResponse photo = task.getResult();
+                            Bitmap bitmap = photo.getBitmap();
+                            holder.image.setImageBitmap(bitmap);
+                            holder.image.setScaleType(ImageView.ScaleType.FIT_XY);
+                            photoMetadataBuffer.release();
                         }
                     });
-                }
-                else if(resultCode == GooglePlacesGeoQuery.RESPONSE_FAILURE){
-                    Log.d("MapsActivity","place ID response failure");
                 }
             }
         });
