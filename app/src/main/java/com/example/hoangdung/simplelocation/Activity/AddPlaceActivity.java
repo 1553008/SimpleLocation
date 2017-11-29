@@ -1,5 +1,6 @@
 package com.example.hoangdung.simplelocation.Activity;
 
+import android.app.DialogFragment;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,7 +10,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.hoangdung.simplelocation.FirebaseCenter;
+import com.example.hoangdung.simplelocation.Fragments.InputPlaceLabelDialog;
 import com.example.hoangdung.simplelocation.Fragments.SearchFragment;
 import com.example.hoangdung.simplelocation.R;
 import com.google.android.gms.common.ConnectionResult;
@@ -30,12 +34,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 
 import butterknife.BindView;
 
 public class AddPlaceActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener
+        GoogleApiClient.OnConnectionFailedListener,
+        InputPlaceLabelDialog.DialogListener // implement what to do after input dialog ends
 {
     private TextView textViewAddress;
 
@@ -140,5 +147,35 @@ public class AddPlaceActivity extends AppCompatActivity implements OnMapReadyCal
         // let user choose location
         Intent intent = new Intent(this, SearchActivity.class);
         startActivityForResult(intent, 0);
+    }
+
+    public void onClickAddplaceAddButton(View view)
+    {
+        Bundle bundle = new Bundle();
+        bundle.putString("placeName", currentChosenPlace.getName().toString());
+
+        // create and show input dialog
+        DialogFragment dialog = new InputPlaceLabelDialog();
+        dialog.setArguments(bundle); // send place name for dialog to set to edit text
+        dialog.show(getFragmentManager(), "InputPlaceLabelDialog1");
+    }
+
+    @Override
+    public void onDialogPositiveClick(String input)
+    {
+        // add new place to my place list in database
+        FirebaseCenter.getInstance().addPlace(FirebaseCenter.getInstance().getUserID(), new FirebaseCenter.Location(currentChosenPlace.getId(),
+                input, currentChosenPlace.getAddress().toString(), currentChosenPlace.getLatLng().latitude,
+                currentChosenPlace.getLatLng().longitude), new DatabaseReference.CompletionListener()
+        {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference)
+            {
+                if (databaseError != null)
+                    Toast.makeText(AddPlaceActivity.this, "Could not add to place list", Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(AddPlaceActivity.this, "Add to place list successfully", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

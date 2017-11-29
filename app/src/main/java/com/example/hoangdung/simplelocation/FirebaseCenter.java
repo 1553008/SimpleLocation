@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.hoangdung.simplelocation.Interface.FirebaseAuthCommand;
 import com.facebook.AccessToken;
@@ -43,11 +44,23 @@ public class FirebaseCenter {
     }
 
     private ArrayList<Location> myPlaces = new ArrayList<Location>();
+    private String userID; // facebook userID
+
+
+    public String getUserID()
+    {
+        return userID;
+    }
+
+    public void setUserID(String userID)
+    {
+        this.userID = userID;
+    }
 
     static public class Location implements Parcelable
     {
       public String placeID;
-      public String label;
+      public transient String label; // will not serialize this field
       public String address;
       public double lat;
       public double lng;
@@ -111,13 +124,22 @@ public class FirebaseCenter {
         }
     }
 
+    // add new place to my place list
+    public  void addPlace(String userID, FirebaseCenter.Location place, DatabaseReference.CompletionListener completionListener)
+    {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("myplace/" + userID);
+        ref = ref.child(place.label);
+        ref.setValue(place, completionListener);
+    }
+
     // start keep track of my place list on database
     public void listenForMyPlaceDatabase()
     {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("myplace/user1");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("myplace/" + this.userID);
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                myPlaces.clear();
                 // for each place
                 for (DataSnapshot placeSnapShot: dataSnapshot.getChildren())
                 {
@@ -137,7 +159,8 @@ public class FirebaseCenter {
 
     public void handleFacebookAccessToken(AccessToken token, final FirebaseAuthCommand cmd)
     {
-        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        final AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        userID = token.getUserId();
         FirestoreAuth.Companion.getInstance().getDbAuth().signInWithCredential(credential)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override

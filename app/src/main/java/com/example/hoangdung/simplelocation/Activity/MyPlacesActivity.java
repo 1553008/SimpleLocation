@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -33,7 +34,7 @@ public class MyPlacesActivity extends AppCompatActivity {
     public @BindView(R.id.add_place_button) FloatingActionButton mAddBtn;
     public @BindView(R.id.my_place_toolbar) Toolbar mToolbar;
     RecyclerViewAdapterMyPlace mRcvAdapter;
-    List<FirebaseCenter.Location> data;
+    List<FirebaseCenter.Location> data = new ArrayList<FirebaseCenter.Location>();
     int chosenPlaceIndex = -1;
 
     @Override
@@ -48,6 +49,17 @@ public class MyPlacesActivity extends AppCompatActivity {
             setResult(RESULT_CANCELED);
         super.finish();
     }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        // update data
+        data = FirebaseCenter.getInstance().getMyPlaces();
+        // tell the adapter that data has been updated
+        mRcvAdapter.notifyDataSetChanged();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,10 +107,9 @@ public class MyPlacesActivity extends AppCompatActivity {
             /* Show place list */
 
             // get location list from intent
-            ArrayList<FirebaseCenter.Location> loc = receivedIntent.getParcelableArrayListExtra("place");
 
-
-            mRcvAdapter = new RecyclerViewAdapterMyPlace(loc, new ItemClickListener() {
+            data = FirebaseCenter.getInstance().getMyPlaces();
+            mRcvAdapter = new RecyclerViewAdapterMyPlace(data, new ItemClickListener() {
                 @Override
                 public void onClick(View view, int position) {
                     chosenPlaceIndex = position;

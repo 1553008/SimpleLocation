@@ -29,6 +29,7 @@
             android:layout_gravity="bottom|end"
             android:backgroundTint="#0AAC9D"
             android:src="@drawable/ic_add"
+            android:onClick="onClickAddplaceAddButton"
             />
 
         <android.support.design.widget.FloatingActionButton
