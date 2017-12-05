@@ -11,10 +11,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.hoangdung.simplelocation.Adapter.RecyclerViewAdapterMyPlace;
 import com.example.hoangdung.simplelocation.FirebaseCenter;
 import com.example.hoangdung.simplelocation.Interface.ItemClickListener;
+import com.example.hoangdung.simplelocation.Interface.ItemLongClickListener;
 import com.example.hoangdung.simplelocation.MyApplication;
 import com.example.hoangdung.simplelocation.R;
 import com.example.hoangdung.simplelocation.ScrollAwareFABBehavior;
@@ -109,11 +111,20 @@ public class MyPlacesActivity extends AppCompatActivity {
             // get location list from intent
 
             data = FirebaseCenter.getInstance().getMyPlaces();
-            mRcvAdapter = new RecyclerViewAdapterMyPlace(data, new ItemClickListener() {
+            mRcvAdapter = new RecyclerViewAdapterMyPlace(data, new ItemClickListener()
+            {
                 @Override
-                public void onClick(View view, int position) {
+                public void onClick(View view, int position)
+                {
                     chosenPlaceIndex = position;
                     finish();
+                }
+            }, new ItemLongClickListener()
+            {
+                @Override
+                public void onLongClick(View view, int position)
+                {
+                    Log.d("khanh", "long click ne");
                 }
             });
 

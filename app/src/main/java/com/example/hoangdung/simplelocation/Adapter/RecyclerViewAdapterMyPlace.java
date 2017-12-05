@@ -7,9 +7,11 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
+import android.os.Debug;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +22,7 @@ import android.widget.Toast;
 import com.example.hoangdung.simplelocation.FirebaseCenter;
 import com.example.hoangdung.simplelocation.GooglePlacesClient.GooglePlacesGeoQuery;
 import com.example.hoangdung.simplelocation.Interface.ItemClickListener;
+import com.example.hoangdung.simplelocation.Interface.ItemLongClickListener;
 import com.example.hoangdung.simplelocation.R;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.GeoDataClient;
@@ -47,17 +50,21 @@ import java.util.List;
 
 public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerViewAdapterMyPlace.RecyclerViewHolder>
 {
+    private SparseBooleanArray selectedItems;
 
     Context mContext;
     final String LABEL_FONT = "HelveticaNeue-Roman.otf";
     final String ADDRESS_FONT = "HelveticaNeue-Roman.otf";
     private List<FirebaseCenter.Location> data = new ArrayList<>();
     private ItemClickListener itemClickListener;
+    private ItemLongClickListener itemLongClickListener;
     private GeoDataClient mGeoClient;
-    public RecyclerViewAdapterMyPlace(List<FirebaseCenter.Location> data, ItemClickListener itemClickListener)
+    public RecyclerViewAdapterMyPlace(List<FirebaseCenter.Location> data, ItemClickListener itemClickListener,
+                                      ItemLongClickListener itemLongClickListener)
     {
         this.data = data;
         this.itemClickListener = itemClickListener;
+        this.itemLongClickListener = itemLongClickListener;
     }
 
 
@@ -76,14 +83,15 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
 
     @Override
     public void onBindViewHolder(final RecyclerViewHolder holder, int position) {
+
         holder.label.setText(data.get(position).label);
         holder.address.setText(data.get(position).address);
         Typeface lableFont = Typeface.createFromAsset(mContext.getAssets(),LABEL_FONT);
         holder.label.setTypeface(lableFont);
         Typeface addressFont = Typeface.createFromAsset(mContext.getAssets(),ADDRESS_FONT);
         holder.setItemClickListener(itemClickListener);
-
-
+        holder.setItemLongClickListener(itemLongClickListener);
+        holder.itemView.setLongClickable(true);
         //Get Place Photo and bind it the ImageView
         GooglePlacesGeoQuery query = new GooglePlacesGeoQuery.Builder()
                 .withLatLng(new LatLng(data.get(position).lat,data.get(position).lng))
@@ -135,11 +143,42 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
         return data.size();
     }
 
-    public class RecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public void toggleSelection(int pos) {
+        if (selectedItems.get(pos, false)) {
+            selectedItems.delete(pos);
+        }
+        else {
+            selectedItems.put(pos, true);
+        }
+        notifyItemChanged(pos);
+    }
+
+    public void clearSelections() {
+        selectedItems.clear();
+        notifyDataSetChanged();
+    }
+
+    public int getSelectedItemCount() {
+        return selectedItems.size();
+    }
+
+    public List<Integer> getSelectedItems() {
+        List<Integer> items =
+                new ArrayList<Integer>(selectedItems.size());
+        for (int i = 0; i < selectedItems.size(); i++) {
+            items.add(selectedItems.keyAt(i));
+        }
+        return items;
+    }
+
+
+    public class RecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
+        View.OnLongClickListener{
         TextView label;
         TextView address;
         ImageView image;
         private ItemClickListener itemClickListener;
+        private ItemLongClickListener itemLongClickListener;
 
 
         @Override
@@ -147,9 +186,19 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
             itemClickListener.onClick(v, getAdapterPosition());
         }
 
+        @Override
+        public boolean onLongClick(View v)
+        {
+            itemLongClickListener.onLongClick(v, getAdapterPosition());
+            return true;
+        }
         public void setItemClickListener(ItemClickListener itemClickListener)
         {
             this.itemClickListener = itemClickListener;
+        }
+        public void setItemLongClickListener(ItemLongClickListener itemLongClickListener)
+        {
+            this.itemLongClickListener = itemLongClickListener;
         }
 
         public RecyclerViewHolder(View itemView) {
@@ -158,6 +207,9 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
             address = (TextView)itemView.findViewById(R.id.my_place_row_address);
             image = (ImageView) itemView.findViewById(R.id.place_image);
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
+
+
     }
 }
