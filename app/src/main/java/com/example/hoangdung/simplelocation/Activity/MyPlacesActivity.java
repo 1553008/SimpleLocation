@@ -9,6 +9,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.support.v7.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -29,7 +32,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 
-public class MyPlacesActivity extends AppCompatActivity {
+public class MyPlacesActivity extends AppCompatActivity implements ActionMode.Callback{
 
 
     public @BindView(R.id.recycler_view_my_place) RecyclerView mRecyclerView;
@@ -38,7 +41,7 @@ public class MyPlacesActivity extends AppCompatActivity {
     RecyclerViewAdapterMyPlace mRcvAdapter;
     List<FirebaseCenter.Location> data = new ArrayList<FirebaseCenter.Location>();
     int chosenPlaceIndex = -1;
-
+    ActionMode actionMode;
     @Override
     public void finish() {
         Intent data = new Intent();
@@ -116,15 +119,27 @@ public class MyPlacesActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view, int position)
                 {
-                    chosenPlaceIndex = position;
-                    finish();
+                    if (actionMode == null)
+                    {
+                      chosenPlaceIndex = position;
+                      finish();
+                    }
+                    else
+                    {
+                        mRcvAdapter.toggleSelection(position);
+                    }
+
                 }
             }, new ItemLongClickListener()
             {
                 @Override
                 public void onLongClick(View view, int position)
                 {
-                    Log.d("khanh", "long click ne");
+                    if (actionMode != null)
+                        return;
+                    actionMode = startSupportActionMode(MyPlacesActivity.this);
+                    mRcvAdapter.toggleSelection(position);
+                    Log.d("khanh", "item long click");
                 }
             });
 
@@ -143,5 +158,31 @@ public class MyPlacesActivity extends AppCompatActivity {
         Intent intent = new Intent(this, AddPlaceActivity.class);
         startActivity(intent);
 
+    }
+
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.menu_addplace_activity, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu)
+    {
+        return false;
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item)
+    {
+        return  false;
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode mode)
+    {
+        mRcvAdapter.clearSelections();
+        this.actionMode = null;
     }
 }

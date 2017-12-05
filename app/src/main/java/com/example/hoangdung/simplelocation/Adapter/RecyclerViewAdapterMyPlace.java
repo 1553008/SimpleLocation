@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Debug;
@@ -50,7 +51,7 @@ import java.util.List;
 
 public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerViewAdapterMyPlace.RecyclerViewHolder>
 {
-    private SparseBooleanArray selectedItems;
+    private SparseBooleanArray selectedItems = new SparseBooleanArray();
 
     Context mContext;
     final String LABEL_FONT = "HelveticaNeue-Roman.otf";
@@ -83,7 +84,10 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
 
     @Override
     public void onBindViewHolder(final RecyclerViewHolder holder, int position) {
-
+        if (selectedItems.get(position))
+            holder.itemView.setBackgroundColor(Color.parseColor("#143b7a"));
+        else
+            holder.itemView.setBackgroundColor(Color.parseColor("#ffffff"));
         holder.label.setText(data.get(position).label);
         holder.address.setText(data.get(position).address);
         Typeface lableFont = Typeface.createFromAsset(mContext.getAssets(),LABEL_FONT);
@@ -144,6 +148,8 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
     }
 
     public void toggleSelection(int pos) {
+        Log.d("khanh", "Toggle");
+
         if (selectedItems.get(pos, false)) {
             selectedItems.delete(pos);
         }
@@ -151,6 +157,7 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
             selectedItems.put(pos, true);
         }
         notifyItemChanged(pos);
+        Log.d("khanh", selectedItems.toString());
     }
 
     public void clearSelections() {
