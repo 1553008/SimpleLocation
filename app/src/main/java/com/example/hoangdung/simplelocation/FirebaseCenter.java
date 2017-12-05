@@ -24,6 +24,9 @@ import com.google.firebase.database.ValueEventListener;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by USER on 11/17/2017.
@@ -46,7 +49,13 @@ public class FirebaseCenter {
     private ArrayList<Location> myPlaces = new ArrayList<Location>();
     private String userID; // facebook userID
 
-
+    public void removePlace(List<String> labels, DatabaseReference.CompletionListener completionListener)
+    {
+        Map<String, Object> map = new HashMap<>();
+        for (String label: labels)
+            map.put("myplace/" + userID + "/"+ label,null);
+       FirebaseDatabase.getInstance().getReference().updateChildren(map, completionListener);
+    }
     public String getUserID()
     {
         return userID;

@@ -68,7 +68,20 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
         this.itemLongClickListener = itemLongClickListener;
     }
 
-
+    public boolean isSelectedItemsListEmpty()
+    {
+        return selectedItems.size() == 0;
+    }
+    public List<String> getSelectedItemsLabel()
+    {
+        List<String> labels = new ArrayList<>();
+        for (int i = 0; i < selectedItems.size(); ++i)
+        {
+            FirebaseCenter.Location location = data.get(selectedItems.keyAt(i));
+            labels.add(location.label);
+        }
+        return labels;
+    }
 
     @Override
     public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
