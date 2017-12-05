@@ -85,7 +85,7 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
     @Override
     public void onBindViewHolder(final RecyclerViewHolder holder, int position) {
         if (selectedItems.get(position))
-            holder.itemView.setBackgroundColor(Color.parseColor("#143b7a"));
+           holder.itemView.setBackgroundColor(Color.parseColor("#a2f2ab"));
         else
             holder.itemView.setBackgroundColor(Color.parseColor("#ffffff"));
         holder.label.setText(data.get(position).label);
