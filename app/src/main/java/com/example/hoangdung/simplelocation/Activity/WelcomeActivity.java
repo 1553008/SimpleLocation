@@ -90,10 +90,12 @@ public class WelcomeActivity extends AppCompatActivity {
             }
         });
 
-        // start keeping track of my place list in database
-        FirebaseCenter.getInstance().listenForMyPlaceDatabase();
         //if already loggined
         if(checkAlreadyLoggined()){
+            // start keeping track of my place list in database
+            FirebaseCenter.getInstance().setUserID(AccessToken.getCurrentAccessToken().getUserId());
+            FirebaseCenter.getInstance().listenForMyPlaceDatabase();
+
             mLoginBtn.setVisibility(View.INVISIBLE);
             new Handler().postDelayed(new Runnable() {
                 @Override
