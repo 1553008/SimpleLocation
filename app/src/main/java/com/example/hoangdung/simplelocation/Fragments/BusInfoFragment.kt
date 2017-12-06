@@ -43,13 +43,13 @@ class BusInfoFragment : Fragment() {
             mAdapter?.steps = value?.routes?.getOrNull(0)?.legs?.getOrNull(0)?.steps
         }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        super.onCreateView(inflater, container, savedInstanceState)
         // Inflate the layout for this fragment
         return inflater!!.inflate(R.layout.fragment_bus_info, container, false)
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //Step Recycler view Setup
         mAdapter = Adapter()
@@ -59,16 +59,16 @@ class BusInfoFragment : Fragment() {
 
         //Setting up panel
         var slidingUpLayoutParams = BusSlidingUpPanel.layoutParams as FrameLayout.LayoutParams
-        slidingUpLayoutParams.bottomMargin = MyApplication.getNavigationBarHeight(context, context.resources.configuration.orientation)
+        slidingUpLayoutParams.bottomMargin = MyApplication.getNavigationBarHeight(context, context!!.resources.configuration.orientation)
         BusSlidingUpPanel.layoutParams = slidingUpLayoutParams
         BusSlidingUpPanel.viewTreeObserver.addOnGlobalLayoutListener {
             BusSlidingUpPanel?.panelHeight = busInfoHeader?.height!!
         }
         //Setting up floating action button
-        var btnLayoutParams = activity.findViewById<FloatingActionButton>(R.id.floating_btn).layoutParams as CoordinatorLayout.LayoutParams
+        var btnLayoutParams = activity!!.findViewById<FloatingActionButton>(R.id.floating_btn).layoutParams as CoordinatorLayout.LayoutParams
         btnLayoutParams.bottomMargin = MyApplication.getNavigationBarHeight(context, resources.configuration.orientation) +
                 BusSlidingUpPanel.panelHeight +
-                context.resources.getDimension(R.dimen.myplaceButtonMarginBottom).toInt()
+                context!!.resources.getDimension(R.dimen.myplaceButtonMarginBottom).toInt()
 
         BusSlidingUpPanel.setFadeOnClickListener { v: View? ->
 

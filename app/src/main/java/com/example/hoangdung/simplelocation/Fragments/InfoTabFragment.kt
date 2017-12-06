@@ -46,13 +46,13 @@ class InfoTabFragment : Fragment() {
     public interface OnTabListener{
         public fun onTabChanged(position: Int, response: DirectionsResponse?)
     }
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         return inflater!!.inflate(R.layout.fragment_info_tab, container, false)
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         tabLayout.addTab(tabLayout.newTab().setText("Driving"))
         tabLayout.addTab(tabLayout.newTab().setText("Bus"))
@@ -62,12 +62,12 @@ class InfoTabFragment : Fragment() {
                 //Driving Info Tab
                 if(position==0)
                 {
-                    drivingInfoFragment = DrivingInfoFragment.newInstance(context)
+                    drivingInfoFragment = DrivingInfoFragment.newInstance(context!!)
                     return drivingInfoFragment!!
                 }
                 else if(position == 1) // Bus Info Tab
                 {
-                    busInfoFragment = BusInfoFragment.newInstance(context)
+                    busInfoFragment = BusInfoFragment.newInstance(context!!)
                     return busInfoFragment!!
                 }
                 else

@@ -1,5 +1,6 @@
 package com.example.hoangdung.simplelocation
 
+import android.os.Build.ID
 import android.util.Log
 import com.google.firebase.firestore.*
 import org.json.JSONException
@@ -25,7 +26,7 @@ public class FirestoreCenter {
     var dbAuth = FirestoreAuth.instance.dbAuth
     fun addUser(user: FireStoreUser){
         dbRef.collection(DB_USERS_PATH)
-                .document(user.ID)
+                .document(user.id)
                 .set(user, SetOptions.merge())
                 .addOnSuccessListener{
                     Log.d("MapsActivity","User: " + dbAuth.currentUser?.uid!! + "is added successfully")
@@ -34,14 +35,14 @@ public class FirestoreCenter {
 
     @IgnoreExtraProperties
     abstract class FireStoreUser{
-        abstract var ID: String
+        abstract var id: String
         @Exclude
         open fun parseJSON(json: JSONObject){
         }
     }
     @IgnoreExtraProperties
     class FacebookUser : FireStoreUser(){
-        override lateinit var ID: String
+        override lateinit var id: String
         lateinit var first_name: String
         lateinit var last_name: String
         lateinit var photo_url: String
@@ -50,7 +51,7 @@ public class FirestoreCenter {
         override fun parseJSON(json: JSONObject) {
             super.parseJSON(json)
             try {
-                ID = FirestoreAuth.instance.dbAuth.uid!!
+                id = FirestoreAuth.instance.dbAuth.uid!!
                 first_name = json.getString("first_name")
                 last_name = json.getString("last_name")
                 email = json.getString("email")

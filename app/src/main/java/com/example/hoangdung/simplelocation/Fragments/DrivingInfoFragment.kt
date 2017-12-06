@@ -45,13 +45,13 @@ class DrivingInfoFragment() : Fragment() {
             durationText?.text = value?.routes?.getOrNull(0)?.legs?.getOrNull(0)?.duration?.text
             mAdapter.directionResponse = value
         }
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         return inflater!!.inflate(R.layout.fragment_driving_info, container, false)
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         //Step Recycler view Setup
@@ -62,17 +62,17 @@ class DrivingInfoFragment() : Fragment() {
 
         //Setting up panel
         var slidingUpLayoutParams = DrivingSlidingUpPanel.layoutParams as FrameLayout.LayoutParams
-        slidingUpLayoutParams.bottomMargin = MyApplication.getNavigationBarHeight(context,context.resources.configuration.orientation)
+        slidingUpLayoutParams.bottomMargin = MyApplication.getNavigationBarHeight(context,context!!.resources.configuration.orientation)
         DrivingSlidingUpPanel.layoutParams = slidingUpLayoutParams
         drivingInfoHeader.viewTreeObserver.addOnGlobalLayoutListener{
             DrivingSlidingUpPanel?.panelHeight = drivingInfoHeader?.height!!
         }
 
         //Setting up floating action button
-        var btnLayoutParams = activity.findViewById<FloatingActionButton>(R.id.floating_btn).layoutParams as CoordinatorLayout.LayoutParams
+        var btnLayoutParams = activity!!.findViewById<FloatingActionButton>(R.id.floating_btn).layoutParams as CoordinatorLayout.LayoutParams
         btnLayoutParams.bottomMargin = MyApplication.getNavigationBarHeight(context,resources.configuration.orientation)+
                 DrivingSlidingUpPanel.panelHeight +
-                context.resources.getDimension(R.dimen.myplaceButtonMarginBottom).toInt()
+                context!!.resources.getDimension(R.dimen.myplaceButtonMarginBottom).toInt()
 
 
 

@@ -38,14 +38,14 @@ class DirectionsFragment constructor(): Fragment() {
         fun onDirectionsFragmentUIReady(directionsFragment: DirectionsFragment)
         fun onLocationChanged(locationList: ArrayList<MyPlace>, directionsFragment: DirectionsFragment)
     }
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         var view = inflater!!.inflate(R.layout.fragment_directions, container, false)
         return view
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         directionsRecycler.adapter = directionsAdapter
         directionsRecycler.setHasFixedSize(true)
@@ -84,14 +84,14 @@ class DirectionsFragment constructor(): Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         //Receive result successful
         if(resultCode == Activity.RESULT_OK){
-            activity.findViewById<View>(R.id.progressBar).visibility = View.VISIBLE
+            activity!!.findViewById<View>(R.id.progressBar).visibility = View.VISIBLE
             var placeID = data?.getStringExtra("PlaceID")
-            var task =  Places.getGeoDataClient(activity,null).getPlaceById(placeID)
+            var task =  Places.getGeoDataClient(activity!!,null).getPlaceById(placeID)
             task.addOnCompleteListener{ responseTask: Task<PlaceBufferResponse> ->
                 if(responseTask.isSuccessful()){
                     if(responseTask.result[0] != null)
                     {
-                        activity.findViewById<View>(R.id.progressBar).visibility = View.GONE
+                        activity!!.findViewById<View>(R.id.progressBar).visibility = View.GONE
                         var myPlace = MyPlace()
                         myPlace.place = responseTask.result[0]
                         //if new position added

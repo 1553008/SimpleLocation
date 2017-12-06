@@ -111,7 +111,8 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
         holder.itemView.setLongClickable(true);
         //Get Place Photo and bind it the ImageView
         String placeID = data.get(position).placeID;
-        Log.d("MapsActivity","place ID: " + placeID + "received success" );
+        Log.d("MapsActivity","place ID: " + placeID + " received success" );
+        Log.d("MapsActivity","position:" + String.valueOf(position));
         Task<PlacePhotoMetadataResponse> photoMetadataResponse = mGeoClient.getPlacePhotos(placeID);
         photoMetadataResponse.addOnCompleteListener(new OnCompleteListener<PlacePhotoMetadataResponse>() {
             @Override
@@ -123,10 +124,11 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
                 // Get the first photo in the list.
                 if(photoMetadataBuffer.getCount() !=0){
                     final PlacePhotoMetadata photoMetadata = photoMetadataBuffer.get(0);
-                    // Get the attribution text.
-                    CharSequence attribution = photoMetadata.getAttributions();
-                    // Get a full-size bitmap for the photo.
-                    final Task<PlacePhotoResponse> photoResponse = mGeoClient.getPhoto(photoMetadata);
+                    // Get a scaled bitmap for the photo.
+
+                    final Task<PlacePhotoResponse> photoResponse = mGeoClient.getScaledPhoto(photoMetadata,
+                            holder.image.getWidth(),
+                            holder.image.getHeight());
                     photoResponse.addOnCompleteListener(new OnCompleteListener<PlacePhotoResponse>() {
                         @Override
                         public void onComplete(@NonNull Task<PlacePhotoResponse> task) {
@@ -138,6 +140,7 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
                         }
                     });
                 }
+
             }
         });
     }
@@ -157,6 +160,8 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
             selectedItems.put(pos, true);
         }
         notifyItemChanged(pos);
+        Log.d("khanh",String.valueOf(pos));
+        //notifyDataSetChanged();
         Log.d("khanh", selectedItems.toString());
     }
 
@@ -187,7 +192,6 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
         private ItemClickListener itemClickListener;
         private ItemLongClickListener itemLongClickListener;
 
-
         @Override
         public void onClick(View v) {
             itemClickListener.onClick(v, getAdapterPosition());
@@ -215,6 +219,7 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
             image = (ImageView) itemView.findViewById(R.id.place_image);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
+
         }
 
 

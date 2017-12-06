@@ -5,58 +5,53 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.hoangdung.simplelocation.Activity.AddPlaceActivity">
- <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/map"
-        tools:context=".Activity.MapsActivity"
-        android:name="com.google.android.gms.maps.SupportMapFragment" />
-
-
+        tools:context=".Activity.MapsActivity" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/floating_btn_add"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_gravity="bottom|end"
-            android:backgroundTint="#0AAC9D"
-            android:src="@drawable/ic_add"
-            android:onClick="onClickAddplaceAddButton"
-            />
+        android:id="@+id/floating_btn_add"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom|end"
+        app:backgroundTint="#0AAC9D"
+        android:onClick="onClickAddplaceAddButton"
+        android:src="@drawable/ic_add" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/floating_btn_search"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_gravity="bottom|end"
-            android:backgroundTint="#0AAC9D"
-            android:src="@drawable/places_ic_search"
-            android:layout_marginTop="7dp"
             android:layout_marginBottom="7dp"
+            android:layout_marginTop="7dp"
+            app:backgroundTint="#0AAC9D"
             android:onClick="onClickAddplaceSearchButton"
-            />
+            android:src="@drawable/places_ic_search" />
 
     </LinearLayout>
 
- <TextView
-     android:id="@+id/textViewAddress"
-     android:layout_marginTop="30dp"
-     android:layout_width="match_parent"
-     android:layout_height="wrap_content"
-     android:text="34 Marion Road, Brooklyn Park, South Australia, Australia"
-     android:textSize="20dp"
-     android:textColor="#ffffff"
-     android:background="#0AAC9D"
-     android:paddingTop="4dp"
-     android:paddingBottom="4dp"
-     android:textAlignment="center"
-     />
+    <TextView
+        android:id="@+id/textViewAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:background="#0AAC9D"
+        android:paddingBottom="4dp"
+        android:paddingTop="4dp"
+        android:text="34 Marion Road, Brooklyn Park, South Australia, Australia"
+        android:textAlignment="center"
+        android:textColor="#ffffff"
+        android:textSize="20dp" />
 </FrameLayout>

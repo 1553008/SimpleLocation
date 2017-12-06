@@ -131,6 +131,9 @@ public class MyPlacesActivity extends AppCompatActivity implements ActionMode.Ca
                     }
                     else
                     {
+                        Log.d("khanh","itemClick");
+                        Log.d("khanh","position: " + String.valueOf(position));
+
                         mRcvAdapter.toggleSelection(position);
                         TextView item  = (TextView)findViewById(R.id.remove_place);
                         if (mRcvAdapter.isSelectedItemsListEmpty())
@@ -143,6 +146,7 @@ public class MyPlacesActivity extends AppCompatActivity implements ActionMode.Ca
                             item.setEnabled(true);
                             item.setTextColor(Color.parseColor("#ffffff"));
                         }
+
 
 //                        removePlaceItem.setEnabled(mRcvAdapter.isSelectedItemsListEmpty());
 
@@ -159,6 +163,7 @@ public class MyPlacesActivity extends AppCompatActivity implements ActionMode.Ca
                     actionMode = startSupportActionMode(MyPlacesActivity.this);
                     mRcvAdapter.toggleSelection(position);
                     Log.d("khanh", "item long click");
+                    Log.d("khanh","position: " + String.valueOf(position));
                 }
             });
 
@@ -167,6 +172,8 @@ public class MyPlacesActivity extends AppCompatActivity implements ActionMode.Ca
 
             mRecyclerView.setLayoutManager(layoutManager);
             mRecyclerView.setAdapter(mRcvAdapter);
+            mRecyclerView.setHasFixedSize(true);
+            mRecyclerView.setItemAnimator(null);
 
         }
     }

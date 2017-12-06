@@ -71,7 +71,6 @@ public class AddPlaceActivity extends AppCompatActivity implements OnMapReadyCal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_place);
-
         textViewAddress = (TextView)findViewById(R.id.textViewAddress);
         floatingActionButtonAdd = (FloatingActionButton)findViewById(R.id.floating_btn_add);
         floatingActionButtonSearch= (FloatingActionButton)findViewById(R.id.floating_btn_search);
