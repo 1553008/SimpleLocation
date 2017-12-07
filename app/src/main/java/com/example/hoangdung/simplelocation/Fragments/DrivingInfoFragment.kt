@@ -74,8 +74,6 @@ class DrivingInfoFragment() : Fragment() {
                 DrivingSlidingUpPanel.panelHeight +
                 context!!.resources.getDimension(R.dimen.myplaceButtonMarginBottom).toInt()
 
-
-
         //Set Swipable for Custom Viewpager
 
         drivingInfoBlank.setOnTouchListener { v, event ->

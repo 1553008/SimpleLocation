@@ -1,7 +1,7 @@
 package com.example.hoangdung.simplelocation
 
-import android.os.Build.ID
 import android.util.Log
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
 import org.json.JSONException
 import org.json.JSONObject
@@ -13,17 +13,39 @@ import org.json.JSONObject
  */
 
 public class FirestoreCenter {
-
     val DB_USERS_PATH = "users"
+    val FOOD_CATEGORIES_PATH = "food_categories"
+    val FOOD_SHOPS_PATH = "food_shops"
+    val FOOD_METADATA_PATH = "food_metadata"
+
+    var dbRef = FirebaseFirestore.getInstance()
+    var dbAuth = FirestoreAuth.instance.dbAuth
+
+
     private object Holder{
         val instance = FirestoreCenter()
     }
     companion object {
-        val instance: FirestoreCenter by lazy { Holder.instance }
+        val instance: FirestoreCenter = FirestoreCenter()
     }
 
-    var dbRef = FirebaseFirestore.getInstance()
-    var dbAuth = FirestoreAuth.instance.dbAuth
+
+    /**
+     * Query Food Categories for auto complete
+     */
+    interface OnFoodCategoriesListener {
+        fun onComplete(task: Task<QuerySnapshot>);
+    }
+    fun getFoodCategories(listener: OnFoodCategoriesListener){
+        dbRef.collection(FOOD_CATEGORIES_PATH)
+                .get()
+                .addOnCompleteListener { task->
+                    listener.onComplete(task)
+                }
+    }
+    /**
+     * Add New User to database using Firebase Authentication
+     */
     fun addUser(user: FireStoreUser){
         dbRef.collection(DB_USERS_PATH)
                 .document(user.id)
@@ -55,7 +77,7 @@ public class FirestoreCenter {
                 first_name = json.getString("first_name")
                 last_name = json.getString("last_name")
                 email = json.getString("email")
-                photo_url = json.getJSONObject("picture").getJSONObject("data").getString("url")
+                photo_url = json.getJSONObject("picture").getJSONObject("categories").getString("url")
             } catch (e: JSONException) {
                 e.printStackTrace()
             }

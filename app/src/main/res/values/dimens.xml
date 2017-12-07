@@ -8,4 +8,7 @@
     <dimen name="myplaceButtonMarginRight">5dp</dimen>
     <dimen name="addMyPlaceButtonMarginBottom">5dp</dimen>
     <dimen name="addMyPlaceButtonMarginRight">5dp</dimen>
+    <dimen name="foodAutoCompletePhoto">48dp</dimen>
+    <dimen name="foodAutoCompleteTextWidth">130dp</dimen>
+    <dimen name="foodAutoCompletePopupHeight">200dp</dimen>
 </resources>

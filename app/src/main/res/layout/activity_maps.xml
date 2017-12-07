@@ -40,8 +40,6 @@
                 android:layout_alignBottom="@id/map"
                 android:layout_alignEnd="@id/map"
                 android:layout_gravity="bottom|end"
-                android:layout_marginBottom="53dp"
-                android:layout_marginRight="5dp"
                 android:src="@drawable/ic_navigate">
 
             </android.support.design.widget.FloatingActionButton>

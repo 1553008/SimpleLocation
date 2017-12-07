@@ -136,7 +136,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<LatLng> mMarkerPlaces = new ArrayList<>();
     //Activity Request Code
     private int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
-
+    private int FOOD_FINDER_REQUEST_CODE = 2;
     private  boolean returnedFromMyPlaceList = false;
     private FirebaseCenter.Location chosenPlaceFromMyPlaceList;
     //-----------------------------------------Activity LifeCycles---------------------------------------------------
@@ -315,16 +315,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .withHeaderBackground(R.drawable.drawerlayoutbackground)
                 .build();
 
-        // construct draw item
+        // construct my places item
         PrimaryDrawerItem myPlaceItem= new PrimaryDrawerItem()
                 .withIdentifier(this.getResources().getInteger(R.integer.my_place_drawer_item_id))
                 .withName("My places");
 
+        // construct i'm hungry item
+        PrimaryDrawerItem hungryItem = new PrimaryDrawerItem()
+                .withIdentifier(this.getResources().getInteger(R.integer.hungry_drawer_item_id))
+                .withName("I'm Hungry");
         //Drawer setup
         mDrawer = new DrawerBuilder()
                 .withActivity(this)
                 //.withToolbar(toolbar)
-                .addDrawerItems(myPlaceItem)
+                .addDrawerItems(myPlaceItem,hungryItem)
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -338,6 +342,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             intent.putParcelableArrayListExtra("place", locList);
                             startActivityForResult(intent, 0);
                             mDrawer.closeDrawer();
+                        }
+                        else if(position == MapsActivity.this.getResources().getInteger(R.integer.hungry_drawer_item_id)){
+                            Intent intent = new Intent(MapsActivity.this,FoodFinderActivity.class);
+                            mDrawer.closeDrawer();
+                            startActivityForResult(intent,FOOD_FINDER_REQUEST_CODE);
                         }
                         return true;
                     }
@@ -389,8 +398,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 showLastknownLocation();
             }
         });
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) mLocateBtn.getLayoutParams();
+        if(MyApplication.hasSoftNavBar(getApplicationContext())){
+            params.bottomMargin += MyApplication.getNavigationBarHeight(getApplicationContext(),
+                    getApplicationContext().getResources().getConfiguration().orientation);
+        }
+        params.bottomMargin += getApplicationContext().getResources().getDimension(R.dimen.myplaceButtonMarginBottom);
+        params.rightMargin += getApplicationContext().getResources().getDimension(R.dimen.myplaceButtonMarginRight);
     }
 
+    private void layoutPositionSetup(){
+
+    }
     //------------------------------------------Search Fragment Callbacks and Search Functionality--------------------------------------------
     //
 
@@ -487,10 +506,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     handleSearchResult(searchFragment.mSearchPlace,searchFragment,RESULT_OK);
                 }
                 //Setting up Locate Button position
-                CoordinatorLayout.LayoutParams floatingBtnLayoutParams =(CoordinatorLayout.LayoutParams) mLocateBtn.getLayoutParams();
-                floatingBtnLayoutParams.bottomMargin = (int) (MyApplication.getNavigationBarHeight(mContext,
-                                        mContext.getResources().getConfiguration().orientation) +
-                                        mContext.getResources().getDimension(R.dimen.myplaceButtonMarginBottom));
+                locateButtonSetup();
             }
             @Override
             public void onSearchFragmentFindDirectionsClicked(SearchFragment searchFragment) {
@@ -545,7 +561,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     /**
      * When the user clicks find directions icon from the search fragment, this function will be called
      * This will replace the search fragment with direction fragment
-     * Using place data of search fragment as destination
+     * Using place categories of search fragment as destination
      * Initialize neccessary listeners to observe changes in searching lists and tab changed
      */
     private void startDirectionsFragment(@NotNull MyPlace firstLocation, @NonNull MyPlace secondLocation){

@@ -64,9 +64,9 @@ public class MyPlacesActivity extends AppCompatActivity implements ActionMode.Ca
     protected void onResume()
     {
         super.onResume();
-        // update data
+        // update categories
         data = FirebaseCenter.getInstance().getMyPlaces();
-        // tell the adapter that data has been updated
+        // tell the adapter that categories has been updated
         mRcvAdapter.notifyDataSetChanged();
     }
 
@@ -169,7 +169,6 @@ public class MyPlacesActivity extends AppCompatActivity implements ActionMode.Ca
 
             LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
             layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-
             mRecyclerView.setLayoutManager(layoutManager);
             mRecyclerView.setAdapter(mRcvAdapter);
             mRecyclerView.setHasFixedSize(true);
