@@ -62,7 +62,6 @@ class DrivingInfoFragment() : Fragment() {
 
         //Setting up panel
         var slidingUpLayoutParams = DrivingSlidingUpPanel.layoutParams as FrameLayout.LayoutParams
-        slidingUpLayoutParams.bottomMargin = MyApplication.getNavigationBarHeight(context,context!!.resources.configuration.orientation)
         DrivingSlidingUpPanel.layoutParams = slidingUpLayoutParams
         drivingInfoHeader.viewTreeObserver.addOnGlobalLayoutListener{
             DrivingSlidingUpPanel?.panelHeight = drivingInfoHeader?.height!!
@@ -70,7 +69,7 @@ class DrivingInfoFragment() : Fragment() {
 
         //Setting up floating action button
         var btnLayoutParams = activity!!.findViewById<FloatingActionButton>(R.id.floating_btn).layoutParams as CoordinatorLayout.LayoutParams
-        btnLayoutParams.bottomMargin = MyApplication.getNavigationBarHeight(context,resources.configuration.orientation)+
+        btnLayoutParams.bottomMargin =
                 DrivingSlidingUpPanel.panelHeight +
                 context!!.resources.getDimension(R.dimen.myplaceButtonMarginBottom).toInt()
 

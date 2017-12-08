@@ -1,9 +1,11 @@
 package com.example.hoangdung.simplelocation.Activity
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -16,6 +18,13 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import com.cunoraz.tagview.Tag
 import com.example.hoangdung.simplelocation.MyApplication
+import com.example.hoangdung.simplelocation.NearestPlacesClient.NearestPlacesPOJO.NearestPlacesResponse
+import com.example.hoangdung.simplelocation.NearestPlacesClient.NearestPlacesQuery
+import com.example.hoangdung.simplelocation.ProgressWindowAnim
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.places.Places
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.QuerySnapshot
 import com.otaliastudios.autocomplete.Autocomplete
@@ -44,12 +53,17 @@ class FoodFinderActivity : AppCompatActivity() {
     var chosenTags: ArrayList<Tag> =  ArrayList()
     var categories: ArrayList<String> = ArrayList()
     val categoriesChosen: HashMap<String,Boolean> = HashMap()
+    lateinit var mLocationProvider: FusedLocationProviderClient
+    private var progressWindow: ProgressWindowAnim? = null
+
     val MAX_SUGGESTION = 15;
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_food_finder)
         ButterKnife.bind(this)
         progress_bar.visibility = View.VISIBLE
+        mLocationProvider = LocationServices.getFusedLocationProviderClient(this@FoodFinderActivity)
+        progressWindowConfig()
         //Initilize Autocomplete Food Categories
         //Get List of Food Categories from database
         FirestoreCenter.instance.getFoodCategories(object : FirestoreCenter.OnFoodCategoriesListener {
@@ -119,14 +133,17 @@ class FoodFinderActivity : AppCompatActivity() {
             if(!food_edit_text.text.isEmpty()){
                 tag.isDeletable = true
                 chosenTags.add(tag)
-                food_edit_text.text.clear()
+                food_edit_text.setText("")
                 showTags(chosenTags)
+                categoriesChosen[tag.text] = true
             }
         }
         food_tag_view.setOnTagDeleteListener { tagView, tag, i ->
             chosenTags.removeAt(i)
             tagView.remove(i)
         }
+
+        //
     }
 
 
@@ -134,13 +151,6 @@ class FoodFinderActivity : AppCompatActivity() {
     private fun showTags(tags: List<Tag>){
         food_tag_view.removeAll()
         food_tag_view.addTags(tags)
-    }
-    override fun onBackPressed() {
-        if (autocomplete?.isPopupShowing!!) {
-            autocomplete?.dismissPopup()
-        } else
-            super.onBackPressed()
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -151,8 +161,52 @@ class FoodFinderActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if(item?.itemId == R.id.confirm)
         {
-            //start new activity
+            //Query Nearest Shops
+            //Get Current Location
+            try {
+                progressWindow?.showProgress()
+                MyApplication.hideKeyboardFrom(this,food_edit_text)
+                val task = mLocationProvider.lastLocation
+                task.addOnCompleteListener { task ->
+                    if(task.isSuccessful){
+                        val location = task.result
+                        val tags = ArrayList<String>()
+                        for(item in chosenTags)
+                        {
+                            tags.add(item.text)
+                        }
+                        val query = NearestPlacesQuery.Builder()
+                                .with(LatLng(location.latitude,location.longitude))
+                                .with(tags)
+                                .build()
+                        query.query{nearestPlacesResponse: NearestPlacesResponse?, resultCode: Int ->
+                            //start new activity
+                            val intent = Intent(this@FoodFinderActivity,FoodResultActivity::class.java)
+                            intent.putParcelableArrayListExtra("shops",nearestPlacesResponse?.shops)
+                            startActivity(intent)
+                            progressWindow?.hideProgress()
+                        }
+                    }
+                    else{
+                        Toast.makeText(this@FoodFinderActivity,"Something wrong try again",Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+            }
+            catch (security: SecurityException){
+                Log.d("MapsActivity",security.message);
+            }
+
+
+
         }
         return super.onOptionsItemSelected(item)
+    }
+    private fun progressWindowConfig(){
+        progressWindow = ProgressWindowAnim.getInstance(this)
+        val progressWindowConfiguration = ProgressWindowAnim.ProgressWindowConfiguration()
+        progressWindowConfiguration.backgroundColor = android.graphics.Color.parseColor("#32000000")
+        progressWindow?.setCofig(progressWindowConfiguration);
+
     }
 }

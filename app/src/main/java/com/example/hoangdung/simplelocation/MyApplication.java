@@ -1,11 +1,14 @@
 package com.example.hoangdung.simplelocation;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 
 import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
@@ -58,5 +61,9 @@ public class MyApplication extends Application {
             result = context.getResources().getDimensionPixelSize(resourceId);
         }
         return result;
+    }
+    public static void hideKeyboardFrom(Context context, View view){
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

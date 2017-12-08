@@ -75,41 +75,14 @@ public class MyPlacesActivity extends AppCompatActivity implements ActionMode.Ca
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_places);
         ButterKnife.bind(this);
-
-        //Prepare UI for Toolbar
-        final int statusBarHeight = MyApplication.getStatusBarHeight(getApplicationContext());
-        LinearLayout.LayoutParams toolbarParams = (LinearLayout.LayoutParams) mToolbar.getLayoutParams();
-        toolbarParams.topMargin +=statusBarHeight;
-        mToolbar.setLayoutParams(toolbarParams);
-
         //Prepare UI for Add Place Button and RecyclerView
-
-        final int navigationBarHeight = MyApplication.getNavigationBarHeight(getApplicationContext(),
-                getApplicationContext()
-                        .getResources()
-                        .getConfiguration()
-                        .orientation);
         CoordinatorLayout.LayoutParams addBtnParams = (CoordinatorLayout.LayoutParams) mAddBtn.getLayoutParams();
         addBtnParams.setBehavior(new ScrollAwareFABBehavior());
         LinearLayout.LayoutParams listParams = (LinearLayout.LayoutParams) mRecyclerView.getLayoutParams();
-
-        if(MyApplication.hasSoftNavBar(getApplicationContext())){
-            addBtnParams.bottomMargin = (int) (navigationBarHeight);
-            addBtnParams.rightMargin = (int) getApplicationContext().getResources().getDimension(R.dimen.addMyPlaceButtonMarginRight);
-
-            listParams.bottomMargin += navigationBarHeight;
-        }
-        addBtnParams.bottomMargin+= getApplicationContext()
+        addBtnParams.bottomMargin = (int)getApplicationContext()
                 .getResources()
                 .getDimension(R.dimen.addMyPlaceButtonMarginBottom);
-        listParams.bottomMargin+=  getApplicationContext()
-                .getResources()
-                .getDimension(R.dimen.addMyPlaceButtonMarginBottom);
-
         setSupportActionBar(mToolbar);
-
-
-
 
         Intent receivedIntent = getIntent();
         if (receivedIntent != null)

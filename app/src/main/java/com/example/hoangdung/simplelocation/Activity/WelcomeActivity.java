@@ -123,7 +123,7 @@ public class WelcomeActivity extends AppCompatActivity {
                                     editor.putString("email",object.getString("email"));
                                     editor.putString("first_name",object.getString("first_name"));
                                     editor.putString("last_name",object.getString("last_name"));
-                                    editor.putString("picture",object.getJSONObject("picture").getJSONObject("categories").getString("url"));
+                                    editor.putString("picture",object.getJSONObject("picture").getJSONObject("data").getString("url"));
                                     editor.commit();
 
                                     // Firebase authentication with facebook

@@ -6,4 +6,19 @@
     <color name="colorStatusBar">#99000000</color>
     <color name="colorPolylineDirectionsDriving">#1E90FF</color>
     <color name="colorPolylineDirectionsBus">#00CED1</color>
+
+    <color name="red">#ea4335</color>
+    <color name="blue">#4285f4</color>
+    <color name="green">#34a853</color>
+    <color name="yellow">#fbbc05</color>
+    <color name="black">#8579ce</color>
+    <color name="magenta">#34e0ee</color>
+    <array name="mydotColors">
+        <item>@color/red</item>
+        <item>@color/blue</item>
+        <item>@color/green</item>
+        <item>@color/yellow</item>
+        <item>@color/black</item>
+        <item>@color/magenta</item>
+    </array>
 </resources>

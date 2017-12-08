@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/progress_bar_container"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <com.bcgdv.asia.lib.dots.DotsProgressIndicator
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:dotsMode="setSize"
+        app:dotsSpacing="2dp"
+        app:dotsDiameter="15dp"
+        app:numberOfDots="6"
+        app:visibilityChangeDelay="1000"
+        app:dotColors="@array/mydotColors"
+        android:layout_gravity="center"/>
+
+</FrameLayout>

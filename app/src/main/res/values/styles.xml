@@ -8,12 +8,12 @@
         <item name="android:textColorPrimary">@android:color/white</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColorPrimaryInverse">@android:color/black</item>
-        <item name="android:windowTranslucentNavigation">true</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="drawerArrowStyle">@style/AppTheme.DrawerArrow</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="android:actionModeBackground">@color/colorPrimaryDark</item>
+        <item name="android:actionMenuTextColor">@color/md_black_1000</item>
     </style>
     <style name="AppTheme.Transparent" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:navigationBarColor">@android:color/transparent</item>

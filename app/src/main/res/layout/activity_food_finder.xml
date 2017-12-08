@@ -15,17 +15,8 @@
             android:id="@+id/food_search_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:layout_marginTop="24dp"
-            android:background="@color/colorPrimary"
+            android:background="@color/md_white_1000"
             app:title="LET'S EAT">
-
-        </android.support.v7.widget.Toolbar>
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            >
             <EditText
                 android:id="@+id/food_edit_text"
                 android:layout_width="match_parent"
@@ -41,14 +32,15 @@
                 android:textCursorDrawable="@null"
                 android:textSize="20sp"
                 />
-        </android.support.v7.widget.CardView>
+        </android.support.v7.widget.Toolbar>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"/>
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-
+            android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp">
             <com.cunoraz.tagview.TagView xmlns:tagview="http://schemas.android.com/apk/res-auto"

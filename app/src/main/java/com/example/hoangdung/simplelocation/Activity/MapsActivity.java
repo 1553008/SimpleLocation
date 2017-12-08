@@ -354,7 +354,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .withAccountHeader(accountHeader)
                 .withFullscreen(true)
                 .build();
-        if(Build.VERSION.SDK_INT >= 19){
+        /*if(Build.VERSION.SDK_INT >= 19){
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         }
         if(Build.VERSION.SDK_INT >= 21){
@@ -363,7 +363,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         if(Build.VERSION.SDK_INT >= 19){
             mDrawer.getDrawerLayout().setFitsSystemWindows(false);
-        }
+        }*/
     }
 
     /**
@@ -376,20 +376,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mProfileIconURL = sharedPreferences.getString("picture","");
     }
 
-
-
-    private void setWindowFlags(Activity activity, final int bits, boolean on){
-        Window win = activity.getWindow();
-        WindowManager.LayoutParams winParams = win.getAttributes();
-        if(on){
-            winParams.flags |= bits;
-        }
-        else{
-            winParams.flags &= ~bits;
-        }
-        win.setAttributes(winParams);
-    }
-
     private void locateButtonSetup(){
         //mLocateBtn = findViewBId(R.id.floating_btn);
         mLocateBtn.setOnClickListener(new View.OnClickListener() {
@@ -399,12 +385,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
         CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) mLocateBtn.getLayoutParams();
-        if(MyApplication.hasSoftNavBar(getApplicationContext())){
-            params.bottomMargin += MyApplication.getNavigationBarHeight(getApplicationContext(),
-                    getApplicationContext().getResources().getConfiguration().orientation);
-        }
-        params.bottomMargin += getApplicationContext().getResources().getDimension(R.dimen.myplaceButtonMarginBottom);
-        params.rightMargin += getApplicationContext().getResources().getDimension(R.dimen.myplaceButtonMarginRight);
+        params.bottomMargin = (int)getApplicationContext().getResources().getDimension(R.dimen.myplaceButtonMarginBottom);
+        params.rightMargin = (int)getApplicationContext().getResources().getDimension(R.dimen.myplaceButtonMarginRight);
     }
 
     private void layoutPositionSetup(){

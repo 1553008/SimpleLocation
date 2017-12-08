@@ -59,14 +59,13 @@ class BusInfoFragment : Fragment() {
 
         //Setting up panel
         var slidingUpLayoutParams = BusSlidingUpPanel.layoutParams as FrameLayout.LayoutParams
-        slidingUpLayoutParams.bottomMargin = MyApplication.getNavigationBarHeight(context, context!!.resources.configuration.orientation)
         BusSlidingUpPanel.layoutParams = slidingUpLayoutParams
         BusSlidingUpPanel.viewTreeObserver.addOnGlobalLayoutListener {
             BusSlidingUpPanel?.panelHeight = busInfoHeader?.height!!
         }
         //Setting up floating action button
         var btnLayoutParams = activity!!.findViewById<FloatingActionButton>(R.id.floating_btn).layoutParams as CoordinatorLayout.LayoutParams
-        btnLayoutParams.bottomMargin = MyApplication.getNavigationBarHeight(context, resources.configuration.orientation) +
+        btnLayoutParams.bottomMargin =
                 BusSlidingUpPanel.panelHeight +
                 context!!.resources.getDimension(R.dimen.myplaceButtonMarginBottom).toInt()
 
