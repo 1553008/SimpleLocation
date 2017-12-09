@@ -169,13 +169,13 @@ public class FirebaseCenter {
     public void handleFacebookAccessToken(AccessToken token, final FirebaseAuthCommand cmd)
     {
         final AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-        userID = token.getUserId();
         FirestoreAuth.Companion.getInstance().getDbAuth().signInWithCredential(credential)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful())
                         {
+                            setUserID(FirestoreAuth.Companion.getInstance().getDbAuth().getUid());
                             listenForMyPlaceDatabase();
                             cmd.onSuccess();
                         }

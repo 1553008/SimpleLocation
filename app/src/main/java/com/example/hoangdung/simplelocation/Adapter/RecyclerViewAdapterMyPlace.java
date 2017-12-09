@@ -16,6 +16,7 @@ import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -97,10 +98,14 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
 
     @Override
     public void onBindViewHolder(final RecyclerViewHolder holder, int position) {
+        CheckBox checkBox = (CheckBox) holder.itemView.findViewById(R.id.checkbox_recylerview);
         if (selectedItems.get(position))
-           holder.itemView.setBackgroundColor(Color.parseColor("#a2f2ab"));
-        else
-            holder.itemView.setBackgroundColor(Color.parseColor("#ffffff"));
+        {
+            checkBox.setVisibility(View.VISIBLE);
+            checkBox.setEnabled(false);
+            checkBox.setChecked(true);
+        } else
+            checkBox.setVisibility(View.INVISIBLE);
         holder.label.setText(data.get(position).label);
         holder.address.setText(data.get(position).address);
         Typeface lableFont = Typeface.createFromAsset(mContext.getAssets(),LABEL_FONT);
