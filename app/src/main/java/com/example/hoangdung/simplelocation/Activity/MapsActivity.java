@@ -116,9 +116,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private DirectionsResponse busResponse;
 
     private Context mContext;
-    //Firebase Authentication
-    private FirebaseAuth mAuth;
-    private FirebaseUser mUser;
+
     @BindView(R.id.floating_btn)
     public FloatingActionButton mLocateBtn;
     //Google Map model
@@ -407,15 +405,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         fragmentTransaction.commit();
         mSearchFragmentHolder = searchFragmentHolder;
         searchFragmentHolder.setOnSearchFragmentCallback(new SearchFragment.OnSearchFragmentCallback() {
+
+            //Set SearchFragment's toolbar as Activity's toolbar
             @Override
             public void onSearchFragmentUIReady(SearchFragment searchFragment) {
                 mDrawer.setToolbar(MapsActivity.this,searchFragment.mToolbar);
             }
 
+            //Create Search Fragment for real Searching Result
             @Override
             public void onSearchFragmentClicked(SearchFragment searchFragment) {
                 initRealSearchFragment();
             }
+
+            //Update Map UI using Current Location
             @Override
             public void onSearchFragmentResumed(SearchFragment searchFragment) {
                 if(mMap!=null)
@@ -466,6 +469,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void initRealSearchFragment(){
         SearchFragment realSearchFragment = SearchFragment.newInstance(MapsActivity.this);
         realSearchFragment.setOnSearchFragmentCallback(new SearchFragment.OnSearchFragmentCallback() {
+
+            //Set Fragment's toolbar as Activity's toolbar
             @Override
             public void onSearchFragmentUIReady(SearchFragment searchFragment) {
                 mDrawer.setToolbar(MapsActivity.this,searchFragment.mToolbar,true);
@@ -473,11 +478,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     searchFragment.mToolbar.callOnClick();
             }
 
+            //Start Search Activity
             @Override
             public void onSearchFragmentClicked(SearchFragment searchFragment) {
                 searchFragment.startSearching();
             }
 
+            //Update Map UI from Search Fragment Result
             @Override
             public void onSearchFragmentResumed(SearchFragment searchFragment) {
                 if(mMap!=null){

@@ -54,7 +54,6 @@ public class WelcomeActivity extends AppCompatActivity {
     //Login Button
     public @BindView(R.id.loginBtn) Button mLoginBtn;
     private CallbackManager mCallbackManager;
-    //Facebook and Firebase
     //Read Permission
     private List<String> readPermissions = Arrays.asList(
             "email","public_profile");
@@ -75,8 +74,10 @@ public class WelcomeActivity extends AppCompatActivity {
     private void getLocationPermission(){
         Log.d(TAG,"getLocationPermission");
         //If the applications is not permitted, ask for permission
-        if(ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},FINE_LOCATION_REQUEST);
+        if(ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    FINE_LOCATION_REQUEST);
         }
     }
     /**
@@ -110,9 +111,7 @@ public class WelcomeActivity extends AppCompatActivity {
         LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(final LoginResult loginResult) {
-                GraphRequest graphRequest =  GraphRequest.newMeRequest(
-                        loginResult.getAccessToken()
-                        , new GraphRequest.GraphJSONObjectCallback() {
+                GraphRequest graphRequest =  GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
                             @Override
                             public void onCompleted(final JSONObject object, GraphResponse response) {
                                 Intent intent = new Intent(WelcomeActivity.this,MapsActivity.class);
@@ -131,6 +130,7 @@ public class WelcomeActivity extends AppCompatActivity {
                                             new FirebaseAuthCommand() {
                                                 @Override
                                                 public void onSuccess() {
+                                                    //If Authentication success, Add User Infomation to Database and proceed to MapsActivity
                                                     FirestoreCenter.FireStoreUser userInfo = new FirestoreCenter.FacebookUser();
                                                     userInfo.parseJSON(object);
                                                     FirestoreCenter.Companion.getInstance().addUser(userInfo);
@@ -160,7 +160,6 @@ public class WelcomeActivity extends AppCompatActivity {
             public void onCancel() {
 
             }
-
             @Override
             public void onError(FacebookException error) {
 
@@ -191,6 +190,8 @@ public class WelcomeActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){
             case FINE_LOCATION_REQUEST:{
+                // If user doesn't allow permission
+                // Quit application
                 if(!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED))
                     finish();
                 else{
