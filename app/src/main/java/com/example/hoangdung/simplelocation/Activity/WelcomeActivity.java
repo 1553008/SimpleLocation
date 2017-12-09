@@ -93,7 +93,7 @@ public class WelcomeActivity extends AppCompatActivity {
         //if already loggined
         if(checkAlreadyLoggined()){
             // start keeping track of my place list in database
-            FirebaseCenter.getInstance().setUserID(AccessToken.getCurrentAccessToken().getUserId());
+            FirebaseCenter.getInstance().setUserID(FirestoreAuth.Companion.getInstance().getDbAuth().getUid());
             FirebaseCenter.getInstance().listenForMyPlaceDatabase();
 
             mLoginBtn.setVisibility(View.INVISIBLE);
