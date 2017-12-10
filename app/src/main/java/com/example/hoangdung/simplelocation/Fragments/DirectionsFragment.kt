@@ -34,10 +34,12 @@ class DirectionsFragment constructor(): Fragment() {
     var directionsFragmentCallback:  DirectionsFragmentCallback? = null
     lateinit var mContext: Context
     lateinit var toolbar: Toolbar
+
     interface DirectionsFragmentCallback{
         fun onDirectionsFragmentUIReady(directionsFragment: DirectionsFragment)
         fun onLocationChanged(locationList: ArrayList<MyPlace>, directionsFragment: DirectionsFragment)
     }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment

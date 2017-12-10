@@ -94,18 +94,17 @@ public class GoogleDirectionsQuery {
             }
         });
     }
+
     public static class Builder{
         GoogleDirectionsQuery googleDirectionsQuery = new GoogleDirectionsQuery();
         public Builder withOrigin(@NonNull LatLng origin){
             googleDirectionsQuery.origin = origin;
             return this;
         }
-
         public Builder withDestination(@NonNull LatLng destination){
             googleDirectionsQuery.destination = destination;
             return this;
         }
-
         public Builder withTransitMode(@NonNull GoogleDirectionsQuery.TRANSIT_MODE transitMode){
             googleDirectionsQuery.transit_mode = transitMode;
             return this;
@@ -122,7 +121,6 @@ public class GoogleDirectionsQuery {
             googleDirectionsQuery.waypoints = latLngArrayList;
             return this;
         }
-
         public GoogleDirectionsQuery buid(){
             HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
             interceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);

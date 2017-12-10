@@ -11,4 +11,6 @@
     <dimen name="foodAutoCompletePhoto">48dp</dimen>
     <dimen name="foodAutoCompleteTextWidth">130dp</dimen>
     <dimen name="foodAutoCompletePopupHeight">200dp</dimen>
+    <dimen name="foodShopsListHeight">200dp</dimen>
+    <dimen name="foodShopsAvartarSize">64dp</dimen>
 </resources>

@@ -33,7 +33,7 @@ import butterknife.ButterKnife;
 
 public class SearchActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        PlaceAutoCompleteAdapter.OnPlaceClickCallback{
+        PlaceAutoCompleteAdapter.OnPlaceClickListener {
 
     @BindView(R.id.search_editText)
     public EditText mSearchText;

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="5dp">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:padding="5dp">
+
+        <ImageView
+            android:id="@+id/food_shop_avartar"
+            android:layout_width="@dimen/foodShopsAvartarSize"
+            android:layout_height="@dimen/foodShopsAvartarSize"
+            android:layout_marginTop="5dp"/>
+        <LinearLayout
+            android:id="@+id/food_info_container"
+            android:layout_toRightOf="@id/food_shop_avartar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="5dp"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/food_shop_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/md_black_1000"
+                android:textSize="16sp"
+                android:layout_marginBottom="2dp"/>
+            <TextView
+                android:id="@+id/food_shop_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/md_dark_dialogs"
+                android:layout_marginBottom="2dp"
+                android:textSize="14sp"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <me.zhanghai.android.materialratingbar.MaterialRatingBar
+                    android:id="@+id/food_shop_ratings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.MaterialRatingBar.RatingBar.Indicator.Small"
+                    android:rating="2"
+                    android:progressTint="@color/yellow"
+                    />
+                <TextView
+                    android:id="@+id/food_shop_ratings_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/food_shop_ratings"
+                    android:textColor="@color/md_black_1000"
+                    android:layout_marginLeft="10dp"/>
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <View
+            android:layout_below="@id/food_info_container"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/wallet_hint_foreground_holo_dark"
+            />
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

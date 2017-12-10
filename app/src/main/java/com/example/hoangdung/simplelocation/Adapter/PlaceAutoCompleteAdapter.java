@@ -31,12 +31,14 @@ public class PlaceAutoCompleteAdapter extends RecyclerView.Adapter<PlaceAutoComp
     private Context mContext;
     private GeoDataClient mGeoDataClient;
     private ArrayList<AutocompletePrediction> mPredictPlaces;
-    private OnPlaceClickCallback mPlaceClickCallback;
+    private OnPlaceClickListener mPlaceClickCallback;
     public String mCountryCode;
-    public interface OnPlaceClickCallback{
+
+    public interface OnPlaceClickListener {
         void onPlaceClick(ArrayList<AutocompletePrediction> predictPlaces,int position);
     }
-    public void setOnPlaceClickCallback(OnPlaceClickCallback callback){
+
+    public void setOnPlaceClickCallback(OnPlaceClickListener callback){
         mPlaceClickCallback = callback;
     }
     public PlaceAutoCompleteAdapter(Context context, GeoDataClient geoDataClient){
@@ -72,6 +74,8 @@ public class PlaceAutoCompleteAdapter extends RecyclerView.Adapter<PlaceAutoComp
     public void clearData(){
         mPredictPlaces.clear();
     }
+
+    //Main Operation For Querying Suggestion and Storing Suggestion
     @Override
     public Filter getFilter() {
         Filter filter = new Filter() {
@@ -79,6 +83,8 @@ public class PlaceAutoCompleteAdapter extends RecyclerView.Adapter<PlaceAutoComp
             protected FilterResults performFiltering(final CharSequence constraint) {
                 final FilterResults filterResults = new FilterResults();
                 if(!constraint.toString().isEmpty()) {
+
+                    //Query Autocomplete Predictions Using, filter downto user current location's country
                     com.google.android.gms.tasks.Task<AutocompletePredictionBufferResponse> task = mGeoDataClient
                             .getAutocompletePredictions(constraint.toString(),
                                     new LatLngBounds(new LatLng(-0, -0), new LatLng(0, 0)),
@@ -86,7 +92,10 @@ public class PlaceAutoCompleteAdapter extends RecyclerView.Adapter<PlaceAutoComp
                     task.addOnCompleteListener(new OnCompleteListener<AutocompletePredictionBufferResponse>() {
                         @Override
                         public void onComplete(@NonNull com.google.android.gms.tasks.Task<AutocompletePredictionBufferResponse> task) {
+
+
                             if (task.isSuccessful() && task.getResult() != null) {
+                                //If there are some results, store the results and update UI
                                 if(task.getResult().getCount() != 0){
                                     for (AutocompletePrediction prediction : task.getResult()) {
                                         mPredictPlaces.add(prediction.freeze());
@@ -96,6 +105,7 @@ public class PlaceAutoCompleteAdapter extends RecyclerView.Adapter<PlaceAutoComp
                                     filterResults.count = mPredictPlaces.size();
                                     notifyDataSetChanged();
                                 }
+                                //If no result is return, retry with no country filter
                                 else{
                                     Log.d("MapsActivity","Results not found");
                                     final com.google.android.gms.tasks.Task<AutocompletePredictionBufferResponse> newTask = mGeoDataClient

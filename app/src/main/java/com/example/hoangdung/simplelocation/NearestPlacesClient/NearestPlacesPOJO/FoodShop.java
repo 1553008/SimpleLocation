@@ -29,11 +29,15 @@ public class FoodShop implements Parcelable {
 
     @SerializedName("avartar")
     @Expose
-    public float avartar;
+    public String avartar;
 
     @SerializedName("name")
     @Expose
     public String name;
+
+    @SerializedName("address")
+    @Expose
+    public String address;
 
     @SerializedName("numOfRatings")
     @Expose
@@ -51,8 +55,9 @@ public class FoodShop implements Parcelable {
         dest.writeDouble(this.lng);
         dest.writeInt(this.shopID);
         dest.writeFloat(this.averageRatings);
-        dest.writeFloat(this.avartar);
+        dest.writeString(this.avartar);
         dest.writeString(this.name);
+        dest.writeString(this.address);
         dest.writeInt(this.numOfRatings);
     }
 
@@ -64,12 +69,13 @@ public class FoodShop implements Parcelable {
         this.lng = in.readDouble();
         this.shopID = in.readInt();
         this.averageRatings = in.readFloat();
-        this.avartar = in.readFloat();
+        this.avartar = in.readString();
         this.name = in.readString();
+        this.address = in.readString();
         this.numOfRatings = in.readInt();
     }
 
-    public static final Parcelable.Creator<FoodShop> CREATOR = new Parcelable.Creator<FoodShop>() {
+    public static final Creator<FoodShop> CREATOR = new Creator<FoodShop>() {
         @Override
         public FoodShop createFromParcel(Parcel source) {
             return new FoodShop(source);
