@@ -204,9 +204,11 @@ class FoodFinderActivity : AppCompatActivity() {
     }
     private fun progressWindowConfig(){
         progressWindow = ProgressWindowAnim.getInstance(this)
-        val progressWindowConfiguration = ProgressWindowAnim.ProgressWindowConfiguration()
-        progressWindowConfiguration.backgroundColor = android.graphics.Color.parseColor("#32000000")
-        progressWindow?.setCofig(progressWindowConfiguration);
+    }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        if(progressWindow?.isShowing!!)
+            progressWindow?.hideProgress()
     }
 }

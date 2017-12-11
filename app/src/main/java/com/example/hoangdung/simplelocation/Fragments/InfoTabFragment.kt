@@ -12,7 +12,6 @@ import android.view.ViewGroup
 import com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO.DirectionsResponse
 
 import com.example.hoangdung.simplelocation.R
-import kotlinx.android.synthetic.main.driving_info_layout.*
 import kotlinx.android.synthetic.main.fragment_info_tab.*
 
 
@@ -26,20 +25,20 @@ class InfoTabFragment : Fragment() {
     var curTabs = 0;
     var listeners: OnTabListener? = null
     lateinit var mTabLayout: TabLayout
-    var drivingInfoFragment : DrivingInfoFragment? = null
-    var busInfoFragment: BusInfoFragment? =null
+    var drivingTabFragment: DrivingTabFragment? = null
+    var busTabFragment: BusTabFragment? =null
     var drivingReponse: DirectionsResponse? = null
         set(value) {
             field = value
             //When reponse is change the InfoTabFragment UI needs also to be updated
-            drivingInfoFragment?.directionsReponse = drivingReponse
+            drivingTabFragment?.directionsReponse = drivingReponse
         }
     var busReponse: DirectionsResponse? = null
         set(value) {
             field = value
             //When response is changed the InfoTabFragment UI needs also to be updated
-            //Changing BusInfoFragment UI
-            busInfoFragment?.directionsReponse = busReponse
+            //Changing BusTabFragment UI
+            busTabFragment?.directionsReponse = busReponse
 
         }
 
@@ -62,13 +61,13 @@ class InfoTabFragment : Fragment() {
                 //Driving Info Tab
                 if(position==0)
                 {
-                    drivingInfoFragment = DrivingInfoFragment.newInstance(context!!)
-                    return drivingInfoFragment!!
+                    drivingTabFragment = DrivingTabFragment.newInstance(context!!)
+                    return drivingTabFragment!!
                 }
                 else if(position == 1) // Bus Info Tab
                 {
-                    busInfoFragment = BusInfoFragment.newInstance(context!!)
-                    return busInfoFragment!!
+                    busTabFragment = BusTabFragment.newInstance(context!!)
+                    return busTabFragment!!
                 }
                 else
                     return Fragment()

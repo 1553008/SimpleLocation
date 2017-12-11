@@ -1,54 +1,74 @@
 package com.example.hoangdung.simplelocation.Activity;
 
-import android.content.Context;
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
+import android.location.Location;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.view.animation.OvershootInterpolator;
+import android.widget.FrameLayout;
 
+import com.example.hoangdung.simplelocation.Adapter.FoodShopListAdapter;
+import com.example.hoangdung.simplelocation.Fragments.FoodListFragment;
+import com.example.hoangdung.simplelocation.Fragments.FoodShopDirectionFragment;
+import com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO.DirectionsResponse;
+import com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO.Polyline;
+import com.example.hoangdung.simplelocation.GoogleDirectionsClient.GoogleDirectionsQuery;
+import com.example.hoangdung.simplelocation.Interface.OnShopClickListener;
 import com.example.hoangdung.simplelocation.NearestPlacesClient.NearestPlacesPOJO.FoodShop;
+import com.example.hoangdung.simplelocation.ProgressWindowAnim;
 import com.example.hoangdung.simplelocation.R;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.squareup.picasso.Picasso;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.common.math.Quantiles;
+import com.google.maps.android.PolyUtil;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import me.zhanghai.android.materialratingbar.MaterialRatingBar;
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 
-public class FoodResultActivity extends AppCompatActivity implements OnMapReadyCallback{
+public class FoodResultActivity extends AppCompatActivity implements OnMapReadyCallback, OnShopClickListener{
 
     @BindView(R.id.food_result_toolbar)
     public Toolbar mToolbar;
 
-    @BindView(R.id.food_result_list)
-    public RecyclerView mListView;
+    @BindView(R.id.fragment_container)
+    public FrameLayout fragmentContainer;
 
     FoodShopListAdapter adapter;
     ArrayList<FoodShop> foodShopArrayList;
     GoogleMap googleMap;
     LatLngBounds.Builder boundBuilder;
-
+    FusedLocationProviderClient fusedLocationProviderClient;
     final static int BOUND_PADDING = 100;
+    Location lastLocation;
+    ProgressWindowAnim progressWindow;
+    com.google.android.gms.maps.model.Polyline polylines;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,23 +80,28 @@ public class FoodResultActivity extends AppCompatActivity implements OnMapReadyC
         foodShopArrayList =  intent.getParcelableArrayListExtra("shops");
         Log.d("MapsActivity","Food Shops received from Food Finder Activity");
 
-        //Init Adapter
-        adapter = new FoodShopListAdapter(getApplicationContext(),foodShopArrayList);
-
-        //Init RecyclerView
-        mListView.setHasFixedSize(true);
-        mListView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        mListView.setAdapter(adapter);
-
         //Init Google Map
         FragmentManager fragmentManager = getSupportFragmentManager();
         SupportMapFragment  supportMapFragment = (SupportMapFragment) fragmentManager.findFragmentById(R.id.map);
         supportMapFragment.getMapAsync(this);
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        //Init Food List Fragment
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        FoodListFragment foodListFragment = FoodListFragment.newInstance(getApplicationContext(),foodShopArrayList);
+        foodListFragment.setOnShopClickListener(this);
+        transaction.add(R.id.fragment_container,foodListFragment);
+        transaction.commit();
+
+        //Init progressWindow
+        progressWindow = ProgressWindowAnim.getInstance(this);
 
     }
 
 
+    @SuppressLint("MissingPermission")
     private void setupFoodShopsMarkers(){
+        progressWindow.showProgress();
         boundBuilder = new LatLngBounds.Builder();
         if(foodShopArrayList.size() > 0)
         {
@@ -90,9 +115,23 @@ public class FoodResultActivity extends AppCompatActivity implements OnMapReadyC
                 //Form LatLngBounds from Food shop LatLng
                 boundBuilder.include(new LatLng(foodShop.lat,foodShop.lng));
             }
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(boundBuilder.build(),BOUND_PADDING));
         }
-
+        Task<Location> lastLocationTask = fusedLocationProviderClient.getLastLocation();
+        lastLocationTask.addOnCompleteListener(new OnCompleteListener<Location>() {
+            @Override
+            public void onComplete(@NonNull Task<Location> task) {
+                if(task.isSuccessful()){
+                    lastLocation = task.getResult();
+                    double lat = task.getResult().getLatitude();
+                    double lng = task.getResult().getLongitude();
+                    googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+                    googleMap.setMyLocationEnabled(true);
+                    boundBuilder.include(new LatLng(lat,lng));
+                    progressWindow.hideProgress();
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(boundBuilder.build(),BOUND_PADDING));
+                }
+            }
+        });
     }
 
     @Override
@@ -101,62 +140,55 @@ public class FoodResultActivity extends AppCompatActivity implements OnMapReadyC
         setupFoodShopsMarkers();
     }
 
-    public static class FoodShopListAdapter extends RecyclerView.Adapter<FoodShopListAdapter.FoodShopViewHolder>{
-        ArrayList<FoodShop> foodShopArrayList;
-        Context mContext;
-        public FoodShopListAdapter(Context context,ArrayList<FoodShop> foodShops){
-            mContext = context;
-            foodShopArrayList = foodShops;
+    @Override
+    public void onClick(FoodShop foodShop, int mode) {
+        //If user swipe to see direction
+        if(mode == FoodShopListAdapter.FIND_DIRECTION){
+            progressWindow.showProgress();
+            GoogleDirectionsQuery query = new GoogleDirectionsQuery.Builder()
+                    .withOrigin(new LatLng(foodShop.lat,foodShop.lng))
+                    .withDestination(new LatLng(lastLocation.getLatitude(),lastLocation.getLongitude()))
+                    .withTravelMode(GoogleDirectionsQuery.TRAVEL_MODE.DRIVING)
+                    .buid();
+            query.query(new GoogleDirectionsQuery.OnDirectionsResultListener() {
+                @Override
+                public void onDirectionsResult(DirectionsResponse directionsResponse, int resultCode) {
+
+                    //Remove old polylines if any
+                    if(polylines!=null)
+                        polylines.remove();
+                    //Decode and draw polylines
+                    polylines =  googleMap.addPolyline(new PolylineOptions()
+                            .addAll(PolyUtil.decode(directionsResponse.routes.get(0).overviewPolyline.points))
+                            .color(getApplicationContext().getResources().getColor(R.color.colorPolylineDirectionsDriving))
+                    );
+
+                    //Replace Food List Fragment with Direction Fragment
+                    FoodShopDirectionFragment foodShopDirectionFragment = FoodShopDirectionFragment.newInstance(FoodResultActivity.this,
+                            directionsResponse);
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    FragmentTransaction transaction = fragmentManager.beginTransaction();
+                    transaction.setCustomAnimations(R.anim.enter_from_left,R.anim.exit_to_right);
+                    transaction.replace(R.id.fragment_container,foodShopDirectionFragment);
+                    transaction.addToBackStack(null);
+                    transaction.commit();
+                    progressWindow.hideProgress();
+
+                }
+            });
         }
-        @Override
-        public FoodShopViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new FoodShopViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.food_shop_item,parent,false)) ;
-        }
+    }
 
-        @Override
-        public void onBindViewHolder(FoodShopViewHolder holder, int position) {
-            //Load shop avartar
-            Picasso.with(mContext)
-                    .load(foodShopArrayList.get(position).avartar)
-                    .fit()
-                    .into(holder.avartar);
-            //Load shop name into textivew
-            holder.name.setText(foodShopArrayList.get(position).name);
-            //Load shop address into textview
-            holder.address.setText(foodShopArrayList.get(position).address);
-            //Load shop ratings into ratingbar
-            holder.ratingBar.setNumStars(10);
-            holder.ratingBar.setRating(foodShopArrayList.get(position).averageRatings);
-            //Load shop ratinng into textview
-            holder.ratingText.setText(String.valueOf(foodShopArrayList.get(position).averageRatings));
-        }
+    private void drawResponse(){
 
-        @Override
-        public int getItemCount() {
-            if(foodShopArrayList==null)
-                return 0;
-            return foodShopArrayList.size();
-        }
+    }
 
-        public class FoodShopViewHolder extends RecyclerView.ViewHolder{
-            @BindView(R.id.food_shop_avartar)
-            public ImageView avartar;
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if(polylines!=null)
+            polylines.remove();
 
-            @BindView(R.id.food_shop_name)
-            public TextView name;
-
-            @BindView(R.id.food_shop_address)
-            public TextView address;
-
-            @BindView(R.id.food_shop_ratings)
-            public MaterialRatingBar ratingBar;
-
-            @BindView(R.id.food_shop_ratings_text)
-            public TextView ratingText;
-            public FoodShopViewHolder(View itemView) {
-                super(itemView);
-                ButterKnife.bind(this,itemView);
-            }
-        }
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(boundBuilder.build(),BOUND_PADDING));
     }
 }

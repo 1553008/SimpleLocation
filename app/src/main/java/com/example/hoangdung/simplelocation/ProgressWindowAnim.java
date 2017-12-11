@@ -28,7 +28,7 @@ public class ProgressWindowAnim {
     WindowManager windowManager;
     WindowManager.LayoutParams windowParams;
     public static ProgressWindowAnim instance;
-
+    public boolean isShowing = false;
     ProgressWindowAnim(Context context){
         mContext = context;
         setupView();
@@ -44,8 +44,7 @@ public class ProgressWindowAnim {
     FrameLayout mProgressBarContainer;
     DotsProgressIndicator mProgressBar;
     View mProgressLayout;
-    ArrayList<Animator> defaultShowAnimator;
-    ArrayList<Animator> defaultHideAnimator;
+
     private void setupView(){
         DisplayMetrics metrics = new DisplayMetrics();
         windowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
@@ -64,14 +63,9 @@ public class ProgressWindowAnim {
                 PixelFormat.TRANSLUCENT
         );
         windowParams.gravity = Gravity.CENTER;
-        defaultShowAnimator  =  new ArrayList<>();
-        defaultShowAnimator.add(ObjectAnimator.ofFloat(mProgressBarContainer,"alpha",0f,1f));
-        defaultHideAnimator = new ArrayList<>();
-        defaultHideAnimator.add(ObjectAnimator.ofFloat(mProgressBarContainer,"alpha",1f,0f));
+        mProgressLayout.setBackgroundColor(Color.parseColor("#1A000000"));
     }
 
-    AnimatorSet showAnimatorSet = new AnimatorSet();
-    AnimatorSet hideAnimatorSet = new AnimatorSet();
     public void setCofig(ProgressWindowConfiguration configuration){
         //Set background color
         mProgressLayout.setBackgroundColor(configuration.backgroundColor);
@@ -80,13 +74,13 @@ public class ProgressWindowAnim {
     public void showProgress(){
         windowManager.addView(mProgressLayout,windowParams);
         mProgressBar.setVisibility(View.VISIBLE);
-        showAnimatorSet.playTogether(defaultShowAnimator);
+        isShowing = true;
     }
 
     public void hideProgress(){
         windowManager.removeViewImmediate(mProgressLayout);
         mProgressBar.setVisibility(View.INVISIBLE);
-        hideAnimatorSet.playTogether(defaultHideAnimator);
+        isShowing = false;
     }
 
     public static class ProgressWindowConfiguration{

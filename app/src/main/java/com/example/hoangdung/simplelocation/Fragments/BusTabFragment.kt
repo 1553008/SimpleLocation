@@ -18,7 +18,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO.DirectionsResponse
 import com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO.Step
-import com.example.hoangdung.simplelocation.MyApplication
 
 import com.example.hoangdung.simplelocation.R
 import kotlinx.android.synthetic.main.bus_info_layout.*
@@ -30,9 +29,9 @@ import kotlin.collections.ArrayList
 /**
  * A simple [Fragment] subclass.
  */
-class BusInfoFragment : Fragment() {
+class BusTabFragment : Fragment() {
 
-    lateinit var mAdapter: BusInfoFragment.Adapter
+    lateinit var mAdapter: BusTabFragment.Adapter
     lateinit var mContext: Context
     var directionsReponse: DirectionsResponse? = null
         set(value) {
@@ -86,8 +85,8 @@ class BusInfoFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(context: Context): BusInfoFragment {
-            var fragment = BusInfoFragment()
+        fun newInstance(context: Context): BusTabFragment {
+            var fragment = BusTabFragment()
             fragment.mContext = context
             return fragment
         }

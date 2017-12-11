@@ -1,32 +1,24 @@
 package com.example.hoangdung.simplelocation.Fragments
 
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
-import android.support.v4.view.ViewPager
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Html
-import android.text.method.SingleLineTransformationMethod
 import android.util.Log
 import android.view.*
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.RelativeLayout
 import android.widget.TextView
 import com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO.DirectionsResponse
-import com.example.hoangdung.simplelocation.MyApplication
 
 import com.example.hoangdung.simplelocation.R
-import com.sothree.slidinguppanel.SlidingUpPanelLayout
-import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.android.synthetic.main.driving_info_layout.*
-import kotlinx.android.synthetic.main.fragment_directions.*
-import kotlinx.android.synthetic.main.fragment_directions.view.*
 import kotlinx.android.synthetic.main.fragment_driving_info.*
 import kotlinx.android.synthetic.main.fragment_info_tab.*
 
@@ -34,7 +26,7 @@ import kotlinx.android.synthetic.main.fragment_info_tab.*
 /**
  * A simple [Fragment] subclass.
  */
-class DrivingInfoFragment() : Fragment() {
+class DrivingTabFragment() : Fragment() {
 
     lateinit var mAdapter : Adapter
     lateinit var mContext : Context
@@ -59,7 +51,7 @@ class DrivingInfoFragment() : Fragment() {
         stepRecyclerView.setHasFixedSize(true)
         mAdapter = Adapter(mContext)
         stepRecyclerView.adapter = mAdapter
-
+        stepRecyclerView.addItemDecoration(DividerItemDecoration(context,DividerItemDecoration.VERTICAL));
         //Setting up panel
         var slidingUpLayoutParams = DrivingSlidingUpPanel.layoutParams as FrameLayout.LayoutParams
         DrivingSlidingUpPanel.layoutParams = slidingUpLayoutParams
@@ -91,13 +83,13 @@ class DrivingInfoFragment() : Fragment() {
     }
 
     companion object {
-        fun newInstance(context: Context) : DrivingInfoFragment{
-            var fragment = DrivingInfoFragment()
+        fun newInstance(context: Context) : DrivingTabFragment {
+            var fragment = DrivingTabFragment()
             fragment.mContext = context
             return fragment
         }
     }
-    //DrivingInfoFragment's Adapter for RecyclerView
+    //DrivingTabFragment's Adapter for RecyclerView
     class Adapter(var context: Context) : RecyclerView.Adapter<Adapter.ViewHolder>(){
         var directionResponse: DirectionsResponse? = null
             set(value) {
@@ -113,7 +105,7 @@ class DrivingInfoFragment() : Fragment() {
         override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
             //Parse step instruction into ViewHolder
             val step = directionResponse?.routes?.getOrNull(0)?.legs?.getOrNull(0)?.steps?.getOrNull(position)
-            holder?.stepText?.text = Html.fromHtml(step?.htmlInstructions?:"")
+            holder?.stepText?.text = Html.fromHtml(step?.htmlInstructions?:"").trim()
             holder?.beforeheadDistance?.text = step?.distance?.text
             holder?.durationStepText?.text = step?.duration?.text
 

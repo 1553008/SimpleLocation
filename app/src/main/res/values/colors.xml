@@ -6,7 +6,8 @@
     <color name="colorStatusBar">#99000000</color>
     <color name="colorPolylineDirectionsDriving">#1E90FF</color>
     <color name="colorPolylineDirectionsBus">#00CED1</color>
-
+    <color name="colorGoToShopBackground">#4a80f5</color>
+    <color name="colorFindShopDirectionBackground">#34a853</color>
     <color name="red">#ea4335</color>
     <color name="blue">#4285f4</color>
     <color name="green">#34a853</color>
