@@ -15,6 +15,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import com.bcgdv.asia.lib.dots.DotsProgressIndicator;
+import com.google.android.gms.maps.model.Marker;
 
 import java.util.ArrayList;
 

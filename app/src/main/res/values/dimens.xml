@@ -14,4 +14,5 @@
     <dimen name="foodShopsListHeight">200dp</dimen>
     <dimen name="foodShopsAvartarSize">56dp</dimen>
     <dimen name="foodShopsIconDirectionSize">32dp</dimen>
+    <dimen name="foodShopIconInfoWindowSize">40dp</dimen>
 </resources>
