@@ -105,6 +105,7 @@ public class FoodResultActivity extends AppCompatActivity implements OnMapReadyC
 
     @SuppressLint("MissingPermission")
     private void setupFoodShopsMarkers(){
+
         progressWindow.showProgress();
         boundBuilder = new LatLngBounds.Builder();
         if(foodShopArrayList.size() > 0)
@@ -154,6 +155,9 @@ public class FoodResultActivity extends AppCompatActivity implements OnMapReadyC
         //If user swipe to see direction
         if(mode == FoodShopListAdapter.FIND_DIRECTION){
             queryFoodShopDirection(foodShop);
+        }
+        else if(mode == FoodShopListAdapter.DISPLAY_INFO){
+            startFoodShopActivity(foodShop);
         }
     }
 
@@ -206,7 +210,11 @@ public class FoodResultActivity extends AppCompatActivity implements OnMapReadyC
             }
         });
     }
-
+    private void startFoodShopActivity(FoodShop foodShop){
+        Intent intent = new Intent(FoodResultActivity.this,FoodShopActivity.class);
+        intent.putExtra("shop",foodShop);
+        startActivity(intent);
+    }
     @Override
     public void onBackPressed() {
         super.onBackPressed();

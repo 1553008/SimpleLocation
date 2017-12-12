@@ -67,18 +67,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activity.SearchActivity"
-            android:theme="@style/AppTheme"/>
-        <activity android:name=".Activity.MyPlacesActivity"
-            android:theme="@style/AppTheme"/>
-        <activity android:name=".Activity.AddPlaceActivity"
-            android:theme="@style/AppTheme"/>
+        <activity
+            android:name=".Activity.SearchActivity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Activity.MyPlacesActivity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Activity.AddPlaceActivity"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".Activity.FoodFinderActivity"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustPan"></activity>
-        <activity android:name=".Activity.FoodResultActivity"
-            android:theme="@style/AppTheme"></activity>
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".Activity.FoodResultActivity"
+            android:theme="@style/AppTheme" />
+        <activity android:name=".Activity.FoodShopActivity"></activity>
     </application>
 
 </manifest>

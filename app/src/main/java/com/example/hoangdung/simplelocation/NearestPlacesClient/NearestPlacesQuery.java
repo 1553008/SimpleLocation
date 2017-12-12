@@ -4,6 +4,7 @@ import com.example.hoangdung.simplelocation.NearestPlacesClient.NearestPlacesPOJ
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -25,6 +26,8 @@ public class NearestPlacesQuery {
     private Retrofit retrofit;
     private LatLng latLng;
     private ArrayList<String> tags;
+
+    public static final int timeout = 2;
     private NearestPlacesQuery(){
 
     }
@@ -72,6 +75,9 @@ public class NearestPlacesQuery {
             interceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
             OkHttpClient httpClient = new OkHttpClient.Builder()
                     .addInterceptor(interceptor)
+                    .connectTimeout(timeout, TimeUnit.MINUTES)
+                    .readTimeout(timeout,TimeUnit.MINUTES)
+                    .writeTimeout(timeout,TimeUnit.MINUTES)
                     .build();
             query.retrofit = new Retrofit
                     .Builder()

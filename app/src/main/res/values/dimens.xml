@@ -15,4 +15,9 @@
     <dimen name="foodShopsAvartarSize">56dp</dimen>
     <dimen name="foodShopsIconDirectionSize">32dp</dimen>
     <dimen name="foodShopIconInfoWindowSize">40dp</dimen>
+    <dimen name="foodShopBigAvartarSize">200dp</dimen>
+    <dimen name="foodShopRatingTextCircleSize">50dp</dimen>
+    <dimen name="foodShopPhotoSize">150dp</dimen>
+    <dimen name="foodShopUserAvarSize">40dp</dimen>
+    <dimen name="foodShopPublishReviewIconSize">32dp</dimen>
 </resources>

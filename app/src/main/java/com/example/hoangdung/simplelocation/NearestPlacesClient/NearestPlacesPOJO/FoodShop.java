@@ -43,6 +43,9 @@ public class FoodShop implements Parcelable {
     @Expose
     public int numOfRatings;
 
+    @SerializedName("numOfPhotos")
+    @Expose
+    public int numOfPhotos;
 
     @Override
     public int describeContents() {
@@ -59,6 +62,7 @@ public class FoodShop implements Parcelable {
         dest.writeString(this.name);
         dest.writeString(this.address);
         dest.writeInt(this.numOfRatings);
+        dest.writeInt(this.numOfPhotos);
     }
 
     public FoodShop() {
@@ -73,6 +77,7 @@ public class FoodShop implements Parcelable {
         this.name = in.readString();
         this.address = in.readString();
         this.numOfRatings = in.readInt();
+        this.numOfPhotos = in.readInt();
     }
 
     public static final Creator<FoodShop> CREATOR = new Creator<FoodShop>() {

@@ -180,6 +180,12 @@ class FoodFinderActivity : AppCompatActivity() {
                                 .with(tags)
                                 .build()
                         query.query{nearestPlacesResponse: NearestPlacesResponse?, resultCode: Int ->
+                            if(resultCode==NearestPlacesQuery.RESPONSE_FAILURE)
+                            {
+                                Toast.makeText(this@FoodFinderActivity,"Can't connect to server. Try again",Toast.LENGTH_LONG)
+                                progressWindow?.hideProgress()
+                                return@query
+                            }
                             //start new activity
                             val intent = Intent(this@FoodFinderActivity,FoodResultActivity::class.java)
                             intent.putParcelableArrayListExtra("shops",nearestPlacesResponse?.shops)
@@ -191,7 +197,6 @@ class FoodFinderActivity : AppCompatActivity() {
                         Toast.makeText(this@FoodFinderActivity,"Something wrong try again",Toast.LENGTH_SHORT).show()
                     }
                 }
-
             }
             catch (security: SecurityException){
                 Log.d("MapsActivity",security.message);

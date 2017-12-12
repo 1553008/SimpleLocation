@@ -147,6 +147,7 @@ public class FoodShopListAdapter extends RecyclerView.Adapter<FoodShopListAdapte
         public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
             final View foregroundView = ((FoodShopListAdapter.FoodShopViewHolder) viewHolder).foreground;
             getDefaultUIUtil().onDraw(c,recyclerView,foregroundView,dX,dY,actionState,isCurrentlyActive);
+
         }
     }
 

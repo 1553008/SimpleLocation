@@ -1,6 +1,9 @@
 package com.example.hoangdung.simplelocation
 
 import android.util.Log
+import com.example.hoangdung.simplelocation.NearestPlacesClient.FoodShopReview
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
 import org.json.JSONException
@@ -15,10 +18,7 @@ import kotlin.collections.HashMap
  */
 
 public class FirestoreCenter {
-    val DB_USERS_PATH = "users"
-    val FOOD_CATEGORIES_PATH = "food_categories"
-    val FOOD_SHOPS_PATH = "food_shops"
-    val FOOD_METADATA_PATH = "food_metadata"
+
 
     var dbRef = FirebaseFirestore.getInstance()
     var dbAuth = FirestoreAuth.instance.dbAuth
@@ -29,6 +29,10 @@ public class FirestoreCenter {
     }
     companion object {
         val instance: FirestoreCenter = FirestoreCenter()
+        val DB_USERS_PATH = "users"
+        val FOOD_CATEGORIES_PATH = "food_categories"
+        val FOOD_SHOPS_PATH = "food_shops"
+        val FOOD_METADATA_PATH = "food_metadata"
     }
 
 
@@ -96,5 +100,57 @@ public class FirestoreCenter {
             map.put("photo_url",photo_url)
             return map
         }
+    }
+    public fun getPhotos(shopID: Int,numOfPhotos: Int, lastEndSnapshot: DocumentSnapshot?, callback: OnCompleteListener<QuerySnapshot>){
+        val photosRef = dbRef.collection(FirestoreCenter.FOOD_SHOPS_PATH)
+                .document(shopID.toString())
+                .collection("photos")
+        if(lastEndSnapshot != null)
+        {
+            photosRef.limit(numOfPhotos.toLong())
+                    .startAfter(lastEndSnapshot!!)
+                    .get()
+                    .addOnCompleteListener(callback)
+        }
+        else{
+            photosRef.limit(numOfPhotos.toLong())
+                    .get()
+                    .addOnCompleteListener(callback)
+        }
+
+    }
+
+    public fun getReviews(shopID: Int, numOfReviews: Int, lastEndSnapshot: DocumentSnapshot?, callback: OnCompleteListener<QuerySnapshot>){
+        val foodReviewsRef = dbRef.collection(FirestoreCenter.FOOD_SHOPS_PATH)
+                .document(shopID.toString())
+                .collection("food_reviews")
+        if(lastEndSnapshot != null){
+            foodReviewsRef.limit(numOfReviews.toLong())
+                    .orderBy("timestamp",Query.Direction.DESCENDING)
+                    .startAfter(lastEndSnapshot!!)
+                    .get()
+                    .addOnCompleteListener(callback)
+        }
+        else{
+            foodReviewsRef.limit(numOfReviews.toLong())
+                    .orderBy("timestamp",Query.Direction.DESCENDING)
+                    .get()
+                    .addOnCompleteListener(callback)
+        }
+    }
+    fun getUser(userID: String, callback: OnCompleteListener<DocumentSnapshot>){
+        val userRef = dbRef.collection(DB_USERS_PATH)
+                .document(userID)
+                .get()
+                .addOnCompleteListener(callback)
+    }
+    public fun publishReview(shopID: Int,review: FoodShopReview, callback: OnCompleteListener<Void>){
+        FieldValue.serverTimestamp()
+        val docRef =  dbRef.collection(FirestoreCenter.FOOD_SHOPS_PATH)
+                .document(shopID.toString())
+                .collection("food_reviews")
+                .document()
+        docRef.set(review.toMap())
+                .addOnCompleteListener(callback)
     }
 }

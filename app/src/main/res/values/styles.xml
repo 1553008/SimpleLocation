@@ -29,4 +29,10 @@
         <item name="color">@android:color/white</item>
         <item name="spinBars">true</item>
     </style>
+    <style name="AppTheme.RatingText">
+        <item name="android:layout_width">20dp</item>
+        <item name="android:height">20dp</item>
+        <item name="android:background">@drawable/rating_text_style</item>
+        <item name="android:padding">5dp</item>
+    </style>
 </resources>
