@@ -1,49 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
+
     <android.support.v7.widget.Toolbar
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:title="Food Shop"
         android:background="@color/colorPrimary"
-        >
+        app:title="Food Shop">
 
     </android.support.v7.widget.Toolbar>
-    <com.sothree.slidinguppanel.SlidingUpPanelLayout
-        xmlns:sothree="http://schemas.android.com/apk/res-auto"
+
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:sothree="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/foodShopSlidingPanel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="bottom"
-        sothree:umanoShadowHeight="4dp"
-        android:id="@+id/foodShopSlidingPanel"
-        >
-        <android.support.v4.widget.NestedScrollView
-            xmlns:android="http://schemas.android.com/apk/res/android"
+        sothree:umanoShadowHeight="4dp">
+
+        <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context="com.example.hoangdung.simplelocation.Activity.FoodShopActivity"
             android:background="@color/md_grey_200"
-            >
+            tools:context="com.example.hoangdung.simplelocation.Activity.FoodShopActivity">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
                 <android.support.v7.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/md_white_1000"
                     android:layout_margin="5dp"
-                    app:cardElevation="10dp"
+                    android:background="@color/md_white_1000"
                     app:cardCornerRadius="5dp"
-                    >
+                    app:cardElevation="10dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -53,98 +51,82 @@
                             android:id="@+id/food_shop_avartar"
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/foodShopBigAvartarSize"
-                            android:layout_margin="5dp"/>
+                            android:layout_margin="5dp" />
+
                         <TextView
                             android:id="@+id/food_shop_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="20sp"
-                            android:textColor="@color/md_black_1000"
-                            android:textStyle="bold"
                             android:layout_marginHorizontal="10dp"
-                            />
+                            android:textColor="@color/md_black_1000"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
                         <TextView
                             android:id="@+id/food_shop_address"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="16sp"
                             android:layout_marginHorizontal="10dp"
-                            />
+                            android:textSize="16sp" />
+
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:background="@color/wallet_dim_foreground_holo_dark"/>
+                            android:background="@color/wallet_dim_foreground_holo_dark" />
+
                         <RelativeLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            >
+                            android:layout_height="wrap_content">
+
                             <RelativeLayout
+                                android:id="@+id/food_shop_reviews_info_container"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingHorizontal="7dp"
-                                android:paddingVertical="5dp"
-                                android:id="@+id/food_shop_reviews_info_container"
-                                >
+                                android:paddingVertical="5dp">
+
                                 <TextView
                                     android:id="@+id/food_shop_num_reviews"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textColor="@color/md_black_1000"
-                                    android:gravity="center"
-                                    android:textSize="16sp"
                                     android:layout_centerHorizontal="true"
-                                    android:textStyle="bold"
-                                    />
+                                    android:gravity="center"
+                                    android:textColor="@color/md_black_1000"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+
                                 <TextView
-                                    android:layout_below="@id/food_shop_num_reviews"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Reviews"/>
+                                    android:layout_below="@id/food_shop_num_reviews"
+                                    android:text="Reviews" />
                             </RelativeLayout>
+
                             <RelativeLayout
+                                android:id="@+id/food_shop_photos_info_container"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingVertical="5dp"
-                                android:paddingHorizontal="7dp"
                                 android:layout_toRightOf="@id/food_shop_reviews_info_container"
-                                android:id="@+id/food_shop_photos_info_container"
-                                >
+                                android:orientation="vertical"
+                                android:paddingHorizontal="7dp"
+                                android:paddingVertical="5dp">
+
                                 <TextView
                                     android:id="@+id/food_shop_num_photos"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_centerHorizontal="true"
+                                    android:gravity="center"
                                     android:textColor="@color/md_black_1000"
                                     android:textSize="16sp"
-                                    android:gravity="center"
-                                    android:layout_centerHorizontal="true"
-                                    android:textStyle="bold"
-                                    />
-                                <TextView
-                                    android:layout_below="@id/food_shop_num_photos"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Photos"/>
-                            </RelativeLayout>
-                            <RelativeLayout
-                                android:id="@+id/food_shop_rating_bar_container"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_toRightOf="@+id/food_shop_photos_info_container"
-                                android:layout_alignParentBottom="true"
-                                android:paddingVertical="7dp"
-                                android:paddingHorizontal="5dp"
-                                style="@style/AppTheme.RatingText"
-                                >
-                                <TextView
-                                    android:textColor="@color/md_white_1000"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:id="@+id/food_shop_ratings_text"
-                                    android:layout_centerInParent="true"
-                                    />
-                            </RelativeLayout>
+                                    android:textStyle="bold" />
 
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@id/food_shop_num_photos"
+                                    android:text="Photos" />
+                            </RelativeLayout>
 
 
                         </RelativeLayout>
@@ -156,95 +138,90 @@
                     android:layout_height="match_parent"
                     android:layout_marginHorizontal="5dp"
                     app:cardCornerRadius="5dp"
-                    app:cardElevation="5dp"
-                    >
+                    app:cardElevation="5dp">
+
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/food_shop_photos"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/foodShopPhotoSize"
-                        android:layout_margin="3dp"
-                        >
-                    </android.support.v7.widget.RecyclerView>
+                        android:layout_margin="3dp"></android.support.v7.widget.RecyclerView>
                 </android.support.v7.widget.CardView>
 
             </LinearLayout>
 
         </android.support.v4.widget.NestedScrollView>
-        <LinearLayout
+
+        <android.support.design.widget.CoordinatorLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:elevation="5dp"
-            >
+            android:layout_height="match_parent">
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:id="@+id/food_shop_reviews_header"
-                android:layout_margin="3dp"
-                >
-                <TextView
-
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Xem Reviews"
-                    android:textColor="@color/md_black_1000"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="5dp"
-                    android:textStyle="bold"
-                    android:textSize="20sp"
-                    />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:elevation="4dp"
-                android:background="@color/black"
-                />
-            <me.zhanghai.android.materialratingbar.MaterialRatingBar
-                android:id="@+id/food_shop_ratings"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/Widget.MaterialRatingBar.RatingBar"
-                android:numStars="10"
-                sothree:mrb_progressTint="@color/yellow"
-                sothree:mrb_progressBackgroundTint="@color/wallet_hint_foreground_holo_dark"
-                />
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                >
-                <EditText
-                    android:id="@+id/food_shop_comment_edit_text"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="Your comment"
-                    android:textSize="15sp"
-                    />
-                <ImageButton
-                    android:id="@+id/food_shop_publish_review"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_publish_review"
-                    android:background="@android:color/transparent"
-                    />
-            </LinearLayout>
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/food_shop_reviews_list"
+                android:id="@+id/anchor"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                >
+                android:elevation="5dp"
+                android:orientation="vertical">
 
-            </android.support.v7.widget.RecyclerView>
+                <LinearLayout
+                    android:id="@+id/food_shop_reviews_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:elevation="10dp"
+                    android:orientation="horizontal"
+                    android:padding="5dp">
 
-        </LinearLayout>
+                    <TextView
+                        android:id="@+id/food_shop_reviews_header_text_1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="12dp"
+                        android:text="Xem Reviews"
+                        android:textColor="@color/md_black_1000"
+                        android:textSize="30sp"
+                        android:textStyle="bold" />
+
+                    <com.example.hoangdung.simplelocation.CircularTextview
+                        android:id="@+id/food_shop_ratings_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="7dp"
+                        android:textColor="@color/md_white_1000"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/md_grey_400"
+                    android:elevation="1dp" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/food_shop_reviews_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                </android.support.v7.widget.RecyclerView>
+
+            </LinearLayout>
+
+            <android.support.design.widget.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/post_review_button"
+                android:layout_width="@dimen/myplaceButtonSize"
+                android:layout_height="@dimen/myplaceButtonSize"
+                android:layout_marginBottom="10dp"
+                android:layout_marginRight="5dp"
+                android:background="@color/primary"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_post_comment"
+                app:layout_anchor="@id/anchor"
+                app:layout_anchorGravity="bottom|right" />
+        </android.support.design.widget.CoordinatorLayout>
+
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
-
 
 
 </LinearLayout>

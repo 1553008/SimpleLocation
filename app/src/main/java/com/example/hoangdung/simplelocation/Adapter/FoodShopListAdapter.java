@@ -54,7 +54,7 @@ public class FoodShopListAdapter extends RecyclerView.Adapter<FoodShopListAdapte
         holder.address.setText(foodShopArrayList.get(position).address);
         //Load shop ratings into ratingbar
         holder.ratingBar.setNumStars(10);
-        holder.ratingBar.setRating(foodShopArrayList.get(position).averageRatings);
+        holder.ratingBar.setRating((float) foodShopArrayList.get(position).averageRatings);
         //Load shop ratinng into textview
         holder.ratingText.setText(String.valueOf(foodShopArrayList.get(position).averageRatings));
 
@@ -99,12 +99,14 @@ public class FoodShopListAdapter extends RecyclerView.Adapter<FoodShopListAdapte
     }
     public class FoodShopListItemTouchHelperCallback extends ItemTouchHelper.SimpleCallback {
 
+        RecyclerView recyclerView;
         public FoodShopListItemTouchHelperCallback(int dragDirs, int swipeDirs) {
             super(dragDirs, swipeDirs);
         }
 
         @Override
         public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            this.recyclerView = recyclerView;
             return true;
         }
 
@@ -112,6 +114,7 @@ public class FoodShopListAdapter extends RecyclerView.Adapter<FoodShopListAdapte
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
             listener.onClick(foodShopArrayList.get(viewHolder.getAdapterPosition()),
                     direction == ItemTouchHelper.LEFT ? DISPLAY_INFO : FIND_DIRECTION);
+            notifyItemChanged(viewHolder.getAdapterPosition());
         }
 
         @Override

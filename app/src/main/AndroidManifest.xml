@@ -83,7 +83,8 @@
         <activity
             android:name=".Activity.FoodResultActivity"
             android:theme="@style/AppTheme" />
-        <activity android:name=".Activity.FoodShopActivity"></activity>
+        <activity android:name=".Activity.FoodShopActivity" />
+        <activity android:name=".Activity.PostReviewsActivity"></activity>
     </application>
 
 </manifest>

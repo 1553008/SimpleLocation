@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="10dp"
     >
@@ -11,7 +11,7 @@
         android:layout_width="@dimen/foodShopUserAvarSize"
         android:layout_height="@dimen/foodShopUserAvarSize"
         android:src="@drawable/ic_user_unknown"
-        app:civ_border_width="1dp"
+        app:civ_border_width="0dp"
         app:civ_border_color="#FF000000"/>
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,6 +23,7 @@
             android:id="@+id/review_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/md_black_1000"
             />
         <me.zhanghai.android.materialratingbar.MaterialRatingBar
             android:id="@+id/review_ratings_bar"
@@ -43,6 +44,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="12sp"/>
             <TextView
+                android:layout_marginLeft="7dp"
                 android:id="@+id/review_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

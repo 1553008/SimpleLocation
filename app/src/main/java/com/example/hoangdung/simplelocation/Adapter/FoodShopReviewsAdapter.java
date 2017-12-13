@@ -17,7 +17,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,6 +35,8 @@ import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 public class FoodShopReviewsAdapter extends RecyclerView.Adapter<FoodShopReviewsAdapter.FoodShopReviewsViewHolder> {
 
     ArrayList<FoodShopReview> foodShopReviews = new ArrayList<>();
+
+    //This reviews checker is to check whether a FoodReview that is added to adapter is a newly ones
     Context context;
     @Override
     public FoodShopReviewsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -64,8 +70,9 @@ public class FoodShopReviewsAdapter extends RecyclerView.Adapter<FoodShopReviews
         );
         //Load review content
         holder.reviewContent.setText(foodShopReview.comment);
-        holder.reviewRatings.setRating(foodShopReview.ratings);
-        holder.date.setText(foodShopReview.toString());
+        holder.reviewRatings.setRating((float) foodShopReview.ratings);
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        holder.date.setText(df.format(foodShopReview.timeStamp));
     }
 
     @Override
@@ -104,4 +111,6 @@ public class FoodShopReviewsAdapter extends RecyclerView.Adapter<FoodShopReviews
     public void setFoodShopReviews(ArrayList<FoodShopReview> foodShopReviews) {
         this.foodShopReviews = foodShopReviews;
     }
+
+
 }

@@ -8,6 +8,20 @@
     <color name="colorPolylineDirectionsBus">#00CED1</color>
     <color name="colorGoToShopBackground">#4a80f5</color>
     <color name="colorFindShopDirectionBackground">#34a853</color>
+    
+    <!-- Review Alert Dialog Color -->
+    <color name="reviewsDialogBackgroundColor">#36b89b</color>
+    <color name="reviewsDialogStarColor">#ffcc00</color>
+    <color name="noteDescriptionTextColor">#ffffff</color>
+    <color name="titleTextColor">#ffffff</color>
+    <color name="contentTextColor">#ffffff</color>
+    <color name="hintTextColor">#ffffff</color>
+    <color name="commentTextColor">#ffffff</color>
+    <color name="commentBackgroundColor">@color/primary_dark</color>
+
+
+
+    <!-- Progress Bar color -->
     <color name="red">#ea4335</color>
     <color name="blue">#4285f4</color>
     <color name="green">#34a853</color>

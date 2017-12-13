@@ -21,11 +21,11 @@ public class FoodShop implements Parcelable {
 
     @SerializedName("shop_id")
     @Expose
-    public int shopID;
+    public long shopID;
 
     @SerializedName("averageRatings")
     @Expose
-    public float averageRatings;
+    public double averageRatings;
 
     @SerializedName("avartar")
     @Expose
@@ -41,11 +41,15 @@ public class FoodShop implements Parcelable {
 
     @SerializedName("numOfRatings")
     @Expose
-    public int numOfRatings;
+    public long numOfRatings;
 
     @SerializedName("numOfPhotos")
     @Expose
-    public int numOfPhotos;
+    public long numOfPhotos;
+
+
+    public FoodShop() {
+    }
 
     @Override
     public int describeContents() {
@@ -56,28 +60,25 @@ public class FoodShop implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeDouble(this.lat);
         dest.writeDouble(this.lng);
-        dest.writeInt(this.shopID);
-        dest.writeFloat(this.averageRatings);
+        dest.writeLong(this.shopID);
+        dest.writeDouble(this.averageRatings);
         dest.writeString(this.avartar);
         dest.writeString(this.name);
         dest.writeString(this.address);
-        dest.writeInt(this.numOfRatings);
-        dest.writeInt(this.numOfPhotos);
-    }
-
-    public FoodShop() {
+        dest.writeLong(this.numOfRatings);
+        dest.writeLong(this.numOfPhotos);
     }
 
     protected FoodShop(Parcel in) {
         this.lat = in.readDouble();
         this.lng = in.readDouble();
-        this.shopID = in.readInt();
-        this.averageRatings = in.readFloat();
+        this.shopID = in.readLong();
+        this.averageRatings = in.readDouble();
         this.avartar = in.readString();
         this.name = in.readString();
         this.address = in.readString();
-        this.numOfRatings = in.readInt();
-        this.numOfPhotos = in.readInt();
+        this.numOfRatings = in.readLong();
+        this.numOfPhotos = in.readLong();
     }
 
     public static final Creator<FoodShop> CREATOR = new Creator<FoodShop>() {

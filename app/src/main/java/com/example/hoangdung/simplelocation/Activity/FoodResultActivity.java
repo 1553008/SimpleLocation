@@ -21,6 +21,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bcgdv.asia.lib.dots.DotsProgressIndicator;
 import com.example.hoangdung.simplelocation.Adapter.FoodShopListAdapter;
 import com.example.hoangdung.simplelocation.Fragments.FoodListFragment;
 import com.example.hoangdung.simplelocation.Fragments.FoodShopDirectionFragment;
@@ -72,14 +73,14 @@ public class FoodResultActivity extends AppCompatActivity implements OnMapReadyC
     FusedLocationProviderClient fusedLocationProviderClient;
     final static int BOUND_PADDING = 100;
     Location lastLocation;
-    ProgressWindowAnim progressWindow;
+    ProgressWindowAnim<DotsProgressIndicator> progressWindow;
     com.google.android.gms.maps.model.Polyline polylines;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_food_result);
         ButterKnife.bind(this);
-
+        progressWindow = new ProgressWindowAnim(this,R.layout.progress_window_layout_2);
         //Get Data from Food Finder Activity
         Intent intent = getIntent();
         foodShopArrayList =  intent.getParcelableArrayListExtra("shops");
@@ -98,8 +99,7 @@ public class FoodResultActivity extends AppCompatActivity implements OnMapReadyC
         transaction.add(R.id.fragment_container,foodListFragment);
         transaction.commit();
 
-        //Init progressWindow
-        progressWindow = ProgressWindowAnim.getInstance(this);
+
 
     }
 

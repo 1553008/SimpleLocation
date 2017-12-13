@@ -1,8 +1,12 @@
 package com.example.hoangdung.simplelocation.Activity;
 
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,27 +21,42 @@ import android.widget.Toast;
 
 import com.example.hoangdung.simplelocation.Adapter.FoodShopPhotosAdapter;
 import com.example.hoangdung.simplelocation.Adapter.FoodShopReviewsAdapter;
+import com.example.hoangdung.simplelocation.CircularTextview;
 import com.example.hoangdung.simplelocation.EndlessRecyclerOnScrollListener;
 import com.example.hoangdung.simplelocation.FirestoreCenter;
+import com.example.hoangdung.simplelocation.MyApplication;
 import com.example.hoangdung.simplelocation.NearestPlacesClient.FoodShopReview;
 import com.example.hoangdung.simplelocation.NearestPlacesClient.NearestPlacesPOJO.FoodShop;
+import com.example.hoangdung.simplelocation.ProgressWindowAnim;
 import com.example.hoangdung.simplelocation.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.jpardogo.android.googleprogressbar.library.GoogleProgressBar;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
+import com.stepstone.apprating.AppRatingDialog;
+import com.stepstone.apprating.listener.RatingDialogListener;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 
-public class FoodShopActivity extends AppCompatActivity {
+public class FoodShopActivity extends AppCompatActivity implements RatingDialogListener {
 
     @BindView(R.id.food_shop_name)
     public TextView foodShopName;
@@ -56,16 +75,17 @@ public class FoodShopActivity extends AppCompatActivity {
     public TextView foodShopNumPhotos;
 
     @BindView(R.id.food_shop_ratings_text)
-    public TextView foodShopRatingText;
+    public CircularTextview foodShopRatingText;
 
     @BindView(R.id.food_shop_photos)
     public RecyclerView foodShopPhotos;
 
-    @BindView(R.id.food_shop_ratings)
-    public MaterialRatingBar foodShopEditRatingsBar;
-
+    ProgressWindowAnim<GoogleProgressBar> progressWindowAnim;
+/*    @BindView(R.id.food_shop_ratings)
+    public MaterialRatingBar foodShopEditRatingsBar;*/
+/*
     @BindView(R.id.food_shop_comment_edit_text)
-    public EditText foodShopCommentEdit;
+    public EditText foodShopCommentEdit;*/
 
     @BindView(R.id.food_shop_reviews_list)
     public RecyclerView foodShopReviewsList;
@@ -76,49 +96,46 @@ public class FoodShopActivity extends AppCompatActivity {
     @BindView(R.id.food_shop_reviews_header)
     public LinearLayout foodShopReviewsHeader;
 
-    @BindView(R.id.food_shop_publish_review)
-    public ImageButton foodShopPublishReview;
+    /*@BindView(R.id.food_shop_publish_review)
+    public ImageButton foodShopPublishReview;*/
+
+    @BindView(R.id.food_shop_reviews_header_text_1)
+    public TextView foodShopHeaderText1;
+
+    @BindView(R.id.post_review_button)
+    public FloatingActionButton floatingActionButton;
 
     FoodShop foodShop;
     boolean isEditRatingBarValid = false;
 
     //Foodshop Photos data
-    private int nextMaxPhotos = 20;
-    private int numOfTotalPhotos;
+    private long nextMaxPhotos = 20;
+    private long numOfTotalPhotos;
     private DocumentSnapshot lastPhotoSnapshot;
 
     //Foodshop Reviews data
-    private int nextMaxReviews = 20;
-    private int numOfTotalsReviews;
+    private long nextMaxReviews = 20;
+    private long numOfTotalsReviews;
     private DocumentSnapshot lastReviewSnapshot;
+    private ListenerRegistration reviewsChangeListener;
 
+    //FoodShop data
+    private ListenerRegistration shopChangeListener;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_food_shop);
         ButterKnife.bind(this);
-
+        progressWindowAnim = new ProgressWindowAnim(this,R.layout.progress_window_layout_2);
         foodShop = getIntent().getParcelableExtra("shop");
         setupFoodShopInfo();
     }
-
     //Setup FoodShop Information
     void setupFoodShopInfo() {
         setupShopContent();
         setupPhotosContent();
         setupReviewsContent();
-        //Set up Sliding Panel Layout
-        foodShopReviewsHeader.getViewTreeObserver()
-                .addOnGlobalLayoutListener(
-                        new ViewTreeObserver.OnGlobalLayoutListener() {
-                            @Override
-                            public void onGlobalLayout() {
-                                foodShopSlidingPanel.setPanelHeight(foodShopReviewsHeader.getHeight());
-                                foodShopReviewsHeader.getViewTreeObserver()
-                                        .removeOnGlobalLayoutListener(this);
-                            }
-                        }
-                );
+        setupPanelLayout();
 
     }
 
@@ -159,7 +176,7 @@ public class FoodShopActivity extends AppCompatActivity {
             @Override
             public void onLoadMore(int current_page) {
                 //Find the number of remaining phots
-                int restNumOfPhotos = numOfTotalPhotos - previousTotal;
+                long restNumOfPhotos = numOfTotalPhotos - previousTotal;
                 Log.d("MapsActivity", "numOfTotalPhotos: " + String.valueOf(numOfTotalPhotos));
                 Log.d("MapsActivity", "previousTotal: " + String.valueOf(previousTotal));
                 Log.d("MapsActivity", "rest: " + String.valueOf(restNumOfPhotos));
@@ -167,14 +184,14 @@ public class FoodShopActivity extends AppCompatActivity {
                 if (restNumOfPhotos == 0)
                     return;
                 //If it is larger than number of photos we going to load next, use nextMaxPhotos to query
-                int numOfNextPhotos = 0;
+                long numOfNextPhotos = 0;
                 if (restNumOfPhotos >= nextMaxPhotos) {
                     numOfNextPhotos = nextMaxPhotos;
                 } else //use number of remaining photos to query
                 {
                     numOfNextPhotos = restNumOfPhotos;
                 }
-                final int finalNumOfNextPhotos = numOfNextPhotos;
+                final long finalNumOfNextPhotos = numOfNextPhotos;
                 FirestoreCenter.Companion.getInstance().getPhotos(
                         foodShop.shopID,
                         numOfNextPhotos,
@@ -203,11 +220,12 @@ public class FoodShopActivity extends AppCompatActivity {
         foodShopReviewsList.setLayoutManager(linearLayoutManager);
         final FoodShopReviewsAdapter adapter = new FoodShopReviewsAdapter();
         foodShopReviewsList.setAdapter(adapter);
+        foodShopReviewsList.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
         //Set EndlessScroll for endless data
         foodShopReviewsList.addOnScrollListener(new EndlessRecyclerOnScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int current_page) {
-                int restNumOfReviews = numOfTotalsReviews - previousTotal;
+                long restNumOfReviews = numOfTotalsReviews - previousTotal;
                 Log.d("MapsActivity", "numOfTotalReviews: " + String.valueOf(numOfTotalPhotos));
                 Log.d("MapsActivity", "previousTotal: " + String.valueOf(previousTotal));
                 Log.d("MapsActivity", "rest: " + String.valueOf(restNumOfReviews));
@@ -215,7 +233,7 @@ public class FoodShopActivity extends AppCompatActivity {
                 if (restNumOfReviews == 0)
                     return;
                 //If it is larger than number of photos we going to load next, use nextMaxPhotos to query
-                int nextNumOfReviews = 0;
+                long nextNumOfReviews = 0;
                 if (restNumOfReviews >= nextMaxReviews) {
                     nextNumOfReviews = nextMaxReviews;
                 } else //use number of remaining photos to query
@@ -268,6 +286,27 @@ public class FoodShopActivity extends AppCompatActivity {
                     }
                 }
         );
+
+        //Add Listener for reviews changes
+        reviewsChangeListener =  FirestoreCenter.Companion.getInstance().listenToReviewChanges(
+                foodShop.shopID,
+                new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(QuerySnapshot querySnapshot, FirebaseFirestoreException e) {
+                        for(DocumentChange documentChange : querySnapshot.getDocumentChanges()){
+                            //If this review is newly added
+                            //Add it to adapter and notify changes
+                            if(documentChange.getType() == DocumentChange.Type.ADDED){
+                                FoodShopReview foodShopReview = new FoodShopReview();
+                                foodShopReview.fromMap(documentChange.getDocument().getData());
+                                adapter.getFoodShopReviews().add(0,foodShopReview);
+                                adapter.notifyItemInserted(0);
+                            }
+                        }
+                    }
+                }
+        );
+
     }
     private void setupShopContent(){
         Log.d("MapsActivity","shopid: " + String.valueOf(foodShop.shopID));
@@ -283,49 +322,129 @@ public class FoodShopActivity extends AppCompatActivity {
         //Display Food Shop Num Reviews
         foodShopNumReviews.setText(String.valueOf(foodShop.numOfRatings));
         numOfTotalsReviews = foodShop.numOfRatings;
-        //Display Food Shop Ratings
-        foodShopRatingText.setText(String.valueOf(foodShop.averageRatings));
         //Display Food Shop Num Photos
         foodShopNumPhotos.setText(String.valueOf(foodShop.numOfPhotos));
         numOfTotalPhotos = foodShop.numOfPhotos;
-        //Add listener for Rating bars
-        foodShopEditRatingsBar.setOnRatingChangeListener(new MaterialRatingBar.OnRatingChangeListener() {
-            @Override
-            public void onRatingChanged(MaterialRatingBar ratingBar, float rating) {
-                if(rating == 0)
-                    isEditRatingBarValid = false;
-                else
-                    isEditRatingBarValid = true;
-                ratingBar.setRating(rating);
 
-            }
-        });
-        foodShopPublishReview.setOnClickListener(new View.OnClickListener() {
+        //Show comment dialog when floating action button is clicked
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isEditRatingBarValid && !foodShopCommentEdit.getText().toString().isEmpty()){
-                    FoodShopReview review = new FoodShopReview();
-                    review.comment = foodShopCommentEdit.getText().toString();
-                    review.ratings = foodShopEditRatingsBar.getRating();
-                    review.userID = FirestoreCenter.Companion.getInstance().getDbAuth().getUid();
-                    FirestoreCenter.Companion.getInstance().publishReview(
-                            foodShop.shopID,
-                            review,
-                            new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if(task.isSuccessful())
-                                    {
-                                        Toast.makeText(FoodShopActivity.this, "Your comment is added", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            }
-                    );
-                }
-                else{
-
-                }
+                showDialog();
             }
         });
+
+        //Add listener to
+        shopChangeListener = FirestoreCenter.Companion.getInstance().listenToShop(
+                foodShop.shopID,
+                new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
+                        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+                        decimalFormat.setRoundingMode(RoundingMode.CEILING);
+                        foodShopRatingText.setText(decimalFormat.format(Double.parseDouble((String) documentSnapshot.get("averageRatings"))));
+                    }
+                }
+        );
+    }
+    private void setupPanelLayout(){
+        //Set up Sliding Panel Layout
+        foodShopReviewsHeader.getViewTreeObserver()
+                .addOnGlobalLayoutListener(
+                        new ViewTreeObserver.OnGlobalLayoutListener() {
+                            @Override
+                            public void onGlobalLayout() {
+                                foodShopSlidingPanel.setPanelHeight(foodShopReviewsHeader.getHeight());
+                                foodShopReviewsHeader.getViewTreeObserver()
+                                        .removeOnGlobalLayoutListener(this);
+                            }
+                        }
+                );
+
+        Typeface typeface = MyApplication.getTypeface("HelveticaNeueLTPro-Th.otf",this);
+        foodShopHeaderText1.setTypeface(typeface);
+        //Display Food Shop Ratings
+        DecimalFormat decimalFormat = new DecimalFormat("#.#");
+        decimalFormat.setRoundingMode(RoundingMode.CEILING);
+        foodShopRatingText.setText(String.valueOf(decimalFormat.format(foodShop.averageRatings)));
+        foodShopRatingText.setSolidColor(getResources().getColor(R.color.green));
+
+    }
+    private void showDialog() {
+        new AppRatingDialog.Builder()
+                .setPositiveButtonText("Submit")
+                .setNegativeButtonText("Cancel")
+                .setNeutralButtonText("Later")
+                .setNoteDescriptions(Arrays.asList("Very Bad", "Not good", "Quite ok", "Very Good", "Excellent !!!"))
+                .setDefaultRating(2)
+                .setTitle("Rate this food shop")
+                .setDescription("Hãy chọn mức yêu thích và điền feedback")
+                .setStarColor(R.color.reviewsDialogStarColor)
+                .setNoteDescriptionTextColor(R.color.noteDescriptionTextColor)
+                .setTitleTextColor(R.color.titleTextColor)
+                .setDescriptionTextColor(R.color.contentTextColor)
+                .setHint("Please write your comment here ...")
+                .setHintTextColor(R.color.hintTextColor)
+                .setCommentTextColor(R.color.commentTextColor)
+                .setCommentBackgroundColor(R.color.colorPrimaryDark)
+                .setWindowAnimation(R.style.MyDialogFadeAnimation)
+                .create(FoodShopActivity.this)
+                .show();
+    }
+
+    @Override
+    public void onPositiveButtonClicked(int i, String s) {
+        if(s.isEmpty())
+        {
+            Toast.makeText(this,"You should also fill feedback",Toast.LENGTH_LONG);
+            return;
+        }
+        progressWindowAnim.showProgress();
+        FoodShopReview review = new FoodShopReview();
+        review.comment = s;
+        review.ratings = i*10/5;
+        review.userID = FirestoreCenter.Companion.getInstance().getDbAuth().getUid();
+        FirestoreCenter.Companion.getInstance().publishReview(
+                foodShop.shopID,
+                review,
+                new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful())
+                        {
+                            progressWindowAnim.hideProgress();
+                            Toast.makeText(FoodShopActivity.this, "Your comment is added", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+        );
+    }
+
+    @Override
+    public void onNegativeButtonClicked() {
+
+    }
+
+    @Override
+    public void onNeutralButtonClicked() {
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        shopChangeListener.remove();
+        reviewsChangeListener.remove();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(foodShopSlidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED)
+        {
+            foodShopSlidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        }
+        else
+            super.onBackPressed();
+
     }
 }

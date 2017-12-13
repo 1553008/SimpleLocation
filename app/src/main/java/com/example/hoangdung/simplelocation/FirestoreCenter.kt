@@ -9,6 +9,7 @@ import com.google.firebase.firestore.*
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
+import java.util.EventListener
 import kotlin.collections.HashMap
 
 /**
@@ -101,7 +102,7 @@ public class FirestoreCenter {
             return map
         }
     }
-    public fun getPhotos(shopID: Int,numOfPhotos: Int, lastEndSnapshot: DocumentSnapshot?, callback: OnCompleteListener<QuerySnapshot>){
+    public fun getPhotos(shopID: Long,numOfPhotos: Long, lastEndSnapshot: DocumentSnapshot?, callback: OnCompleteListener<QuerySnapshot>){
         val photosRef = dbRef.collection(FirestoreCenter.FOOD_SHOPS_PATH)
                 .document(shopID.toString())
                 .collection("photos")
@@ -120,7 +121,7 @@ public class FirestoreCenter {
 
     }
 
-    public fun getReviews(shopID: Int, numOfReviews: Int, lastEndSnapshot: DocumentSnapshot?, callback: OnCompleteListener<QuerySnapshot>){
+    public fun getReviews(shopID: Long, numOfReviews: Long, lastEndSnapshot: DocumentSnapshot?, callback: OnCompleteListener<QuerySnapshot>){
         val foodReviewsRef = dbRef.collection(FirestoreCenter.FOOD_SHOPS_PATH)
                 .document(shopID.toString())
                 .collection("food_reviews")
@@ -138,19 +139,44 @@ public class FirestoreCenter {
                     .addOnCompleteListener(callback)
         }
     }
+    fun listenToReviewChanges(shopID: Long, callback: com.google.firebase.firestore.EventListener<QuerySnapshot>): ListenerRegistration{
+        return dbRef.collection(FOOD_SHOPS_PATH)
+                .document(shopID.toString())
+                .collection("food_reviews")
+                .addSnapshotListener(callback)
+    }
     fun getUser(userID: String, callback: OnCompleteListener<DocumentSnapshot>){
         val userRef = dbRef.collection(DB_USERS_PATH)
                 .document(userID)
                 .get()
                 .addOnCompleteListener(callback)
     }
-    public fun publishReview(shopID: Int,review: FoodShopReview, callback: OnCompleteListener<Void>){
-        FieldValue.serverTimestamp()
+    fun publishReview(shopID: Long,review: FoodShopReview, callback: OnCompleteListener<Nothing>){
         val docRef =  dbRef.collection(FirestoreCenter.FOOD_SHOPS_PATH)
                 .document(shopID.toString())
                 .collection("food_reviews")
                 .document()
-        docRef.set(review.toMap())
-                .addOnCompleteListener(callback)
+        dbRef.runTransaction { transaction ->
+            val snapshot = transaction.get(
+                    dbRef.collection(FOOD_SHOPS_PATH).document(shopID.toString())
+            )
+            //Get old ratings and calculate new ratings
+            var oldNumOfRatings = snapshot.get("numOfRatings") as Long
+            var newNumRatings = oldNumOfRatings + 1;
+            var oldTotalRatings = snapshot.get("averageRatings").toString().toDouble()  * oldNumOfRatings.toDouble()
+            var newTotalRatings = (oldTotalRatings + review.ratings)/newNumRatings
+
+            //Insert new comment
+            transaction.set(docRef,review.toMap())
+
+            //Update ratings
+            transaction.update(dbRef.collection(FOOD_SHOPS_PATH).document(shopID.toString()),"averageRatings",newTotalRatings)
+            return@runTransaction null
+        }.addOnCompleteListener(callback)
+    }
+    fun listenToShop(shopID: Long, callback: com.google.firebase.firestore.EventListener<DocumentSnapshot>): ListenerRegistration{
+        return dbRef.collection(FOOD_SHOPS_PATH)
+                .document(shopID.toString())
+                .addSnapshotListener(callback)
     }
 }

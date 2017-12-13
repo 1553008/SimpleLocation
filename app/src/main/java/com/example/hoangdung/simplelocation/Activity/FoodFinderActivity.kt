@@ -16,6 +16,7 @@ import com.example.hoangdung.simplelocation.R
 
 import butterknife.BindView
 import butterknife.ButterKnife
+import com.bcgdv.asia.lib.dots.DotsProgressIndicator
 import com.cunoraz.tagview.Tag
 import com.example.hoangdung.simplelocation.MyApplication
 import com.example.hoangdung.simplelocation.NearestPlacesClient.NearestPlacesPOJO.NearestPlacesResponse
@@ -54,7 +55,7 @@ class FoodFinderActivity : AppCompatActivity() {
     var categories: ArrayList<String> = ArrayList()
     val categoriesChosen: HashMap<String,Boolean> = HashMap()
     lateinit var mLocationProvider: FusedLocationProviderClient
-    private var progressWindow: ProgressWindowAnim? = null
+    private var progressWindow: ProgressWindowAnim<DotsProgressIndicator>? = null
 
     val MAX_SUGGESTION = 15;
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -208,7 +209,7 @@ class FoodFinderActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
     private fun progressWindowConfig(){
-        progressWindow = ProgressWindowAnim.getInstance(this)
+        progressWindow = ProgressWindowAnim(this,R.layout.progress_window_layout)
     }
 
     override fun onBackPressed() {

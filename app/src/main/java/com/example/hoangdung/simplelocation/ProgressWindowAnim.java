@@ -23,34 +23,28 @@ import java.util.ArrayList;
  * Created by hoangdung on 12/8/17.
  */
 
-public class ProgressWindowAnim {
+public class ProgressWindowAnim<T extends View> {
 
     Context mContext;
     WindowManager windowManager;
     WindowManager.LayoutParams windowParams;
-    public static ProgressWindowAnim instance;
     public boolean isShowing = false;
-    ProgressWindowAnim(Context context){
+    private int layoutID;
+    public ProgressWindowAnim(Context context, int layoutID){
         mContext = context;
+        this.layoutID = layoutID;
         setupView();
-    }
-    public static ProgressWindowAnim getInstance(Context context){
-        synchronized (ProgressWindowAnim.class){
-            if(instance == null)
-                instance = new ProgressWindowAnim(context);
-        }
-        return instance;
     }
 
     FrameLayout mProgressBarContainer;
-    DotsProgressIndicator mProgressBar;
+    T mProgressBar;
     View mProgressLayout;
 
     private void setupView(){
         DisplayMetrics metrics = new DisplayMetrics();
         windowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
         windowManager.getDefaultDisplay().getMetrics(metrics);
-        mProgressLayout = LayoutInflater.from(mContext).inflate(R.layout.progress_window_layout,null);
+        mProgressLayout = LayoutInflater.from(mContext).inflate(layoutID,null);
 
         mProgressBarContainer = mProgressLayout.findViewById(R.id.progress_bar_container);
         mProgressBarContainer.setBackgroundColor(Color.TRANSPARENT);
@@ -73,17 +67,21 @@ public class ProgressWindowAnim {
 
     }
     public void showProgress(){
-        windowManager.addView(mProgressLayout,windowParams);
-        mProgressBar.setVisibility(View.VISIBLE);
-        isShowing = true;
+        if(!mProgressLayout.isAttachedToWindow()){
+            windowManager.addView(mProgressLayout,windowParams);
+            mProgressBar.setVisibility(View.VISIBLE);
+            isShowing = true;
+        }
     }
 
     public void hideProgress(){
-        windowManager.removeViewImmediate(mProgressLayout);
-        mProgressBar.setVisibility(View.INVISIBLE);
-        isShowing = false;
+        if(mProgressLayout.isAttachedToWindow())
+        {
+            windowManager.removeViewImmediate(mProgressLayout);
+            mProgressBar.setVisibility(View.INVISIBLE);
+            isShowing = false;
+        }
     }
-
     public static class ProgressWindowConfiguration{
         public @ColorInt int backgroundColor;
 

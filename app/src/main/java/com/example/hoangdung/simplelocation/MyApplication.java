@@ -5,6 +5,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.view.View;
@@ -65,5 +66,10 @@ public class MyApplication extends Application {
     public static void hideKeyboardFrom(Context context, View view){
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    public static Typeface getTypeface(String fontName,Context context){
+        Typeface font = Typeface.createFromAsset(context.getAssets(),fontName);
+        return font;
     }
 }

@@ -20,9 +20,30 @@ public class FoodShopReview implements Parcelable {
     @PropertyName("user_id")
     public String userID;
     @PropertyName("ratings")
-    public Float ratings;
+    public double ratings;
     @PropertyName("content")
     public String comment;
+
+
+
+    public FoodShopReview() {
+    }
+
+
+    public Map<String,Object> toMap(){
+        Map<String,Object> map = new HashMap<>();
+        map.put("content",comment);
+        map.put("ratings",ratings);
+        map.put("user_id",userID);
+        map.put("timestamp", FieldValue.serverTimestamp());
+        return map;
+    }
+    public void fromMap(Map<String,Object> map){
+        userID = (String) map.get("user_id");
+        ratings = (double) map.get("ratings");
+        timeStamp = (Date) map.get("timestamp");
+        comment = (String) map.get("content");
+    }
 
     @Override
     public int describeContents() {
@@ -33,22 +54,19 @@ public class FoodShopReview implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(this.timeStamp != null ? this.timeStamp.getTime() : -1);
         dest.writeString(this.userID);
-        dest.writeValue(this.ratings);
+        dest.writeDouble(this.ratings);
         dest.writeString(this.comment);
-    }
-
-    public FoodShopReview() {
     }
 
     protected FoodShopReview(Parcel in) {
         long tmpTimeStamp = in.readLong();
         this.timeStamp = tmpTimeStamp == -1 ? null : new Date(tmpTimeStamp);
         this.userID = in.readString();
-        this.ratings = (Float) in.readValue(Float.class.getClassLoader());
+        this.ratings = in.readDouble();
         this.comment = in.readString();
     }
 
-    public static final Parcelable.Creator<FoodShopReview> CREATOR = new Parcelable.Creator<FoodShopReview>() {
+    public static final Creator<FoodShopReview> CREATOR = new Creator<FoodShopReview>() {
         @Override
         public FoodShopReview createFromParcel(Parcel source) {
             return new FoodShopReview(source);
@@ -59,13 +77,4 @@ public class FoodShopReview implements Parcelable {
             return new FoodShopReview[size];
         }
     };
-
-    public Map<String,Object> toMap(){
-        Map<String,Object> map = new HashMap<>();
-        map.put("content",comment);
-        map.put("ratings",ratings);
-        map.put("user_id",userID);
-        map.put("timestamp", FieldValue.serverTimestamp());
-        return map;
-    }
 }

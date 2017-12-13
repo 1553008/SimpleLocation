@@ -60,6 +60,8 @@ dependencies {
     compile 'me.zhanghai.android.materialratingbar:library:1.2.0'
     compile 'jp.wasabeef:recyclerview-animators:2.2.7'
     compile 'de.hdodenhof:circleimageview:2.2.0'
+    compile 'com.stepstone.apprating:app-rating:2.1.1'
+    compile 'com.jpardogo.googleprogressbar:library:1.2.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 
     //Test compile
