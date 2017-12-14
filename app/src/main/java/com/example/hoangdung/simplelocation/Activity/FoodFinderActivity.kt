@@ -206,6 +206,9 @@ class FoodFinderActivity : AppCompatActivity() {
 
 
         }
+        else if(item?.itemId == android.R.id.home){
+            onBackPressed()
+        }
         return super.onOptionsItemSelected(item)
     }
     private fun progressWindowConfig(){
@@ -213,8 +216,10 @@ class FoodFinderActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
         if(progressWindow?.isShowing!!)
             progressWindow?.hideProgress()
+        else super.onBackPressed()
+
     }
+
 }

@@ -40,9 +40,7 @@ public class SearchFragment extends Fragment {
     public @BindView(R.id.toolbar_search)Toolbar mToolbar;
     public @BindView(R.id.find_direction)ImageView mImageView;
     private Unbinder mUnbinder;
-    public Place mSearchPlace;
     public GeoDataClient mGeoClient;
-    public Menu mMenu;
     private OnSearchFragmentCallback mSearchFragmentCallback;
     public SearchFragment() {
         // Required empty public constructor
@@ -87,50 +85,22 @@ public class SearchFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mUnbinder.unbind();
+    public void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
     public void onActivityResult(int requestCode, final int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d("MapsActivity","SearchFragment:onActivityResult");
-        if(data!=null)
-        {
-            getActivity().findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
-            final String placeID = data.getStringExtra("PlaceID");
-            Task<PlaceBufferResponse> task = mGeoClient.getPlaceById(placeID);
-            task.addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
-                @Override
-                public void onComplete(@NonNull Task<PlaceBufferResponse> task) {
-                    if(task.isSuccessful() && task.getResult()!= null){
-                        mSearchPlace = task.getResult().get(0).freeze();
-                        mImageView.setVisibility(View.VISIBLE);
-                        getActivity().findViewById(R.id.progressBar).setVisibility(View.GONE);
-                        mSearchFragmentCallback.onSearchFragmentResumed(SearchFragment.this);
-                        task.getResult().release();
-                    }
-                    getActivity().findViewById(R.id.progressBar).setVisibility(View.GONE);
-                }
-            });
-        }
-        if(resultCode == getActivity().RESULT_CANCELED){
-        }
 
     }
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("MapsActivity","SearchFragment:onResume");
-        if(mSearchFragmentCallback!=null)
+        if(mSearchFragmentCallback != null)
             mSearchFragmentCallback.onSearchFragmentResumed(this);
+
     }
 
-    public void startSearching(){
-        Intent intent = new Intent(getActivity(), SearchActivity.class);
-        startActivityForResult(intent,1);
-    }
 
     @OnClick(R.id.find_direction)
     void onFindDirectionsClicked(View view){
@@ -139,5 +109,13 @@ public class SearchFragment extends Fragment {
     @OnClick(R.id.toolbar_search)
     void onSearchToolbarClicked(View view){
         mSearchFragmentCallback.onSearchFragmentClicked(this);
+    }
+
+    public void showFindDirections(boolean shouldShown){
+        mImageView.setVisibility(shouldShown ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    public void setTitle(CharSequence title){
+        mToolbar.setTitle(title);
     }
 }

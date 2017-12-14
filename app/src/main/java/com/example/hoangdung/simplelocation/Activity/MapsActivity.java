@@ -45,7 +45,10 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBufferResponse;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -102,7 +105,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private String mProfileIconURL;
 
-    private SearchFragment mSearchFragmentHolder;
+    private SearchFragment mSearchFragment;
+    private DirectionsFragment mDirectionFragment;
 
     private FragmentManager mFragmentManager;
     @BindView(R.id.toolbar_container)
@@ -119,22 +123,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @BindView(R.id.floating_btn)
     public FloatingActionButton mLocateBtn;
+
+    //My Place Search
+    Place mSearchPlace;
     //Google Map model
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
-    private String mCountryCode;
     //Fused Location Provider
     private FusedLocationProviderClient mLocationProvider;
 
     //Last known location
     private Location mLastknownLocation;
-
+    private GeoDataClient mGeoDataClient;
     //Choose places on Maps
 
     private ArrayList<LatLng> mMarkerPlaces = new ArrayList<>();
     //Activity Request Code
     private int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     private int FOOD_FINDER_REQUEST_CODE = 2;
+    private int SEARCH_ACTIVITY_REQUEST_CODE = 3;
     private  boolean returnedFromMyPlaceList = false;
     private FirebaseCenter.Location chosenPlaceFromMyPlaceList;
     //-----------------------------------------Activity LifeCycles---------------------------------------------------
@@ -191,6 +198,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 returnedFromMyPlaceList = true;
             }
         }
+        // if the result is from search activity
+        if(requestCode == SEARCH_ACTIVITY_REQUEST_CODE){
+            handleSearchResult(resultCode,data);
+
+        }
     }
 
     //----------------------------------------Google API Setup and Callbacks---------------------------------------------------------
@@ -204,6 +216,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     .build();
         }
         mLocationProvider = LocationServices.getFusedLocationProviderClient(this);
+        mGeoDataClient = Places.getGeoDataClient(this,null);
     }
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -227,7 +240,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         try {
             List<Address> addressList = geocoder.getFromLocation(mLastknownLocation.getLatitude(),mLastknownLocation.getLongitude(),1);
             Address address = addressList.get(0);
-            mCountryCode = address.getCountryCode();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -387,9 +399,31 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         params.rightMargin = (int)getApplicationContext().getResources().getDimension(R.dimen.myplaceButtonMarginRight);
     }
 
-    private void layoutPositionSetup(){
-
+    @Override
+    public void onBackPressed() {
+        //When Directions Fragment is visible, return to search fragment
+        if(mDirectionFragment != null && mDirectionFragment.isVisible())
+        {
+            super.onBackPressed();
+            mMap.clear();
+            addMarkers(Arrays.asList(mSearchPlace.getLatLng()),R.drawable.ic_normal_marker);
+            updateCamera(Arrays.asList(mSearchPlace.getLatLng()));
+            updateSearchToolbar();
+            return;
+        }
+        //Because when user search for a place successully, we allow them to press back button to return to current location
+        //Note: This should works only when direction fragment is invisible
+        if(mSearchPlace != null){
+            mSearchPlace = null;
+            mMap.clear();
+            showLastknownLocation();
+            updateSearchToolbar();
+        }
+        else
+            super.onBackPressed();
     }
+
+
     //------------------------------------------Search Fragment Callbacks and Search Functionality--------------------------------------------
     //
 
@@ -403,19 +437,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.toolbar_container,searchFragmentHolder,SearchFragment.class.getSimpleName());
         fragmentTransaction.commit();
-        mSearchFragmentHolder = searchFragmentHolder;
+        mSearchFragment = searchFragmentHolder;
         searchFragmentHolder.setOnSearchFragmentCallback(new SearchFragment.OnSearchFragmentCallback() {
 
             //Set SearchFragment's toolbar as Activity's toolbar
             @Override
             public void onSearchFragmentUIReady(SearchFragment searchFragment) {
-                mDrawer.setToolbar(MapsActivity.this,searchFragment.mToolbar);
+                updateSearchToolbar();
             }
 
             //Create Search Fragment for real Searching Result
             @Override
             public void onSearchFragmentClicked(SearchFragment searchFragment) {
-                initRealSearchFragment();
+                Intent intent = new Intent(MapsActivity.this,SearchActivity.class);
+                startActivityForResult(intent,SEARCH_ACTIVITY_REQUEST_CODE);
             }
 
             //Update Map UI using Current Location
@@ -423,7 +458,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onSearchFragmentResumed(SearchFragment searchFragment) {
                 if(mMap!=null)
                 {
-                    mMap.clear();
 
                     // if return from myplacesActivity
                     if (returnedFromMyPlaceList)
@@ -453,89 +487,97 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Log.d(TAG, "onSearchFragmentResumed");
                     Log.d(TAG, "showLastKnowLocation from onsearchFragmentResumed");
                 }
-                mDrawer.setToolbar(MapsActivity.this,searchFragment.mToolbar,true);
-
-            }
-            @Override
-            public void onSearchFragmentFindDirectionsClicked(SearchFragment searchFragment) {
-
-            }
-        });
-    }
-
-    /**
-     * Create Search Fragment and replace the Holder with this
-     */
-    private void initRealSearchFragment(){
-        SearchFragment realSearchFragment = SearchFragment.newInstance(MapsActivity.this);
-        realSearchFragment.setOnSearchFragmentCallback(new SearchFragment.OnSearchFragmentCallback() {
-
-            //Set Fragment's toolbar as Activity's toolbar
-            @Override
-            public void onSearchFragmentUIReady(SearchFragment searchFragment) {
-                mDrawer.setToolbar(MapsActivity.this,searchFragment.mToolbar,true);
-                if(searchFragment.mSearchPlace==null)
-                    searchFragment.mToolbar.callOnClick();
             }
 
-            //Start Search Activity
-            @Override
-            public void onSearchFragmentClicked(SearchFragment searchFragment) {
-                searchFragment.startSearching();
-            }
-
-            //Update Map UI from Search Fragment Result
-            @Override
-            public void onSearchFragmentResumed(SearchFragment searchFragment) {
-                if(mMap!=null){
-                    mMap.clear();
-                }
-                mDrawer.setToolbar(MapsActivity.this,searchFragment.mToolbar,true);
-                if(searchFragment.mSearchPlace!= null){
-                    handleSearchResult(searchFragment.mSearchPlace,searchFragment,RESULT_OK);
-                }
-                //Setting up Locate Button position
-                locateButtonSetup();
-            }
+            /**
+             * This callback will be called when Find Direction Icon is clicked
+             * It will create DirectionsFragment
+             * We need to provide two locations first, which is represented by {@link MyPlace MyPlace}
+             * @param searchFragment
+             */
             @Override
             public void onSearchFragmentFindDirectionsClicked(SearchFragment searchFragment) {
                 MyPlace firstLocation = new MyPlace();
                 firstLocation.setLatlng(new LatLng(mLastknownLocation.getLatitude(),mLastknownLocation.getLongitude()));
                 firstLocation.setFullName("Your location");
                 MyPlace secondLocation = new MyPlace();
-                secondLocation.setPlace(searchFragment.mSearchPlace);
+                secondLocation.setPlace(mSearchPlace);
                 startDirectionsFragment(firstLocation,secondLocation);
             }
         });
-        FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.toolbar_container,realSearchFragment,SearchFragment.class.getSimpleName());
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
     }
 
 
-    private void handleSearchResult(final Place searchPlace, final SearchFragment searchFragment, int resultCode){
+
+    private void handleSearchResult(int resultCode, Intent data){
+        //if users choose one place
         if(resultCode == RESULT_OK){
-            if(searchPlace!=null){
-                mMap.clear();
-                addMarkers(Arrays.asList(searchPlace.getLatLng()),R.drawable.ic_normal_marker);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(searchPlace.getLatLng(), DEFAULT_ZOOM));
+            //Use the placeID passed from Search Activity to query search place
+            final String placeID = data.getStringExtra("PlaceID");
+            Task<PlaceBufferResponse> task = mGeoDataClient.getPlaceById(placeID);
+            task.addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
+                @Override
+                public void onComplete(@NonNull Task<PlaceBufferResponse> task) {
+                    if(task.isSuccessful() && task.getResult()!= null){
 
+                        //Get place result, copy it and release buffer
+                        mSearchPlace = task.getResult().get(0).freeze();
+                        task.getResult().release();
+                        //Update camera
+                        mMap.clear();
+                        addMarkers(Arrays.asList(mSearchPlace.getLatLng()),R.drawable.ic_normal_marker);
+                        updateCamera(Arrays.asList(mSearchPlace.getLatLng()));
+                        //Update search toolbar
+                        updateSearchToolbar();
                     }
-                },50);
-                searchFragment.mToolbar.setTitle(searchPlace.getName());
-                searchFragment.mImageView.setVisibility(View.VISIBLE);
-            }
+                }
+            });
+
         }
-        else if( resultCode == RESULT_CANCELED){
-            if(searchPlace==null)
-                getSupportFragmentManager().popBackStack();
+        else if(resultCode == RESULT_CANCELED){
+
         }
+
+
     }
 
+    private void updateSearchToolbar(){
+        if(mSearchPlace == null){
+            mSearchFragment.setTitle("Search here");
+            mSearchFragment.showFindDirections(false);
+        }
+        else{
+            mSearchFragment.setTitle(mSearchPlace.getName());
+            mSearchFragment.showFindDirections(true);
+        }
+        mDrawer.setToolbar(this,mSearchFragment.mToolbar,true);
+    }
+
+    /**
+     * This function update camera based on List of LatLngs
+     * @param latLngs array list of LatLngs, which will be used to move camera over specific bound area
+     */
+    private void updateCamera(List<LatLng> latLngs){
+        if(latLngs == null || latLngs.size() == 0)
+            return;
+
+        final LatLngBounds.Builder boundBuilder = new LatLngBounds.Builder();
+        for(LatLng latLng : latLngs){
+            boundBuilder.include(latLng);
+        }
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundBuilder.build(),100));
+            }
+        },50);
+    }
+
+    /**
+     * This function add markers on the map
+     * @param markers array list of LatLng, which will be used to display markers
+     * @param drawable drawable icon
+     */
     private void addMarkers(List<LatLng> markers,int drawable){
         if(markers == null)
             return;
@@ -565,6 +607,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
         //Create Directions Fragment and add listener for changes
         DirectionsFragment directionsFragment = DirectionsFragment.Companion.newInstance(this,firstLocation,secondLocation);
+        mDirectionFragment = directionsFragment;
         directionsFragment.setDirectionsFragmentCallback(new DirectionsFragment.DirectionsFragmentCallback() {
             //When the fragment is ready
             @Override
@@ -734,4 +777,5 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }, 50);
         }
     }
+
 }
