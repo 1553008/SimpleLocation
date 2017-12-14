@@ -8,4 +8,7 @@
     <item android:id="@+id/select_all_place"
         android:title="Select all"
         />
+    <item android:id="@+id/unselect_all_place"
+        android:title="Unselect all"
+        />
 </menu>

@@ -192,7 +192,11 @@ public class MyPlacesActivity extends AppCompatActivity implements ActionMode.Ca
                 );
                 break;
             case R.id.select_all_place:
-                mRcvAdapter.selectAll();
+                mRcvAdapter.setAllItemStateSelected(true);
+                break;
+            case R.id.unselect_all_place:
+                actionMode.finish();
+                mRcvAdapter.notifyDataSetChanged();
                 break;
             default:
                 return false;

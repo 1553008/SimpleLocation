@@ -133,10 +133,10 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
         });
     }
 
-    public void selectAll()
+    public void setAllItemStateSelected(boolean selected)
     {
         for (int i = 0; i < getItemCount(); ++i)
-            selectedItems.put(i, true);
+            selectedItems.put(i, selected);
         notifyDataSetChanged();
     }
 
