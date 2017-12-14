@@ -13,8 +13,6 @@
         <item name="drawerArrowStyle">@style/AppTheme.DrawerArrow</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="android:actionModeBackground">@color/colorPrimaryDark</item>
-        <item name="android:actionMenuTextColor">@color/md_black_1000</item>
-
         <!-- Assign dialog style here. -->
         <item name="alertDialogTheme">@style/MyAlertDialogStyle</item>
         <item name="alertDialogStyle">@style/MyAlertDialogStyle</item>
@@ -32,6 +30,15 @@
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:statusBarColor">@color/colorStatusBar</item>
 
+    </style>
+    <style name="AppTheme.WhiteMenu" parent="AppTheme">
+        <item name="android:colorControlNormal">@color/md_white_1000</item>
+        <item name="android:actionMenuTextColor">@color/md_white_1000</item>
+
+    </style>
+    <style name="AppTheme.BlackMenu" parent="AppTheme">
+        <item name="android:actionMenuTextColor">@color/md_black_1000</item>
+        <item name="android:colorControlNormal">@color/md_grey_600</item>
     </style>
     <style name="Toolbar.Transparent" parent="MaterialDrawerTheme.ActionBar.TranslucentStatus">
         <item name="android:windowActionBarOverlay">true</item>

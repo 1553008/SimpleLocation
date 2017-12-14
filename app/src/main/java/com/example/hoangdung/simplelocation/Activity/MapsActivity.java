@@ -347,16 +347,26 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             // Fire activity Choose My Plases and show my place list, which
                             // is gotten from firebaseCenter
 
-                            Intent intent = new Intent(MapsActivity.this, MyPlacesActivity.class);
+                            final Intent intent = new Intent(MapsActivity.this, MyPlacesActivity.class);
                             ArrayList<FirebaseCenter.Location> locList = FirebaseCenter.getInstance().getMyPlaces();
                             intent.putParcelableArrayListExtra("place", locList);
-                            startActivityForResult(intent, 0);
                             mDrawer.closeDrawer();
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    startActivityForResult(intent, 0);
+                                }
+                            },100);
                         }
                         else if(position == MapsActivity.this.getResources().getInteger(R.integer.hungry_drawer_item_id)){
-                            Intent intent = new Intent(MapsActivity.this,FoodFinderActivity.class);
+                            final Intent intent = new Intent(MapsActivity.this,FoodFinderActivity.class);
                             mDrawer.closeDrawer();
-                            startActivityForResult(intent,FOOD_FINDER_REQUEST_CODE);
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    startActivityForResult(intent,FOOD_FINDER_REQUEST_CODE);
+                                }
+                            },100);
                         }
                         return true;
                     }

@@ -57,7 +57,7 @@
         <activity
             android:name=".Activity.MapsActivity"
             android:label="@string/title_activity_maps"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme.WhiteMenu" />
         <activity
             android:name=".Activity.WelcomeActivity"
             android:theme="@style/AppTheme.Transparent">
@@ -69,22 +69,24 @@
         </activity>
         <activity
             android:name=".Activity.SearchActivity"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            />
         <activity
             android:name=".Activity.MyPlacesActivity"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme.WhiteMenu" />
         <activity
             android:name=".Activity.AddPlaceActivity"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme.WhiteMenu" />
         <activity
             android:name=".Activity.FoodFinderActivity"
-            android:theme="@style/AppTheme"
+            android:theme="@style/AppTheme.BlackMenu"
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".Activity.FoodResultActivity"
-            android:theme="@style/AppTheme" />
-        <activity android:name=".Activity.FoodShopActivity" />
-        <activity android:name=".Activity.PostReviewsActivity"></activity>
+            android:theme="@style/AppTheme.WhiteMenu" />
+        <activity android:name=".Activity.FoodShopActivity"
+            android:theme="@style/AppTheme.WhiteMenu"
+            />
     </application>
 
 </manifest>

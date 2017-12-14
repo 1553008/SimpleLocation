@@ -2,21 +2,16 @@ package com.example.hoangdung.simplelocation.Activity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Color;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,9 +21,8 @@ import com.example.hoangdung.simplelocation.Adapter.FoodShopListAdapter;
 import com.example.hoangdung.simplelocation.Fragments.FoodListFragment;
 import com.example.hoangdung.simplelocation.Fragments.FoodShopDirectionFragment;
 import com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO.DirectionsResponse;
-import com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO.Polyline;
 import com.example.hoangdung.simplelocation.GoogleDirectionsClient.GoogleDirectionsQuery;
-import com.example.hoangdung.simplelocation.Interface.OnShopClickListener;
+import com.example.hoangdung.simplelocation.Interface.OnShopSwipeListener;
 import com.example.hoangdung.simplelocation.NearestPlacesClient.NearestPlacesPOJO.FoodShop;
 import com.example.hoangdung.simplelocation.ProgressWindowAnim;
 import com.example.hoangdung.simplelocation.R;
@@ -39,7 +33,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -47,18 +40,15 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.common.math.Quantiles;
 import com.google.maps.android.PolyUtil;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 
-public class FoodResultActivity extends AppCompatActivity implements OnMapReadyCallback, OnShopClickListener, GoogleMap.OnInfoWindowClickListener,
+public class FoodResultActivity extends AppCompatActivity implements OnMapReadyCallback, OnShopSwipeListener, GoogleMap.OnInfoWindowClickListener,
 GoogleMap.OnMarkerClickListener{
 
     @BindView(R.id.food_result_toolbar)
@@ -76,6 +66,7 @@ GoogleMap.OnMarkerClickListener{
     Location lastLocation;
     ProgressWindowAnim<DotsProgressIndicator> progressWindow;
     com.google.android.gms.maps.model.Polyline polylines;
+    private int shopChosenIndex;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,6 +77,10 @@ GoogleMap.OnMarkerClickListener{
         Intent intent = getIntent();
         foodShopArrayList =  intent.getParcelableArrayListExtra("shops");
         Log.d("MapsActivity","Food Shops received from Food Finder Activity");
+
+        //Set Toolbar
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Init Google Map
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -153,7 +148,7 @@ GoogleMap.OnMarkerClickListener{
     }
 
     @Override
-    public void onClick(FoodShop foodShop, int mode) {
+    public void onSwiped(FoodShop foodShop, int position, int mode) {
         //If user swipe to see direction
         if(mode == FoodShopListAdapter.FIND_DIRECTION){
             queryFoodShopDirection(foodShop);
@@ -161,6 +156,7 @@ GoogleMap.OnMarkerClickListener{
         else if(mode == FoodShopListAdapter.DISPLAY_INFO){
             startFoodShopActivity(foodShop);
         }
+        shopChosenIndex = position;
     }
 
     private void queryFoodShopDirection(FoodShop foodShop){
@@ -215,7 +211,7 @@ GoogleMap.OnMarkerClickListener{
     private void startFoodShopActivity(FoodShop foodShop){
         Intent intent = new Intent(FoodResultActivity.this,FoodShopActivity.class);
         intent.putExtra("shop",foodShop);
-        startActivity(intent);
+        startActivityForResult(intent,0);
     }
     @Override
     public void onBackPressed() {
@@ -272,5 +268,24 @@ GoogleMap.OnMarkerClickListener{
         public View getInfoContents(Marker marker) {
             return null;
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 0){
+            if(resultCode == RESULT_OK){
+                queryFoodShopDirection(foodShopArrayList.get(shopChosenIndex));
+            }
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home){
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

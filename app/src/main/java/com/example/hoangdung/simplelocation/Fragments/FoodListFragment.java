@@ -16,7 +16,7 @@ import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 
 import com.example.hoangdung.simplelocation.Adapter.FoodShopListAdapter;
-import com.example.hoangdung.simplelocation.Interface.OnShopClickListener;
+import com.example.hoangdung.simplelocation.Interface.OnShopSwipeListener;
 import com.example.hoangdung.simplelocation.NearestPlacesClient.NearestPlacesPOJO.FoodShop;
 import com.example.hoangdung.simplelocation.R;
 
@@ -75,7 +75,7 @@ public class FoodListFragment extends Fragment{
         mListView.addItemDecoration(new DividerItemDecoration(context,DividerItemDecoration.VERTICAL));
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(mListView);
     }
-    public void setOnShopClickListener(OnShopClickListener listener){
+    public void setOnShopClickListener(OnShopSwipeListener listener){
         adapter.listener = listener;
     }
 }

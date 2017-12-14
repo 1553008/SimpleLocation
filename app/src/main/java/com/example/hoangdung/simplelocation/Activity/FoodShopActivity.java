@@ -10,12 +10,17 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.example.hoangdung.simplelocation.Adapter.FoodShopPhotosAdapter;
 import com.example.hoangdung.simplelocation.Adapter.FoodShopReviewsAdapter;
@@ -51,6 +56,9 @@ import butterknife.ButterKnife;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class FoodShopActivity extends AppCompatActivity implements RatingDialogListener {
+
+    @BindView(R.id.food_shop_toolbar)
+    public android.support.v7.widget.Toolbar foodShopToolbar;
 
     @BindView(R.id.food_shop_name)
     public TextView foodShopName;
@@ -122,6 +130,8 @@ public class FoodShopActivity extends AppCompatActivity implements RatingDialogL
         ButterKnife.bind(this);
         progressWindowAnim = new ProgressWindowAnim(this,R.layout.progress_window_layout_2);
         foodShop = getIntent().getParcelableExtra("shop");
+        setSupportActionBar(foodShopToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setupFoodShopInfo();
     }
     //Setup FoodShop Information
@@ -345,6 +355,7 @@ public class FoodShopActivity extends AppCompatActivity implements RatingDialogL
                     }
                 }
         );
+
     }
     private void setupPanelLayout(){
         //Set up Sliding Panel Layout
@@ -443,12 +454,40 @@ public class FoodShopActivity extends AppCompatActivity implements RatingDialogL
             foodShopSlidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         }
         else
-            super.onBackPressed();
+        {
+            setResult(RESULT_CANCELED);
+            finish();
+
+        }
 
     }
 
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home)
+        {
+            setResult(RESULT_CANCELED);
+            finish();
+            return true;
+        }
+        if(item.getItemId() == R.id.find_direction)
+        {
+            setResult(RESULT_OK);
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.food_shop_menu,menu);
+        return true;
     }
 }

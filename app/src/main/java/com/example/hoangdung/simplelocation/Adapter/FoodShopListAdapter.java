@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.example.hoangdung.simplelocation.Interface.OnShopClickListener;
+import com.example.hoangdung.simplelocation.Interface.OnShopSwipeListener;
 import com.example.hoangdung.simplelocation.NearestPlacesClient.NearestPlacesPOJO.FoodShop;
 import com.example.hoangdung.simplelocation.R;
 import com.squareup.picasso.Picasso;
@@ -31,7 +31,7 @@ public class FoodShopListAdapter extends RecyclerView.Adapter<FoodShopListAdapte
     Context mContext;
     public static final int DISPLAY_INFO = 0;
     public static final int FIND_DIRECTION = 1;
-    public OnShopClickListener listener;
+    public OnShopSwipeListener listener;
     public FoodShopListAdapter(Context context,ArrayList<FoodShop> foodShops){
         mContext = context;
         foodShopArrayList = foodShops;
@@ -112,7 +112,7 @@ public class FoodShopListAdapter extends RecyclerView.Adapter<FoodShopListAdapte
 
         @Override
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-            listener.onClick(foodShopArrayList.get(viewHolder.getAdapterPosition()),
+            listener.onSwiped(foodShopArrayList.get(viewHolder.getAdapterPosition()),viewHolder.getAdapterPosition() ,
                     direction == ItemTouchHelper.LEFT ? DISPLAY_INFO : FIND_DIRECTION);
             notifyItemChanged(viewHolder.getAdapterPosition());
         }

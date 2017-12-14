@@ -6,6 +6,6 @@ import com.example.hoangdung.simplelocation.NearestPlacesClient.NearestPlacesPOJ
  * Created by hoangdung on 12/11/17.
  */
 
-public interface OnShopClickListener {
-    public void onClick(FoodShop foodShop, int mode);
+public interface OnShopSwipeListener {
+    public void onSwiped(FoodShop foodShop, int position, int mode);
 }
