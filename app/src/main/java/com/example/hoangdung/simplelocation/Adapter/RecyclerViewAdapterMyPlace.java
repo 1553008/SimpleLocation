@@ -1,14 +1,7 @@
 package com.example.hoangdung.simplelocation.Adapter;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.os.AsyncTask;
-import android.os.Debug;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,29 +12,19 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.hoangdung.simplelocation.FirebaseCenter;
-import com.example.hoangdung.simplelocation.GooglePlacesClient.GooglePlacesGeoQuery;
 import com.example.hoangdung.simplelocation.Interface.ItemClickListener;
 import com.example.hoangdung.simplelocation.Interface.ItemLongClickListener;
 import com.example.hoangdung.simplelocation.R;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.GeoDataClient;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceBufferResponse;
 import com.google.android.gms.location.places.PlacePhotoMetadata;
 import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
 import com.google.android.gms.location.places.PlacePhotoMetadataResponse;
-import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 import com.google.android.gms.location.places.PlacePhotoResponse;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.squareup.picasso.Picasso;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,8 +38,8 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
     private SparseBooleanArray selectedItems = new SparseBooleanArray();
 
     Context mContext;
-    final String LABEL_FONT = "HelveticaNeue-Roman.otf";
-    final String ADDRESS_FONT = "HelveticaNeue-Roman.otf";
+    final String LABEL_FONT = "fonts/HelveticaNeue-Roman.otf";
+    final String ADDRESS_FONT = "fonts/HelveticaNeue-Roman.otf";
     private List<FirebaseCenter.Location> data = new ArrayList<>();
     private ItemClickListener itemClickListener;
     private ItemLongClickListener itemLongClickListener;
@@ -108,9 +91,9 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
             checkBox.setVisibility(View.INVISIBLE);
         holder.label.setText(data.get(position).label);
         holder.address.setText(data.get(position).address);
-        Typeface lableFont = Typeface.createFromAsset(mContext.getAssets(),LABEL_FONT);
+       /* Typeface lableFont = Typeface.createFromAsset(mContext.getAssets(),LABEL_FONT);
         holder.label.setTypeface(lableFont);
-        Typeface addressFont = Typeface.createFromAsset(mContext.getAssets(),ADDRESS_FONT);
+        Typeface addressFont = Typeface.createFromAsset(mContext.getAssets(),ADDRESS_FONT);*/
         holder.setItemClickListener(itemClickListener);
         holder.setItemLongClickListener(itemLongClickListener);
         holder.itemView.setLongClickable(true);

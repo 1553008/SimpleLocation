@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:ignore="MissingPrefix"
+    >
 
     <android.support.v7.widget.Toolbar
         android:layout_width="match_parent"
@@ -21,6 +23,7 @@
         android:gravity="bottom"
         sothree:umanoShadowHeight="4dp">
 
+        <!-- Main content -->
         <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
@@ -47,12 +50,14 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
+                        <!-- Food Shop Avartar -->
                         <ImageView
                             android:id="@+id/food_shop_avartar"
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/foodShopBigAvartarSize"
                             android:layout_margin="5dp" />
 
+                        <!-- Food Shop Name -->
                         <TextView
                             android:id="@+id/food_shop_name"
                             android:layout_width="wrap_content"
@@ -60,14 +65,19 @@
                             android:layout_marginHorizontal="10dp"
                             android:textColor="@color/md_black_1000"
                             android:textSize="20sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            fontPath="@string/food_shop_name_font"
+                            />
 
+                        <!-- Food Shop Address -->
                         <TextView
                             android:id="@+id/food_shop_address"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginHorizontal="10dp"
-                            android:textSize="16sp" />
+                            android:textSize="16sp"
+                            fontPath="@string/food_shop_address_font"
+                            />
 
                         <View
                             android:layout_width="match_parent"
@@ -76,8 +86,11 @@
 
                         <RelativeLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            xmlns:app="http://schemas.android.com/apk/res-auto"
+                            >
 
+                            <!-- Food Shop Reviews Info -->
                             <RelativeLayout
                                 android:id="@+id/food_shop_reviews_info_container"
                                 android:layout_width="wrap_content"
@@ -93,14 +106,20 @@
                                     android:gravity="center"
                                     android:textColor="@color/md_black_1000"
                                     android:textSize="16sp"
-                                    android:textStyle="bold" />
+                                    android:textStyle="bold"
+                                     />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_below="@id/food_shop_num_reviews"
-                                    android:text="Reviews" />
+                                    android:text="Reviews"
+                                    app:smart_font="@string/food_shop_info_font"
+                                    fontPath="@string/food_shop_info_font"
+
+                                    />
                             </RelativeLayout>
+                            <!-- Food Shop Photos Info -->
 
                             <RelativeLayout
                                 android:id="@+id/food_shop_photos_info_container"
@@ -119,13 +138,18 @@
                                     android:gravity="center"
                                     android:textColor="@color/md_black_1000"
                                     android:textSize="16sp"
-                                    android:textStyle="bold" />
+                                    android:textStyle="bold"
+
+                                    />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_below="@id/food_shop_num_photos"
-                                    android:text="Photos" />
+                                    android:text="Photos"
+                                    fontPath="@string/food_shop_info_font"
+
+                                    />
                             </RelativeLayout>
 
 
@@ -151,9 +175,12 @@
 
         </android.support.v4.widget.NestedScrollView>
 
+        <!-- Sliding up Panel content-->
         <android.support.design.widget.CoordinatorLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            >
 
             <LinearLayout
                 android:id="@+id/anchor"
@@ -180,7 +207,8 @@
                         android:text="Xem Reviews"
                         android:textColor="@color/md_black_1000"
                         android:textSize="30sp"
-                        android:textStyle="bold" />
+                        fontPath="@string/food_shop_reviews_header_font"
+                        />
 
                     <com.example.hoangdung.simplelocation.CircularTextview
                         android:id="@+id/food_shop_ratings_text"
@@ -189,7 +217,8 @@
                         android:gravity="center"
                         android:padding="7dp"
                         android:textColor="@color/md_white_1000"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"
+                        />
 
                 </LinearLayout>
 

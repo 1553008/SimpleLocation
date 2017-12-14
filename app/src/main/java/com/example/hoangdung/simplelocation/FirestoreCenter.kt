@@ -126,7 +126,7 @@ public class FirestoreCenter {
                 .document(shopID.toString())
                 .collection("food_reviews")
         if(lastEndSnapshot != null){
-            foodReviewsRef.limit(numOfReviews.toLong())
+            foodReviewsRef.limit(numOfReviews)
                     .orderBy("timestamp",Query.Direction.DESCENDING)
                     .startAfter(lastEndSnapshot!!)
                     .get()
@@ -163,7 +163,7 @@ public class FirestoreCenter {
             //Get old ratings and calculate new ratings
             var oldNumOfRatings = snapshot.get("numOfRatings") as Long
             var newNumRatings = oldNumOfRatings + 1;
-            var oldTotalRatings = snapshot.get("averageRatings").toString().toDouble()  * oldNumOfRatings.toDouble()
+            var oldTotalRatings = snapshot.get("averageRatings") as Double  * oldNumOfRatings.toDouble()
             var newTotalRatings = (oldTotalRatings + review.ratings)/newNumRatings
 
             //Insert new comment
@@ -171,6 +171,8 @@ public class FirestoreCenter {
 
             //Update ratings
             transaction.update(dbRef.collection(FOOD_SHOPS_PATH).document(shopID.toString()),"averageRatings",newTotalRatings)
+            transaction.update(dbRef.collection(FOOD_SHOPS_PATH).document(shopID.toString()),"numOfRatings",newNumRatings)
+            Log.d("MapsActivity","Success publish review")
             return@runTransaction null
         }.addOnCompleteListener(callback)
     }

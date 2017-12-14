@@ -16,6 +16,8 @@ import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.squareup.picasso.Picasso;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+
 /**
  * Created by hoangdung on 10/30/17.
  */
@@ -36,6 +38,11 @@ public class MyApplication extends Application {
                 Picasso.with(imageView.getContext()).cancelRequest(imageView);
             }
         });
+        /*CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/HelveticaLTStd- steevo -Roman - pointed .ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build()
+        );*/
     }
 
     public static int getNavigationBarHeight(Context context, int orientation){

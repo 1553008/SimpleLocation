@@ -1,6 +1,6 @@
 package com.example.hoangdung.simplelocation.Activity;
 
-import android.graphics.Color;
+import android.content.Context;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -12,8 +12,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,10 +28,8 @@ import com.example.hoangdung.simplelocation.NearestPlacesClient.NearestPlacesPOJ
 import com.example.hoangdung.simplelocation.ProgressWindowAnim;
 import com.example.hoangdung.simplelocation.R;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -49,12 +45,10 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import de.hdodenhof.circleimageview.CircleImageView;
-import me.zhanghai.android.materialratingbar.MaterialRatingBar;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class FoodShopActivity extends AppCompatActivity implements RatingDialogListener {
 
@@ -297,6 +291,7 @@ public class FoodShopActivity extends AppCompatActivity implements RatingDialogL
                             //If this review is newly added
                             //Add it to adapter and notify changes
                             if(documentChange.getType() == DocumentChange.Type.ADDED){
+                                Log.d("MapsActivity","There is changes in reviews");
                                 FoodShopReview foodShopReview = new FoodShopReview();
                                 foodShopReview.fromMap(documentChange.getDocument().getData());
                                 adapter.getFoodShopReviews().add(0,foodShopReview);
@@ -342,7 +337,11 @@ public class FoodShopActivity extends AppCompatActivity implements RatingDialogL
                     public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
                         DecimalFormat decimalFormat = new DecimalFormat("#.##");
                         decimalFormat.setRoundingMode(RoundingMode.CEILING);
-                        foodShopRatingText.setText(decimalFormat.format(Double.parseDouble((String) documentSnapshot.get("averageRatings"))));
+                        double newRatings = Double.parseDouble(documentSnapshot.get("averageRatings").toString());
+
+                        foodShop.averageRatings = newRatings;
+                        foodShopRatingText.setText(decimalFormat.format(newRatings));
+                        foodShop.numOfRatings = (long) documentSnapshot.get("numOfRatings");
                     }
                 }
         );
@@ -361,8 +360,7 @@ public class FoodShopActivity extends AppCompatActivity implements RatingDialogL
                         }
                 );
 
-        Typeface typeface = MyApplication.getTypeface("HelveticaNeueLTPro-Th.otf",this);
-        foodShopHeaderText1.setTypeface(typeface);
+
         //Display Food Shop Ratings
         DecimalFormat decimalFormat = new DecimalFormat("#.#");
         decimalFormat.setRoundingMode(RoundingMode.CEILING);
@@ -402,7 +400,8 @@ public class FoodShopActivity extends AppCompatActivity implements RatingDialogL
         progressWindowAnim.showProgress();
         FoodShopReview review = new FoodShopReview();
         review.comment = s;
-        review.ratings = i*10/5;
+        DecimalFormat decimalFormat = new DecimalFormat("#.#");
+        review.ratings = Double.parseDouble(decimalFormat.format(i*10/5));
         review.userID = FirestoreCenter.Companion.getInstance().getDbAuth().getUid();
         FirestoreCenter.Companion.getInstance().publishReview(
                 foodShop.shopID,
@@ -446,5 +445,10 @@ public class FoodShopActivity extends AppCompatActivity implements RatingDialogL
         else
             super.onBackPressed();
 
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }

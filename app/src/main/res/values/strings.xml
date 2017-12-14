@@ -10,4 +10,10 @@
     <integer name="hungry_drawer_item_id">2</integer>
 
 
+    <!-- TODO: Fonts for FoodShopActivity -->
+    <string name="food_shop_reviews_header_font">fonts/food_shop_activity/HelveticaNeueLTStd-LtIt.otf</string>
+    <string name="food_shop_name_font">fonts/food_shop_activity/HelveticaLTStd- steevo -Roman - pointed .ttf</string>
+    <string name="food_shop_address_font">fonts/food_shop_activity/Muli-ExtraLight.ttf</string>
+    <string name="food_shop_info_font">fonts/food_shop_activity/HelveticaNeueLTStd-Roman.otf</string>
+
 </resources>
