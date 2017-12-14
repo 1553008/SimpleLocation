@@ -107,16 +107,15 @@ public class MyPlacesActivity extends AppCompatActivity implements ActionMode.Ca
                         Log.d("khanh","itemClick");
                         Log.d("khanh","position: " + String.valueOf(position));
 
+
                         mRcvAdapter.toggleSelection(position);
                         TextView item  = (TextView)findViewById(R.id.remove_place);
                         if (mRcvAdapter.isSelectedItemsListEmpty())
                         {
-                            item.setEnabled(false);
-                            item.setTextColor(Color.parseColor("#a1a39f"));
+                             actionMode.finish();
                         }
                         else
                         {
-                            item.setEnabled(true);
                             item.setTextColor(Color.parseColor("#ffffff"));
                         }
 
