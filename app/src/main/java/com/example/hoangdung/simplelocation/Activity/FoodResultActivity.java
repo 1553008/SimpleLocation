@@ -58,7 +58,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 
-public class FoodResultActivity extends AppCompatActivity implements OnMapReadyCallback, OnShopClickListener, GoogleMap.OnInfoWindowClickListener{
+public class FoodResultActivity extends AppCompatActivity implements OnMapReadyCallback, OnShopClickListener, GoogleMap.OnInfoWindowClickListener,
+GoogleMap.OnMarkerClickListener{
 
     @BindView(R.id.food_result_toolbar)
     public Toolbar mToolbar;
@@ -148,6 +149,7 @@ public class FoodResultActivity extends AppCompatActivity implements OnMapReadyC
         this.googleMap.setInfoWindowAdapter(new FoodShopInfoWindowAdapter());
         this.googleMap.getUiSettings().setMapToolbarEnabled(false);
         this.googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+        this.googleMap.setOnInfoWindowClickListener(this);
     }
 
     @Override
@@ -227,7 +229,15 @@ public class FoodResultActivity extends AppCompatActivity implements OnMapReadyC
     @Override
     public void onInfoWindowClick(Marker marker) {
         queryFoodShopDirection((FoodShop) marker.getTag());
+        marker.hideInfoWindow();
     }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        marker.showInfoWindow();
+        return false;
+    }
+
 
     public class FoodShopInfoWindowAdapter implements GoogleMap.InfoWindowAdapter{
         private final View mWindow;
