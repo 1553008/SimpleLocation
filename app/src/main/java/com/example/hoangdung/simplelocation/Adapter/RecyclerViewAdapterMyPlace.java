@@ -133,6 +133,13 @@ public class RecyclerViewAdapterMyPlace extends RecyclerView.Adapter<RecyclerVie
         });
     }
 
+    public void selectAll()
+    {
+        for (int i = 0; i < getItemCount(); ++i)
+            selectedItems.put(i, true);
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
         return data.size();

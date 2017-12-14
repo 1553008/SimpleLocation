@@ -191,6 +191,9 @@ public class MyPlacesActivity extends AppCompatActivity implements ActionMode.Ca
                         }
                 );
                 break;
+            case R.id.select_all_place:
+                mRcvAdapter.selectAll();
+                break;
             default:
                 return false;
         }

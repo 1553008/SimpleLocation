@@ -5,4 +5,7 @@
     <item android:id="@+id/remove_place"
         android:title="Remove"
         />
+    <item android:id="@+id/select_all_place"
+        android:title="Select all"
+        />
 </menu>
