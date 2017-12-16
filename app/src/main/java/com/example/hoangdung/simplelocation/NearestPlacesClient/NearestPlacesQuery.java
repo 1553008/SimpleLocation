@@ -40,11 +40,11 @@ public class NearestPlacesQuery {
             @Override
             public void onResponse(Call<NearestPlacesResponse> call, Response<NearestPlacesResponse> response) {
                 //if response is successful
-                if(response.code() == 200)
+                if(response.code() == 200 && response.body().shops!= null && response.body().shops.size() !=0)
                 {
                     responseListener.onResponseComplete(response.body(),RESPONSE_SUCCESS);
                 }
-                else if(response.code() == 404)
+                else
                 {
                     responseListener.onResponseComplete(null,RESPONSE_FAILURE);
                 }

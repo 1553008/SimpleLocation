@@ -273,7 +273,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public void onComplete(@NonNull Task<Location> task) {
                     if (task.isComplete() && task.isSuccessful() && task.getResult()!=null) {
                         mLastknownLocation = task.getResult();
-                        //getCountryCode();
                         mMap.animateCamera(CameraUpdateFactory
                                 .newLatLngZoom(
                                         new LatLng(mLastknownLocation.getLatitude(), mLastknownLocation.getLongitude())
@@ -411,18 +410,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onBackPressed() {
-        //When Directions Fragment is visible, return to search fragment
+        //When Directions Fragment is visible, return to search fragment and updateUI
         if(mDirectionFragment != null && mDirectionFragment.isVisible())
         {
             super.onBackPressed();
             mMap.clear();
-            addMarkers(Arrays.asList(mSearchPlace.getLatLng()),R.drawable.ic_normal_marker);
-            updateCamera(Arrays.asList(mSearchPlace.getLatLng()));
+            if(mSearchPlace!=null){
+                addMarkers(Arrays.asList(mSearchPlace.getLatLng()),R.drawable.ic_normal_marker);
+                updateCamera(Arrays.asList(mSearchPlace.getLatLng()));
+            }
             updateSearchToolbar();
             return;
         }
         //Because when user search for a place successully, we allow them to press back button to return to current location
-        //Note: This should works only when direction fragment is invisible
         if(mSearchPlace != null){
             mSearchPlace = null;
             mMap.clear();
@@ -455,15 +455,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onSearchFragmentUIReady(SearchFragment searchFragment) {
                 updateSearchToolbar();
             }
-
-            //Create Search Fragment for real Searching Result
+            //Start Search Activity
             @Override
             public void onSearchFragmentClicked(SearchFragment searchFragment) {
                 Intent intent = new Intent(MapsActivity.this,SearchActivity.class);
                 startActivityForResult(intent,SEARCH_ACTIVITY_REQUEST_CODE);
             }
-
-            //Update Map UI using Current Location
+            //1.Automatically Update UI when SearchFragment comebacks to displayoolbar
+            //2.Start Directions Fragment When users back from MyPlaceActivity
             @Override
             public void onSearchFragmentResumed(SearchFragment searchFragment) {
                 if(mMap!=null)
@@ -498,7 +497,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Log.d(TAG, "showLastKnowLocation from onsearchFragmentResumed");
                 }
             }
-
             /**
              * This callback will be called when Find Direction Icon is clicked
              * It will create DirectionsFragment
@@ -514,6 +512,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 secondLocation.setPlace(mSearchPlace);
                 startDirectionsFragment(firstLocation,secondLocation);
             }
+
         });
     }
 
@@ -528,6 +527,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             task.addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
                 @Override
                 public void onComplete(@NonNull Task<PlaceBufferResponse> task) {
+                    //If place is received, save the data. Also add markers to map, and update toolbar
                     if(task.isSuccessful() && task.getResult()!= null){
 
                         //Get place result, copy it and release buffer
@@ -542,7 +542,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 }
             });
-
         }
         else if(resultCode == RESULT_CANCELED){
 

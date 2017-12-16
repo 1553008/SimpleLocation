@@ -67,7 +67,9 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
         mListView.setHasFixedSize(true);
         mListView.setAdapter(mAdapter);
 
-        //Search Edit Text Setup
+        //Search Edit Text wait for user to actually finish inputing before suggesting places
+        // last_text_edit is the time of user last input
+        // delay is the time interval to start suggest after users stop inputting
         input_finish_checker = new Runnable() {
             @Override
             public void run() {
@@ -77,6 +79,7 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
                 }
             }
         };
+
         mSearchText.requestFocus();
         mSearchText.setCursorVisible(true);
         mSearchText.addTextChangedListener(new TextWatcher() {
@@ -84,12 +87,12 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
             }
-
+            //When users are still typing, remove the runnable
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 handler.removeCallbacks(input_finish_checker);
             }
-
+            //After users stop input, wait for delay seconds to query suggestplaces
             @Override
             public void afterTextChanged(Editable s) {
                 if(s.length() > 0){

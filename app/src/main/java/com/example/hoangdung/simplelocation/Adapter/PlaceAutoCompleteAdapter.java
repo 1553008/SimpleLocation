@@ -92,8 +92,6 @@ public class PlaceAutoCompleteAdapter extends RecyclerView.Adapter<PlaceAutoComp
                     task.addOnCompleteListener(new OnCompleteListener<AutocompletePredictionBufferResponse>() {
                         @Override
                         public void onComplete(@NonNull com.google.android.gms.tasks.Task<AutocompletePredictionBufferResponse> task) {
-
-
                             if (task.isSuccessful() && task.getResult() != null) {
                                 //If there are some results, store the results and update UI
                                 if(task.getResult().getCount() != 0){
@@ -128,7 +126,6 @@ public class PlaceAutoCompleteAdapter extends RecyclerView.Adapter<PlaceAutoComp
                                         }
                                     });
                                 }
-
                             }
                             else{
 

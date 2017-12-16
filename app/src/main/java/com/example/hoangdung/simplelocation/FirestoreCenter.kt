@@ -43,24 +43,10 @@ public class FirestoreCenter {
     interface OnFoodCategoriesListener {
         fun onComplete(task: Task<QuerySnapshot>);
     }
-    fun getFoodCategories(listener: OnFoodCategoriesListener){
-        dbRef.collection(FOOD_CATEGORIES_PATH)
-                .get()
-                .addOnCompleteListener { task->
-                    listener.onComplete(task)
-                }
-    }
+
     /**
      * Add New User to database using Firebase Authentication
      */
-    fun addUser(user: FireStoreUser){
-        dbRef.collection(DB_USERS_PATH)
-                .document(user.id)
-                .set(user.toMap(), SetOptions.merge())
-                .addOnSuccessListener{
-                    Log.d("MapsActivity","User: " + dbAuth.currentUser?.uid!! + "is added successfully")
-                }
-    }
 
     @IgnoreExtraProperties
     abstract class FireStoreUser{
@@ -102,7 +88,22 @@ public class FirestoreCenter {
             return map
         }
     }
-    public fun getPhotos(shopID: Long,numOfPhotos: Long, lastEndSnapshot: DocumentSnapshot?, callback: OnCompleteListener<QuerySnapshot>){
+    fun getFoodCategories(listener: OnFoodCategoriesListener) {
+        dbRef.collection(FOOD_CATEGORIES_PATH)
+                .get()
+                .addOnCompleteListener { task ->
+                    listener.onComplete(task)
+                }
+    }
+    fun addUser(user: FireStoreUser){
+        dbRef.collection(DB_USERS_PATH)
+                .document(user.id)
+                .set(user.toMap(), SetOptions.merge())
+                .addOnSuccessListener{
+                    Log.d("MapsActivity","User: " + dbAuth.currentUser?.uid!! + "is added successfully")
+                }
+    }
+    fun getPhotos(shopID: Long,numOfPhotos: Long, lastEndSnapshot: DocumentSnapshot?, callback: OnCompleteListener<QuerySnapshot>){
         val photosRef = dbRef.collection(FirestoreCenter.FOOD_SHOPS_PATH)
                 .document(shopID.toString())
                 .collection("photos")
@@ -120,8 +121,7 @@ public class FirestoreCenter {
         }
 
     }
-
-    public fun getReviews(shopID: Long, numOfReviews: Long, lastEndSnapshot: DocumentSnapshot?, callback: OnCompleteListener<QuerySnapshot>){
+    fun getReviews(shopID: Long, numOfReviews: Long, lastEndSnapshot: DocumentSnapshot?, callback: OnCompleteListener<QuerySnapshot>){
         val foodReviewsRef = dbRef.collection(FirestoreCenter.FOOD_SHOPS_PATH)
                 .document(shopID.toString())
                 .collection("food_reviews")
@@ -180,5 +180,11 @@ public class FirestoreCenter {
         return dbRef.collection(FOOD_SHOPS_PATH)
                 .document(shopID.toString())
                 .addSnapshotListener(callback)
+    }
+    fun getShop(shopID: Long,callback: OnCompleteListener<DocumentSnapshot>){
+        val docRef = dbRef.collection(FOOD_SHOPS_PATH)
+                .document(shopID.toString())
+                .get()
+                .addOnCompleteListener(callback);
     }
 }

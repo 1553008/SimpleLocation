@@ -67,12 +67,14 @@ class DirectionsFragment constructor(): Fragment() {
                 override fun onItemClick(position: Int) {
                     var intent = Intent(context,SearchActivity::class.java);
                     fragment.positionClicked = position
+                    //Start Search Activity when an item is clicked
                     fragment.startActivityForResult(intent,0);
                 }
                 //Item Delete Listener
                 override fun onItemDelete(position: Int) {
                     directionsAdapter.mPlacesList.removeAt(position)
                     directionsAdapter.notifyDataSetChanged()
+                    //Notify back to listener when an item is deleted
                     fragment.directionsFragmentCallback?.onLocationChanged(directionsAdapter.mPlacesList,fragment)
                 }
 
@@ -98,7 +100,7 @@ class DirectionsFragment constructor(): Fragment() {
                         myPlace.place = responseTask.result[0]
                         //if new position added
                         if(positionClicked == directionsAdapter.mPlacesList.size){
-                            //add it to adapter and notify changes
+                            //add it to adapter and notify changes for listener
                             directionsAdapter.mPlacesList.add(myPlace)
                             directionsAdapter.notifyDataSetChanged()
                             directionsFragmentCallback?.onLocationChanged(directionsAdapter.mPlacesList,this)
@@ -108,7 +110,7 @@ class DirectionsFragment constructor(): Fragment() {
                             //if the old place is different than new one
                             if(directionsAdapter.mPlacesList[positionClicked].place?.id != responseTask.result[0].id)
                             {
-                                //replace the old one and notify changes
+                                //replace the old one and notify changes for listener
                                 directionsAdapter.mPlacesList[positionClicked] = myPlace
                                 directionsAdapter.notifyDataSetChanged()
                                 directionsFragmentCallback?.onLocationChanged(directionsAdapter.mPlacesList,this)

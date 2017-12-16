@@ -123,6 +123,14 @@ public class FoodShopActivity extends AppCompatActivity implements RatingDialogL
 
     //FoodShop data
     private ListenerRegistration shopChangeListener;
+
+    //Used for EventListener of Reviews, Photos, Shop
+    //Because EventListener will always be called when it is invoked the first time,
+    //We may want keep track of this behavior
+    boolean shopLoadingFirstTime = true;
+    boolean photosLoadingFirstTime = true;
+    boolean reviewsLoadingFirstTime = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -137,8 +145,6 @@ public class FoodShopActivity extends AppCompatActivity implements RatingDialogL
     //Setup FoodShop Information
     void setupFoodShopInfo() {
         setupShopContent();
-        setupPhotosContent();
-        setupReviewsContent();
         setupPanelLayout();
 
     }
@@ -230,10 +236,7 @@ public class FoodShopActivity extends AppCompatActivity implements RatingDialogL
             @Override
             public void onLoadMore(int current_page) {
                 long restNumOfReviews = numOfTotalsReviews - previousTotal;
-                Log.d("MapsActivity", "numOfTotalReviews: " + String.valueOf(numOfTotalPhotos));
-                Log.d("MapsActivity", "previousTotal: " + String.valueOf(previousTotal));
-                Log.d("MapsActivity", "rest: " + String.valueOf(restNumOfReviews));
-                //If there are no reviews to query, return
+                //If there are no reviews , return
                 if (restNumOfReviews == 0)
                     return;
                 //If it is larger than number of photos we going to load next, use nextMaxPhotos to query
@@ -279,33 +282,44 @@ public class FoodShopActivity extends AppCompatActivity implements RatingDialogL
                         if(task.isSuccessful()){
                             if (task.getResult().getDocuments().size() == 0)
                                 return;
-                            ArrayList<FoodShopReview> reviewsArrayList = new ArrayList<>();
-                            for (DocumentSnapshot documentSnapshot : task.getResult()) {
-                                reviewsArrayList.add(documentSnapshot.toObject(FoodShopReview.class));
+                            synchronized (FoodShopActivity.this){
+                                ArrayList<FoodShopReview> reviewsArrayList = new ArrayList<>();
+                                for (DocumentSnapshot documentSnapshot : task.getResult()) {
+                                    reviewsArrayList.add(documentSnapshot.toObject(FoodShopReview.class));
+                                }
+                                lastReviewSnapshot = task.getResult().getDocuments().get(task.getResult().getDocuments().size()-1);
+                                adapter.setFoodShopReviews(reviewsArrayList);
+                                adapter.notifyDataSetChanged();
                             }
-                            lastReviewSnapshot = task.getResult().getDocuments().get(task.getResult().getDocuments().size()-1);
-                            adapter.setFoodShopReviews(reviewsArrayList);
-                            adapter.notifyDataSetChanged();
+
                         }
                     }
                 }
         );
 
         //Add Listener for reviews changes
+        //The listener will be always called the first time when this function is invoked eventhough the data are not changed
+        //We skip that first call and keep track of later calls
         reviewsChangeListener =  FirestoreCenter.Companion.getInstance().listenToReviewChanges(
                 foodShop.shopID,
                 new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(QuerySnapshot querySnapshot, FirebaseFirestoreException e) {
                         for(DocumentChange documentChange : querySnapshot.getDocumentChanges()){
+                            if(reviewsLoadingFirstTime){
+                                reviewsLoadingFirstTime = false;
+                                return;
+                            }
                             //If this review is newly added
-                            //Add it to adapter and notify changes
+                            //Add it to adapter and notify changes for recycler view to update UI
                             if(documentChange.getType() == DocumentChange.Type.ADDED){
-                                Log.d("MapsActivity","There is changes in reviews");
-                                FoodShopReview foodShopReview = new FoodShopReview();
-                                foodShopReview.fromMap(documentChange.getDocument().getData());
-                                adapter.getFoodShopReviews().add(0,foodShopReview);
-                                adapter.notifyItemInserted(0);
+                                synchronized (FoodShopActivity.this){
+                                    Log.d("MapsActivity","There is changes in reviews");
+                                    FoodShopReview foodShopReview = new FoodShopReview();
+                                    foodShopReview.fromMap(documentChange.getDocument().getData());
+                                    adapter.getFoodShopReviews().add(0,foodShopReview);
+                                    adapter.notifyItemInserted(0);
+                                }
                             }
                         }
                     }
@@ -324,12 +338,7 @@ public class FoodShopActivity extends AppCompatActivity implements RatingDialogL
         foodShopName.setText(foodShop.name);
         //Display Food Shop Adress
         foodShopAdress.setText(foodShop.address);
-        //Display Food Shop Num Reviews
-        foodShopNumReviews.setText(String.valueOf(foodShop.numOfRatings));
-        numOfTotalsReviews = foodShop.numOfRatings;
-        //Display Food Shop Num Photos
-        foodShopNumPhotos.setText(String.valueOf(foodShop.numOfPhotos));
-        numOfTotalPhotos = foodShop.numOfPhotos;
+
 
         //Show comment dialog when floating action button is clicked
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -339,22 +348,48 @@ public class FoodShopActivity extends AppCompatActivity implements RatingDialogL
             }
         });
 
-        //Add listener to
+        //Add listener when there are changes to this food shop
+        //Also listener will be called when we invoke it the first time
+        //Use this to get latest update of food shop
         shopChangeListener = FirestoreCenter.Companion.getInstance().listenToShop(
                 foodShop.shopID,
                 new EventListener<DocumentSnapshot>() {
                     @Override
                     public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
-                        DecimalFormat decimalFormat = new DecimalFormat("#.##");
-                        decimalFormat.setRoundingMode(RoundingMode.CEILING);
-                        double newRatings = Double.parseDouble(documentSnapshot.get("averageRatings").toString());
+                        synchronized (FoodShopActivity.this){
 
-                        foodShop.averageRatings = newRatings;
-                        foodShopRatingText.setText(decimalFormat.format(newRatings));
-                        foodShop.numOfRatings = (long) documentSnapshot.get("numOfRatings");
+                            //Save and Display Rating Text
+                            DecimalFormat decimalFormat = new DecimalFormat("#.##");
+                            decimalFormat.setRoundingMode(RoundingMode.CEILING);
+                            double newRatings = Double.parseDouble(documentSnapshot.get("averageRatings").toString());
+                            foodShop.averageRatings = newRatings;
+                            foodShopRatingText.setText(decimalFormat.format(newRatings));
+                            foodShopRatingText.setSolidColor(getResources().getColor(R.color.green));
+
+                            //Save number of total photos, number of total reviews
+                            foodShop.numOfPhotos = (long) documentSnapshot.get("numOfPhotos");
+                            numOfTotalPhotos = foodShop.numOfPhotos;
+                            foodShop.numOfRatings = (long) documentSnapshot.get("numOfRatings");
+                            numOfTotalsReviews = foodShop.numOfRatings;
+
+                            //Display Food Shop Num Reviews
+                            foodShopNumReviews.setText(String.valueOf(foodShop.numOfRatings));
+                            //Display Food Shop Num Photos
+                            foodShopNumPhotos.setText(String.valueOf(foodShop.numOfPhotos));
+
+                            //Setup Photo and Review features
+                            if(shopLoadingFirstTime)
+                            {
+                                setupPhotosContent();
+                                setupReviewsContent();
+                                shopLoadingFirstTime = false;
+                            }
+
+                        }
                     }
                 }
         );
+
 
     }
     private void setupPanelLayout(){
@@ -372,11 +407,7 @@ public class FoodShopActivity extends AppCompatActivity implements RatingDialogL
                 );
 
 
-        //Display Food Shop Ratings
-        DecimalFormat decimalFormat = new DecimalFormat("#.#");
-        decimalFormat.setRoundingMode(RoundingMode.CEILING);
-        foodShopRatingText.setText(String.valueOf(decimalFormat.format(foodShop.averageRatings)));
-        foodShopRatingText.setSolidColor(getResources().getColor(R.color.green));
+
 
     }
     private void showDialog() {

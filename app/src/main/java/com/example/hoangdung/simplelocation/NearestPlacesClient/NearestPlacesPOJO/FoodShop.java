@@ -16,35 +16,27 @@ public class FoodShop implements Parcelable {
     @SerializedName("lat")
     @Expose
     public double lat;
-
     @SerializedName("lng")
     @Expose
     public double lng;
-
     @SerializedName("shop_id")
     @Expose
     public long shopID;
-
     @SerializedName("averageRatings")
     @Expose
     public double averageRatings;
-
     @SerializedName("avartar")
     @Expose
     public String avartar;
-
     @SerializedName("name")
     @Expose
     public String name;
-
     @SerializedName("address")
     @Expose
     public String address;
-
     @SerializedName("numOfRatings")
     @Expose
     public long numOfRatings;
-
     @SerializedName("numOfPhotos")
     @Expose
     public long numOfPhotos;

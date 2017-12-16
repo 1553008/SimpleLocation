@@ -80,6 +80,7 @@ public class WelcomeActivity extends AppCompatActivity {
                     FINE_LOCATION_REQUEST);
         }
     }
+
     /**
      *
      */
@@ -109,8 +110,10 @@ public class WelcomeActivity extends AppCompatActivity {
         }
         mCallbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+            //When user logins successfully through Facebook
             @Override
             public void onSuccess(final LoginResult loginResult) {
+                //Query user information which is used for firebase authentication
                 GraphRequest graphRequest =  GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
                             @Override
                             public void onCompleted(final JSONObject object, GraphResponse response) {
@@ -171,6 +174,7 @@ public class WelcomeActivity extends AppCompatActivity {
         //If the user is already loggin, go straight to the MapsActivity
         return FirestoreAuth.Companion.getInstance().getDbAuth().getCurrentUser() != null;
     }
+
     private void goToMapsActivity(){
         Intent intent = new Intent(WelcomeActivity.this,MapsActivity.class);
         WelcomeActivity.this.startActivity(intent);
