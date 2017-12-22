@@ -7,15 +7,18 @@
     android:fitsSystemWindows="false"
     tools:context=".Activity.MapsActivity">
 
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+
+    <fragment
+        xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/map"
         tools:context=".Activity.MapsActivity"
-        android:name="com.google.android.gms.maps.SupportMapFragment" />
-
-
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_below="@id/toolbar_container"
+        />
+    <!-- Toolbar Container -->
     <FrameLayout
         android:id="@+id/toolbar_container"
         android:layout_width="match_parent"
@@ -26,7 +29,9 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar_container">
+        android:layout_below="@id/toolbar_container"
+        android:id="@+id/somelayout"
+        >
 
         <android.support.design.widget.CoordinatorLayout
             android:layout_width="wrap_content"
@@ -40,7 +45,10 @@
                 android:layout_alignBottom="@id/map"
                 android:layout_alignEnd="@id/map"
                 android:layout_gravity="bottom|end"
-                android:src="@drawable/ic_navigate">
+                android:src="@drawable/ic_navigate"
+                android:layout_marginRight="@dimen/myplaceButtonMarginRight"
+                android:layout_marginBottom="@dimen/myplaceButtonMarginBottom"
+                >
 
             </android.support.design.widget.FloatingActionButton>
         </android.support.design.widget.CoordinatorLayout>

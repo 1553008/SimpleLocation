@@ -277,6 +277,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 .newLatLngZoom(
                                         new LatLng(mLastknownLocation.getLatitude(), mLastknownLocation.getLongitude())
                                         , DEFAULT_ZOOM));
+                        mMap.setMyLocationEnabled(true);
                         SharedPreferences sharedPreferences = getSharedPreferences("UserInfo",0);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putLong("LastKnownLocationLat",Double.doubleToRawLongBits(mLastknownLocation.getLatitude()));
@@ -355,7 +356,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 public void run() {
                                     startActivityForResult(intent, 0);
                                 }
-                            },100);
+                            },200);
                         }
                         else if(position == MapsActivity.this.getResources().getInteger(R.integer.hungry_drawer_item_id)){
                             final Intent intent = new Intent(MapsActivity.this,FoodFinderActivity.class);
@@ -365,7 +366,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 public void run() {
                                     startActivityForResult(intent,FOOD_FINDER_REQUEST_CODE);
                                 }
-                            },100);
+                            },200);
                         }
                         return true;
                     }
@@ -373,16 +374,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .withAccountHeader(accountHeader)
                 .withFullscreen(true)
                 .build();
-        /*if(Build.VERSION.SDK_INT >= 19){
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-        }
-        if(Build.VERSION.SDK_INT >= 21){
-            setWindowFlags(this,WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,true);
-            getWindow().setStatusBarColor(Color.TRANSPARENT);
-        }
-        if(Build.VERSION.SDK_INT >= 19){
-            mDrawer.getDrawerLayout().setFitsSystemWindows(false);
-        }*/
+
     }
 
     /**
@@ -491,10 +483,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         showLastknownLocation();
                         mMarkerPlaces.clear();
                     }
+                    updateSearchToolbar();
+                    updateFloatingActionBtn();
 
-
-                    Log.d(TAG, "onSearchFragmentResumed");
-                    Log.d(TAG, "showLastKnowLocation from onsearchFragmentResumed");
                 }
             }
             /**
@@ -547,9 +538,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         }
 
-
     }
 
+    private void updateFloatingActionBtn(){
+        if(mSearchFragment.isVisible()){
+            CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) mLocateBtn.getLayoutParams();
+            params.bottomMargin = (int) getResources().getDimension(R.dimen.myplaceButtonMarginBottom);
+            params.rightMargin = (int) getResources().getDimension(R.dimen.myplaceButtonMarginRight);
+            return;
+        }
+    }
     private void updateSearchToolbar(){
         if(mSearchPlace == null){
             mSearchFragment.setTitle("Search here");

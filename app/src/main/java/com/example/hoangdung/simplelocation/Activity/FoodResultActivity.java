@@ -67,6 +67,7 @@ GoogleMap.OnMarkerClickListener{
     ProgressWindowAnim<DotsProgressIndicator> progressWindow;
     com.google.android.gms.maps.model.Polyline polylines;
     private int shopChosenIndex;
+    FoodListFragment foodListFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +92,7 @@ GoogleMap.OnMarkerClickListener{
         //Init Food List Fragment
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         FoodListFragment foodListFragment = FoodListFragment.newInstance(getApplicationContext(),foodShopArrayList);
+        this.foodListFragment = foodListFragment;
         foodListFragment.setOnShopClickListener(this);
         transaction.add(R.id.fragment_container,foodListFragment);
         transaction.commit();
@@ -135,6 +137,7 @@ GoogleMap.OnMarkerClickListener{
                 }
             }
         });
+        googleMap.setMyLocationEnabled(true);
     }
 
     @Override
@@ -157,6 +160,15 @@ GoogleMap.OnMarkerClickListener{
             startFoodShopActivity(foodShop);
         }
         shopChosenIndex = position;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //Scroll to previous chosen shop's position
+        if(foodListFragment != null && foodListFragment.isVisible()){
+            foodListFragment.mListView.scrollToPosition(shopChosenIndex);
+        }
     }
 
     private void queryFoodShopDirection(FoodShop foodShop){
@@ -288,4 +300,5 @@ GoogleMap.OnMarkerClickListener{
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

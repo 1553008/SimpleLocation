@@ -16,6 +16,8 @@ import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.squareup.picasso.Picasso;
 
+import java.text.DecimalFormat;
+
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 /**
@@ -78,5 +80,9 @@ public class MyApplication extends Application {
     public static Typeface getTypeface(String fontName,Context context){
         Typeface font = Typeface.createFromAsset(context.getAssets(),fontName);
         return font;
+    }
+    public static String formatNumber(double number){
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        return decimalFormat.format(number);
     }
 }

@@ -22,6 +22,7 @@
             android:gravity="fill_vertical"
             android:layout_marginLeft="10dp"
             android:background="@android:color/transparent"
+            android:maxLines="1"
             />
     </LinearLayout>
 

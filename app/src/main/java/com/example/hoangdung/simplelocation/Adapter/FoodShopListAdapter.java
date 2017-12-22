@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.hoangdung.simplelocation.Interface.OnShopSwipeListener;
+import com.example.hoangdung.simplelocation.MyApplication;
 import com.example.hoangdung.simplelocation.NearestPlacesClient.NearestPlacesPOJO.FoodShop;
 import com.example.hoangdung.simplelocation.R;
 import com.squareup.picasso.Picasso;
@@ -56,7 +57,7 @@ public class FoodShopListAdapter extends RecyclerView.Adapter<FoodShopListAdapte
         holder.ratingBar.setNumStars(10);
         holder.ratingBar.setRating((float) foodShopArrayList.get(position).averageRatings);
         //Load shop ratinng into textview
-        holder.ratingText.setText(String.valueOf(foodShopArrayList.get(position).averageRatings));
+        holder.ratingText.setText(MyApplication.formatNumber(foodShopArrayList.get(position).averageRatings));
 
     }
 
