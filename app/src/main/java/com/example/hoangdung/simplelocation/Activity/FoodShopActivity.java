@@ -1,7 +1,10 @@
 package com.example.hoangdung.simplelocation.Activity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
+import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -27,11 +30,17 @@ import com.example.hoangdung.simplelocation.Adapter.FoodShopReviewsAdapter;
 import com.example.hoangdung.simplelocation.CircularTextview;
 import com.example.hoangdung.simplelocation.EndlessRecyclerOnScrollListener;
 import com.example.hoangdung.simplelocation.FirestoreCenter;
+import com.example.hoangdung.simplelocation.GoogleDirectionsClient.DirectionsPOJO.DirectionsResponse;
+import com.example.hoangdung.simplelocation.GoogleDirectionsClient.GoogleDirectionsQuery;
 import com.example.hoangdung.simplelocation.MyApplication;
 import com.example.hoangdung.simplelocation.NearestPlacesClient.FoodShopReview;
 import com.example.hoangdung.simplelocation.NearestPlacesClient.NearestPlacesPOJO.FoodShop;
+import com.example.hoangdung.simplelocation.NearestPlacesClient.NearestPlacesQuery;
 import com.example.hoangdung.simplelocation.ProgressWindowAnim;
 import com.example.hoangdung.simplelocation.R;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentChange;
@@ -483,6 +492,7 @@ public class FoodShopActivity extends AppCompatActivity implements RatingDialogL
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -491,9 +501,40 @@ public class FoodShopActivity extends AppCompatActivity implements RatingDialogL
             return true;
         }
         if (item.getItemId() == R.id.find_direction) {
-            setResult(RESULT_OK);
-            finish();
-            return true;
+            progressWindowAnim.showProgress();
+            final Intent intent = new Intent(this,FoodShopDirectionActivity.class);
+            Task<Location> lastLocationTask = LocationServices.getFusedLocationProviderClient(this).getLastLocation();
+            lastLocationTask.addOnCompleteListener(new OnCompleteListener<Location>() {
+                @Override
+                public void onComplete(@NonNull Task<Location> task) {
+                    if(task.isSuccessful()){
+                        Location location = task.getResult();
+                        final double lat = task.getResult().getLatitude();
+                        final double lng = task.getResult().getLongitude();
+                        GoogleDirectionsQuery query = new GoogleDirectionsQuery.Builder()
+                                .withOrigin(new LatLng(lat,lng))
+                                .withDestination(new LatLng(foodShop.lat,foodShop.lng))
+                                .buid();
+                        query.query(new GoogleDirectionsQuery.OnDirectionsResultListener() {
+                            @Override
+                            public void onDirectionsResult(DirectionsResponse directionsResponse, int resultCode) {
+                                if(resultCode == GoogleDirectionsQuery.RESPONSE_SUCCESS){
+                                    intent.putExtra("direction",directionsResponse);
+                                    intent.putExtra("source",new LatLng(lat,lng));
+                                    intent.putExtra("dest",new LatLng(foodShop.lat,foodShop.lng));
+                                    startActivity(intent);
+                                }
+                                else
+                                {
+                                    Toast.makeText(FoodShopActivity.this,"Something wrong happened, try again!",Toast.LENGTH_LONG).show();
+                                }
+                                progressWindowAnim.hideProgress();
+                            }
+                        });
+
+                    }
+                }
+            });
         }
         return super.onOptionsItemSelected(item);
     }

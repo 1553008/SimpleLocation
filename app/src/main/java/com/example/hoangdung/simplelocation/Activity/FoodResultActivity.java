@@ -97,8 +97,6 @@ GoogleMap.OnMarkerClickListener{
         transaction.add(R.id.fragment_container,foodListFragment);
         transaction.commit();
 
-
-
     }
 
     @SuppressLint("MissingPermission")
