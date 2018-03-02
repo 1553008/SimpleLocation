@@ -2,7 +2,7 @@
 SimpleLocation is all about Map and inspired by Google Map, it is created as a purpose for studying Android. Key feature that makes our app prominent is Nearest Street Food Vendor.
 
 ## Demo
-
+[![Demo](https://img.youtube.com/vi/QPNvd-no4ok/0.jpg)](https://www.youtube.com/watch?v=QPNvd-no4ok)
 ## Install
 
 * Clone the project
