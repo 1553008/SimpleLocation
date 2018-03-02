@@ -10,6 +10,7 @@ SimpleLocation is all about Map and inspired by Google Map, it is created as a p
 
 * Clone the project
 * Build project with Android Studio
+
 **Note:** *If you have any issue while building this project, you can contact us through this email: lhdung1997@gmail.com*
 
 ## Development Environment
