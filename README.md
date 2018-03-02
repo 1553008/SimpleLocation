@@ -41,6 +41,7 @@ SimpleLocation is all about Map and inspired by Google Map, it is created as a p
 
 ## Acknowledgements:
 * Thanks Mr. Thanh T.Ho for guiding us through this project
+* Thanks Foody for amazing food shop data
 * Inspired by Google Map application
 
 ## Contribution:
