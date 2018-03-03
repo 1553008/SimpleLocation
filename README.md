@@ -29,12 +29,17 @@ SimpleLocation is all about Map and inspired by Google Map, it is created as a p
 **Note:** *If you have any issue while building this project, you can contact us through this email: lhdung1997@gmail.com*
 
 ## Development Environment
+
 * Compatible with Android 5.0 and above
 * Android code mainly written in Java, some written in Kotlin. In future, we will convert all code into Kotlin because of its advantages
 * Cloud Functions are written in NodeJs with version specified by Google Cloud Function
 * Android Studio 3.0.1
 
+## Applied Techniques
+
+
 ## External Libraries and Frameworks
+
 * [Material Drawer by mikepenz](https://github.com/mikepenz/MaterialDrawer) - UI Library
 * [SlidingUp Panel by sothree](https://github.com/umano/AndroidSlidingUpPanel) - UI Library
 * [Tagview by Cutta](https://github.com/Cutta/TagView) - UI Library
@@ -55,14 +60,17 @@ SimpleLocation is all about Map and inspired by Google Map, it is created as a p
 * [FuzzyWuzzy](https://github.com/xdrop/fuzzywuzzy) - String Searching Library
 
 ## Authors:
+
 * Dung H.Lam - Analysis, Architecture Design, Developer- Junior at Information Technology, University of Science, HCM, Vietnam
 * Khanh Q.Nguyen - Architecture Design, Developer, Quality Control - unior at Information Technology, University of Science, HCM, Vietnam
 
 ## Acknowledgements:
+
 * Thanks Mr. Thanh T.Ho for guiding us through this project
 * Thanks Foody for amazing food shop data
 * Inspired by Google Map application
 
 ## Contribution:
+
 Any contribution, pull request is welcome. If you want to use our project for any purpose, please contact our email: *lhdung1997@gmail.com*
 
