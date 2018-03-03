@@ -9,10 +9,7 @@ SimpleLocation is all about Map and inspired by Google Map, it is created as a p
 ## Screenshots
 
 <p display="inline" margin="auto">
-   <img src="https://i.imgur.com/VPULa4W.jpg" width="150">
-   <img src="" width="">
-   <img src="" width="">
-   <img src="" width="">
+   <a href="https://ibb.co/nvaBHn"><img src="https://preview.ibb.co/mcQYV7/image.png" alt="image" border="0"></a>
 </p>
 
 ## Install
