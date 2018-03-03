@@ -37,6 +37,13 @@ SimpleLocation is all about Map and inspired by Google Map, it is created as a p
 
 ## Applied Techniques
 
+* Handling Rest API calls with Retrofit
+* Implementing OnScrollListener for RecyclerView to achieve "just in time" data loading
+* K-d tree for spatial index of geographic locations
+* Use Queue as an underlying algorithm to query k-nearest-locations
+* Model-View-Controller model and Dependency Injection with Butterknife
+* Managing database with Firebase, Firestore
+* Managing our Rest API with Google Cloud Function
 
 ## External Libraries and Frameworks
 
@@ -51,6 +58,7 @@ SimpleLocation is all about Map and inspired by Google Map, it is created as a p
 * [ButterKnife](http://jakewharton.github.io/butterknife/) - Dependency Injection Library
 * [Retrofit](http://square.github.io/retrofit/) - HTTP Network Communication Library
 * [GSON](https://github.com/google/gson) - Convert JSON to Java Object and otherwise.
+* [GeoKdbush](https://github.com/mourner/geokdbush) - The fastest spatial index for geographic locations in JavaScript
 * Google Firebase
 * Google Firestore
 * Google Cloud Functions
@@ -61,14 +69,14 @@ SimpleLocation is all about Map and inspired by Google Map, it is created as a p
 
 ## Authors:
 
-* Dung H.Lam - Analysis, Architecture Design, Developer- Junior at Information Technology, University of Science, HCM, Vietnam
-* Khanh Q.Nguyen - Architecture Design, Developer, Quality Control - unior at Information Technology, University of Science, HCM, Vietnam
+* **Dung H.Lam** - *Analyst, Design Architect, Developer*- **Junior at Information Technology, University of Science, HCM**, Vietnam
+* **Khanh Q.Nguyen** - *Design Architect, Developer, Quality Control* - **Junior at Information Technology, University of Science, HCM, Vietnam**
 
 ## Acknowledgements:
 
-* Thanks Mr. Thanh T.Ho for guiding us through this project
-* Thanks Foody for amazing food shop data
-* Inspired by Google Map application
+* Thanks **Mr. Ho Tuan Thanh** for guiding us through this project
+* Thanks **Foody** for amazing food shop data
+* Inspired by **Google Map** application
 
 ## Contribution:
 
