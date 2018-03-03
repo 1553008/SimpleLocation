@@ -36,9 +36,12 @@ SimpleLocation is all about Map and inspired by Google Map, it is created as a p
 * Android Studio 3.0.1
 
 ## Features:
+* Login with Facebook.
 * Searching places. Places near user's current location will be showed with highest priority.
 * Finding directions, users can choose and see information between 2 travel modes: bus and driving. Supports up to 23 waypoints
-* Finding nearest food street vendors based on user's current locations and food name. Users can find directions to food shop and see shop's information including ratings, reviews, photos, adresses. 
+* Finding nearest food street vendors based on user's current locations and food name. Users can find directions to food shop and see shop's information including ratings, reviews, photos, adresses. Users are enable to leave reviews and ratings.
+* Intuitive, Colorful UI.
+* Smooth, Fast, Stable UX.
 
 ## Applied Techniques
 
