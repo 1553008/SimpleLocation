@@ -6,6 +6,13 @@ SimpleLocation is all about Map and inspired by Google Map, it is created as a p
   <a href="https://www.youtube.com/watch?v=QPNvd-no4ok"><img src="https://img.youtube.com/vi/QPNvd-no4ok/0.jpg" alt="IMAGE ALT TEXT"></a>
 </div>
 
+## Screenshots
+
+<p display="block" margin="auto">
+    <img src="https://imgur.com/aY1CyHj" width="150">
+  
+</p>
+
 ## Install
 
 * Clone the project
