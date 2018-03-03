@@ -35,6 +35,11 @@ SimpleLocation is all about Map and inspired by Google Map, it is created as a p
 * Cloud Functions are written in NodeJs with version specified by Google Cloud Function
 * Android Studio 3.0.1
 
+## Features:
+* Searching places. Places near user's current location will be showed with highest priority.
+* Finding directions, users can choose and see information between 2 travel modes: bus and driving. Supports up to 23 waypoints
+* Finding nearest food street vendors based on user's current locations and food name. Users can find directions to food shop and see shop's information including ratings, reviews, photos, adresses. 
+
 ## Applied Techniques
 
 * Handling Rest API calls with Retrofit
