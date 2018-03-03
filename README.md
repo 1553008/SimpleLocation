@@ -10,7 +10,15 @@ SimpleLocation is all about Map and inspired by Google Map, it is created as a p
 
 <p display="inline" margin="auto">
    <a href="https://ibb.co/nvaBHn"><img src="https://preview.ibb.co/mcQYV7/image.png" alt="image" border="0" width="150"></a>
-  <a href="https://ibb.co/icMwiS"><img src="https://preview.ibb.co/cMzSq7/image.png" alt="image" border="0"></a>
+  <a href="https://ibb.co/icMwiS"><img src="https://preview.ibb.co/cMzSq7/image.png" alt="image" border="0" width="150"></a>
+  <a href="https://ibb.co/khjMHn"><img src="https://preview.ibb.co/c6UXOS/image.png" alt="image" border="0" width="150"></a>
+  <a href="https://ibb.co/ghK5cn"><img src="https://preview.ibb.co/bLyLA7/image.png" alt="image" border="0" width="150"></a>
+  <a href="https://ibb.co/gvzriS"><img src="https://preview.ibb.co/ejoTV7/image.png" alt="image" border="0" width="150"></a>
+  <a href="https://ibb.co/eQcYxn"><img src="https://preview.ibb.co/gLN0cn/image.png" alt="image" border="0" width="150"></a>
+  <a href="https://ibb.co/bYByV7"><img src="https://preview.ibb.co/mCtCq7/image.png" alt="image" border="0" width="150"></a>
+  <a href="https://ibb.co/dEQWiS"><img src="https://preview.ibb.co/fn143S/image.png" alt="image" border="0" width="150"></a>
+  <a href="https://ibb.co/gBRMiS"><img src="https://preview.ibb.co/di6MiS/image.png" alt="image" border="0" width="150"></a>
+  <a href="https://ibb.co/byPwHn"><img src="https://preview.ibb.co/nQ8dV7/image.png" alt="image" border="0" width="150"></a>
 </p>
 
 ## Install
